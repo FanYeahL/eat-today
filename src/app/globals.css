@@ -1,0 +1,109 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /*
+   * 配色 token（单一可信源）。
+   * 值以「R G B」通道形式存放，配合 tailwind 的 rgb(var(--x) / <alpha>) 用法。
+   * 换肤只改这里的通道值，组件不用动。
+   * 当前主题：简约 ins · 通透浅蓝（清新自然）。
+   */
+  --c-base: 247 251 255; /* #f7fbff 极淡天空白，通透底色 */
+  --c-surface: 255 255 255; /* #ffffff 卡片/面板（纯白） */
+  --c-surface-2: 238 246 253; /* #eef6fd 卡片悬浮态（极淡蓝） */
+  --c-brand: 111 177 227; /* #6fb1e3 淡天空蓝（主色：边框/重点） */
+  --c-brand-soft: 124 146 168; /* #7c92a8 蓝灰（次要文字/链接） */
+  --c-accent: 47 161 122; /* #2fa17a 草木绿（高亮/选中/hover，浅底可读） */
+  --c-accent-hot: 63 143 208; /* #3f8fd0 天空蓝（渐变端/按钮，白字可读） */
+  --c-accent-pink: 224 99 76; /* #e0634c 珊瑚红（错误/提示） */
+  --c-info: 45 150 168; /* #2d96a8 青色（距离/金额/数字） */
+  --c-gold: 224 168 60; /* #e0a83c 琥珀金（评分） */
+  --c-ink: 38 60 78; /* #263c4e 主文字（深蓝灰，高对比） */
+  --c-ink-muted: 108 130 150; /* #6c8296 次文字（蓝灰） */
+  --c-paper: 38 60 78; /* #263c4e 中性前景 */
+
+  /* 旧变量名沿用，指向通道，保持 body 背景/前景一致 */
+  --background: rgb(var(--c-base));
+  --foreground: rgb(var(--c-ink));
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+  /* 关掉移动端点击高亮的灰/紫色块（点标题、按钮时残留的方框） */
+  -webkit-tap-highlight-color: transparent;
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  /* 隐藏滚动条（滚轮选择器用） */
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+/*
+ * 水底氛围动画（WaterAmbience 用）
+ * ─────────────────────────────────────────────
+ * 全部只跑 transform/opacity，走合成层不重排。组件用内联 style 注入
+ * 时长/延迟做随机错峰，所以这里只定义"运动形状"，不写时长。
+ */
+
+/* 锦鲤横游：从左侧外缓游到右侧外，配合极缓上下摆与轻微俯仰 */
+@keyframes koi-swim {
+  0% { transform: translateX(-24vw) translateY(0) rotate(2deg); }
+  25% { transform: translateX(12vw) translateY(-14px) rotate(-3deg); }
+  50% { transform: translateX(48vw) translateY(8px) rotate(2deg); }
+  75% { transform: translateX(84vw) translateY(-10px) rotate(-2deg); }
+  100% { transform: translateX(124vw) translateY(0) rotate(2deg); }
+}
+
+/* 锦鲤尾鳍轻摆（套在内层元素上，与横游解耦） */
+@keyframes koi-tail {
+  0%, 100% { transform: rotate(-4deg); }
+  50% { transform: rotate(5deg); }
+}
+
+/* 气泡上升：从底部升到顶部，带左右轻摆 + 涨缩呼吸 + 渐隐 */
+@keyframes bubble-rise {
+  0% { transform: translateY(0) translateX(0) scale(0.7); opacity: 0; }
+  12% { opacity: 0.7; }
+  50% { transform: translateY(-46vh) translateX(10px) scale(1.05); }
+  85% { opacity: 0.5; }
+  100% { transform: translateY(-92vh) translateX(-6px) scale(0.85); opacity: 0; }
+}
+
+/* 阳光光柱：极缓地左右摇曳 + 明暗呼吸 */
+@keyframes light-shaft {
+  0%, 100% { transform: translateX(-50%) rotate(8deg) scaleY(1); opacity: 0.35; }
+  50% { transform: translateX(-46%) rotate(6deg) scaleY(1.08); opacity: 0.55; }
+}
+
+/*
+ * 细雨平湖涟漪（RippleLayer 的 splash 用）
+ * ─────────────────────────────────────────────
+ * 1px 极细线条，从 0 缓缓扩散到全屏 ~70%，透明度 0.4→0 平滑递减。
+ * 曲线 cubic-bezier(0.1,0.8,0.3,1) 先快后慢的极强阻尼，像丝线在水面荡漾。
+ * 多圈靠组件注入不同 animation-delay 做时差重叠。
+ */
+@keyframes pond-ripple {
+  0% { transform: translate(-50%, -50%) scale(0.04); opacity: 0; }
+  10% { opacity: 0.9; }
+  100% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
+}
+
+/* 尊重减少动效偏好：关掉氛围层的持续动画 */
+@media (prefers-reduced-motion: reduce) {
+  .ambience-anim {
+    animation: none !important;
+  }
+}

@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>试水 · 有食欲方向</title>
+<style>
+  /* ============ 全局 ============ */
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; }
+  body {
+    font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: #1a1411;
+    color: #2b211c;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 24px 0 60px;
+    gap: 20px;
+  }
+
+  /* 顶部说明 + 切换 */
+  .hdr { color: #f3e6d8; text-align: center; max-width: 760px; padding: 0 20px; }
+  .hdr h1 { font-size: 20px; letter-spacing: .04em; margin-bottom: 6px; }
+  .hdr p { font-size: 13px; color: #b9a892; line-height: 1.7; }
+  .switch { display: flex; gap: 10px; margin-top: 14px; justify-content: center; }
+  .switch button {
+    font-size: 13px; font-weight: 700; padding: 9px 18px; border-radius: 999px;
+    border: 1.5px solid #5a4634; background: #2b211c; color: #d8c4ad; cursor: pointer;
+    transition: all .2s;
+  }
+  .switch button.on { background: #ff5a36; border-color: #ff5a36; color: #fff; box-shadow: 0 6px 20px rgba(255,90,54,.4); }
+
+  /* 手机框 */
+  .stage { display: flex; gap: 40px; flex-wrap: wrap; justify-content: center; align-items: flex-start; }
+  .phone {
+    width: 360px; height: 740px; border-radius: 44px; overflow: hidden; position: relative;
+    box-shadow: 0 30px 80px rgba(0,0,0,.55); border: 10px solid #0c0907;
+  }
+  .label { text-align: center; color: #f3e6d8; font-size: 13px; font-weight: 700; margin-bottom: 12px; letter-spacing: .05em; }
+  .screen { width: 100%; height: 100%; overflow-y: auto; overflow-x: hidden; position: relative; }
+  .screen::-webkit-scrollbar { display: none; }
+
+  /* ============ 方向 A:暖食票根老虎机 ============ */
+  .A {
+    background:
+      radial-gradient(circle at 20% 0%, #ffd9a0 0%, transparent 45%),
+      radial-gradient(circle at 90% 30%, #ffb27a 0%, transparent 40%),
+      linear-gradient(180deg, #fff3e2 0%, #ffe8cf 100%);
+    padding: 22px 18px 40px;
+  }
+  .A .topbar { display:flex; justify-content:space-between; align-items:center; font-size:12px; color:#a8744a; font-weight:700; letter-spacing:.1em; }
+  .A .kicker { display:inline-block; margin: 18px 0 4px; font-size:11px; font-weight:800; letter-spacing:.35em; color:#e0502c; text-transform:uppercase; }
+  .A h2 { font-size: 30px; font-weight: 900; color:#3a1d10; line-height:1.15; }
+  .A h2 .hot { color:#ff5a36; }
+  .A .sub { font-size:13px; color:#9c6f4e; margin-top:8px; }
+
+  /* 票根 */
+  .ticket {
+    margin-top: 22px; background:#fffaf3; border-radius:16px; position:relative;
+    box-shadow: 0 14px 34px rgba(180,90,40,.22); padding: 0 0 6px;
+    border: 1px solid #ffe0bd;
+  }
+  .ticket::before, .ticket::after {
+    content:""; position:absolute; width:22px; height:22px; border-radius:50%;
+    background:#ffe8cf; top:96px;
+  }
+  .ticket::before { left:-12px; box-shadow: inset -3px 0 4px rgba(180,90,40,.12); }
+  .ticket::after  { right:-12px; box-shadow: inset 3px 0 4px rgba(180,90,40,.12); }
+  .tk-head {
+    padding: 16px 20px; border-bottom: 2px dashed #ffcfa0; display:flex; justify-content:space-between; align-items:center;
+  }
+  .tk-head .t { font-size:14px; font-weight:900; color:#c2410c; letter-spacing:.05em; }
+  .tk-head .n { font-size:11px; color:#bb8a63; font-weight:700; }
+  .reels { display:flex; align-items:stretch; padding: 18px 14px 8px; gap: 8px; }
+  .reel {
+    flex:1; background:linear-gradient(180deg,#fff,#fff4e6); border-radius:12px; padding:14px 6px;
+    text-align:center; box-shadow: inset 0 -3px 0 rgba(190,110,60,.12), 0 2px 6px rgba(190,110,60,.1);
+    position:relative;
+  }
+  .reel .emo { font-size:42px; line-height:1; filter: drop-shadow(0 4px 6px rgba(0,0,0,.15)); }
+  .reel .nm { font-size:13px; font-weight:800; color:#46291a; margin-top:8px; }
+  .reel .rl { font-size:10px; color:#b07a4e; margin-top:2px; }
+  .reel.plus { flex:0 0 18px; display:flex; align-items:center; justify-content:center; background:none; box-shadow:none; color:#e0a878; font-size:18px; font-weight:900; padding:0; }
+  .tk-foot { padding: 6px 20px 14px; display:flex; justify-content:space-between; align-items:center; }
+  .tk-foot .meta { font-size:11px; color:#a87a54; font-weight:700; }
+  .stamp {
+    border:2.5px solid #d6442a; color:#d6442a; font-weight:900; font-size:12px; padding:4px 10px;
+    border-radius:8px; transform:rotate(-9deg); letter-spacing:.1em; opacity:.9;
+  }
+  .A .actions { display:flex; gap:10px; margin-top:20px; }
+  .A .btn {
+    flex:1; padding:15px; border-radius:14px; border:none; font-size:15px; font-weight:900; cursor:pointer; letter-spacing:.05em;
+  }
+  .A .btn.main { background:linear-gradient(180deg,#ff7a45,#ff5226); color:#fff; box-shadow:0 10px 24px rgba(255,82,38,.45); }
+  .A .btn.ghost { background:#fff3e2; color:#c2410c; border:1.5px solid #ffc59a; }
+
+  /* 店铺:暖色「菜单条」而非点评卡 */
+  .A .shoptitle { margin:26px 0 12px; font-size:13px; font-weight:900; color:#7a4a28; display:flex; align-items:center; gap:8px; }
+  .A .shoptitle::after { content:""; flex:1; height:2px; background:repeating-linear-gradient(90deg,#ffc59a 0 6px,transparent 6px 12px); }
+  .menurow {
+    background:#fffaf3; border-radius:14px; padding:14px 16px; margin-bottom:10px; display:flex; align-items:center; gap:14px;
+    box-shadow:0 6px 16px rgba(190,110,60,.12); border:1px solid #ffe6cc; position:relative; overflow:hidden;
+  }
+  .menurow::before { content:""; position:absolute; left:0; top:0; bottom:0; width:5px; background:linear-gradient(#ff7a45,#ff5226); }
+  .menurow .em { font-size:26px; }
+  .menurow .info { flex:1; min-width:0; }
+  .menurow .nm { font-size:15px; font-weight:800; color:#3a1d10; }
+  .menurow .ad { font-size:11px; color:#9c6f4e; margin-top:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .menurow .rt { text-align:right; }
+  .menurow .dist { font-size:16px; font-weight:900; color:#e0502c; }
+  .menurow .du { font-size:10px; color:#bb8a63; }
+  .menurow .go { font-size:11px; font-weight:800; color:#fff; background:#ff5a36; padding:5px 10px; border-radius:8px; margin-top:6px; display:inline-block;}
+
+  /* ============ 方向 B:全屏大字 ============ */
+  .B {
+    background: linear-gradient(165deg, #ff6a3d 0%, #ff3d2e 55%, #c81e3a 100%);
+    color:#fff; padding: 0; display:flex; flex-direction:column;
+  }
+  .B .nav { display:flex; justify-content:space-between; padding:20px 22px 0; font-size:12px; font-weight:800; letter-spacing:.1em; opacity:.85; }
+  .B .center { flex:1; display:flex; flex-direction:column; justify-content:center; padding: 0 26px; }
+  .B .bigemo { font-size:130px; line-height:1; filter: drop-shadow(0 16px 28px rgba(0,0,0,.35)); margin-bottom: 6px; }
+  .B .axis { font-size:10px; font-weight:900; letter-spacing:.4em; opacity:.7; text-transform:uppercase; }
+  .B h2 {
+    font-size: 66px; font-weight: 900; line-height: .95; letter-spacing:-.02em;
+    text-shadow: 0 6px 20px rgba(0,0,0,.25); margin: 4px 0 2px;
+  }
+  .B .pinyin { font-size:13px; font-weight:700; letter-spacing:.3em; opacity:.65; }
+  .B .pair { margin-top: 26px; display:flex; gap:10px; }
+  .B .chip {
+    background: rgba(255,255,255,.16); backdrop-filter: blur(6px); border:1px solid rgba(255,255,255,.3);
+    border-radius: 12px; padding: 10px 14px; display:flex; align-items:center; gap:8px; font-size:13px; font-weight:800;
+  }
+  .B .chip .e { font-size:22px; }
+  .B .nearby {
+    margin-top: 28px; background: rgba(0,0,0,.18); border-radius:16px; padding: 4px;
+  }
+  .B .nb-row { display:flex; align-items:center; gap:12px; padding:13px 14px; border-radius:13px; }
+  .B .nb-row + .nb-row { border-top: 1px solid rgba(255,255,255,.12); }
+  .B .nb-row .rank { font-size:18px; font-weight:900; opacity:.5; width:20px; }
+  .B .nb-row .nm { flex:1; font-size:15px; font-weight:800; }
+  .B .nb-row .nm small { display:block; font-size:11px; font-weight:600; opacity:.7; margin-top:2px; }
+  .B .nb-row .d { font-size:15px; font-weight:900; }
+  .B .footer { padding: 18px 22px 28px; display:flex; gap:12px; align-items:center; }
+  .B .swipe { flex:1; text-align:center; font-size:13px; font-weight:800; opacity:.75; }
+  .B .lockbtn {
+    background:#fff; color:#e0301f; border:none; font-size:17px; font-weight:900; padding:16px 30px;
+    border-radius:16px; cursor:pointer; box-shadow:0 12px 30px rgba(0,0,0,.3); letter-spacing:.08em;
+  }
+  .B .arrow { font-size:30px; font-weight:900; opacity:.8; }
+
+  .hide { display:none !important; }
+  .note { color:#9a8a76; font-size:12px; max-width:760px; text-align:center; line-height:1.8; padding:0 24px; }
+  .note b { color:#ffcaa3; }
+</style>
+</head>
+<body>
+  <div class="hdr">
+    <h1>🍜 试水 · 两个「有食欲」方向</h1>
+    <p>都已换暖色系(番茄红 / 咖喱金 / 奶油底),重点给你看最像点评的<b style="color:#ffcaa3">结果页 + 店铺列表</b>怎么摆脱列表感。左右滑不动是静态稿,点按钮切换方向。</p>
+    <div class="switch">
+      <button id="bA" class="on" onclick="show('A')">A · 暖食票根老虎机</button>
+      <button id="bB" onclick="show('B')">B · 全屏大字</button>
+    </div>
+  </div>
+
+  <div class="stage">
+    <!-- 方向 A -->
+    <div id="wrapA">
+      <div class="label">A · 暖食票根老虎机 — 拟物小票 / 盖章定了</div>
+      <div class="phone">
+        <div class="screen A">
+          <div class="topbar"><span>☀️ 午饭 11:00–14:00</span><span>📖 干饭日记</span></div>
+          <span class="kicker">eat today</span>
+          <h2>今天<span class="hot">吃这个</span></h2>
+          <div class="sub">忙一上午了,歇会儿好好吃一顿 🍚</div>
+
+          <div class="ticket">
+            <div class="tk-head"><span class="t">🎰 今日干饭券</span><span class="n">NO.0623</span></div>
+            <div class="reels">
+              <div class="reel"><div class="emo">🍗</div><div class="nm">黄焖鸡米饭</div><div class="rl">★★★★★</div></div>
+              <div class="reel plus">+</div>
+              <div class="reel"><div class="emo">🥟</div><div class="nm">沙县馄饨</div><div class="rl">★★★★</div></div>
+              <div class="reel plus">+</div>
+              <div class="reel"><div class="emo">🧋</div><div class="nm">柠檬茶</div><div class="rl">★★★★</div></div>
+            </div>
+            <div class="tk-foot">
+              <span class="meta">中式 · 适中 · 不辣</span>
+              <span class="stamp">定 了 ✓</span>
+            </div>
+          </div>
+
+          <div class="actions">
+            <button class="btn ghost">↻ 再摇三个</button>
+            <button class="btn main">就吃这个 →</button>
+          </div>
+
+          <div class="shoptitle">🛵 附近吃黄焖鸡的店</div>
+          <div class="menurow">
+            <span class="em">🍗</span>
+            <div class="info"><div class="nm">杨铭宇黄焖鸡米饭</div><div class="ad">珞喻路 128 号 · 学生最爱</div></div>
+            <div class="rt"><div class="dist">240<span class="du">m</span></div><span class="go">导航 ›</span></div>
+          </div>
+          <div class="menurow">
+            <span class="em">🍚</span>
+            <div class="info"><div class="nm">福满楼家常菜</div><div class="ad">广埠屯街 5 号 · 也有黄焖鸡</div></div>
+            <div class="rt"><div class="dist">410<span class="du">m</span></div><span class="go">导航 ›</span></div>
+          </div>
+          <div class="menurow">
+            <span class="em">🍗</span>
+            <div class="info"><div class="nm">老王黄焖鸡(光谷店)</div><div class="ad">鲁磨路 88 号</div></div>
+            <div class="rt"><div class="dist">1.2<span class="du">km</span></div><span class="go">导航 ›</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 方向 B -->
+    <div id="wrapB" class="hide">
+      <div class="label">B · 全屏大字 — 一道菜占满屏 / 滑动换菜</div>
+      <div class="phone">
+        <div class="screen B">
+          <div class="nav"><span>☀️ 午饭</span><span>🎚️ 想换口味</span></div>
+          <div class="center">
+            <div class="bigemo">🍗</div>
+            <div class="axis">主 打</div>
+            <h2>黄焖鸡<br>米饭</h2>
+            <div class="pinyin">HUANG MEN JI</div>
+
+            <div class="pair">
+              <div class="chip"><span class="e">🥟</span>沙县馄饨</div>
+              <div class="chip"><span class="e">🧋</span>柠檬茶</div>
+            </div>
+
+            <div class="nearby">
+              <div class="nb-row"><span class="rank">1</span><span class="nm">杨铭宇黄焖鸡<small>珞喻路 128 号</small></span><span class="d">240m</span></div>
+              <div class="nb-row"><span class="rank">2</span><span class="nm">福满楼家常菜<small>也有黄焖鸡</small></span><span class="d">410m</span></div>
+              <div class="nb-row"><span class="rank">3</span><span class="nm">老王黄焖鸡<small>鲁磨路 88 号</small></span><span class="d">1.2km</span></div>
+            </div>
+          </div>
+          <div class="footer">
+            <span class="arrow">‹</span>
+            <span class="swipe">◀ 滑走换一道 ▶</span>
+            <button class="lockbtn">定了</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <p class="note">
+    A 的记忆点:<b>票根 + 盖章「定了」的仪式感</b>(契合你之前定的「盖章」黏性,见干饭日记方向);店铺做成「菜单条」左侧暖色封边,不是点评卡。<br>
+    B 的记忆点:<b>一道菜怼满全屏 + 超大字</b>,滑动换菜像翻菜单,信息克制到极致,最不像点评。<br>
+    两者都可加 emoji 轻动效;迁微信小程序时,A 的拟物质感纯 CSS 可还原,B 的滑动用小程序 swiper 原生支持。
+  </p>
+
+  <script>
+    function show(k){
+      document.getElementById('wrapA').classList.toggle('hide', k!=='A');
+      document.getElementById('wrapB').classList.toggle('hide', k!=='B');
+      document.getElementById('bA').classList.toggle('on', k==='A');
+      document.getElementById('bB').classList.toggle('on', k==='B');
+    }
+  </script>
+</body>
+</html>
