@@ -117,7 +117,7 @@ keywordOf(food) = food.shopKeyword ?? cuisineKeyword(food.cuisine)   // 现状�
 
 ### 2.1 ⚠️ 落库时的 shopKeyword 决策（防"附近可用性偏虚"）
 
-Phase 1 运行时查店仍是 `keywordOf = shopKeyword ?? cuisineKeyword(cuisine)`。但候选草案**只生成 `search`、不生成 `shopKeyword`**。若直接把新菜落库、又不补 `shopKeyword`，则每道新菜查店都退回到宽泛的菜系词（"家常菜/川菜/粤菜"），availability 门控会**偏虚**（几乎总是"附近有"，失去筛掉冷门菜的意义）。
+Phase 1 运行时查店仍是 `keywordOf = shopKeyword ?? cuisineKeyword(cuisine)`。候选草案**已按 A 变体生成部分 `shopKeyword`**（回退过宽/含专门店型品类的菜才补，见下）。若把回退过宽的新菜落库又不补 `shopKeyword`，则查店会退回到宽泛的菜系词（"家常菜/西餐厅/异国料理"），availability 门控会**偏虚**（几乎总是"附近有"，失去筛掉冷门菜的意义）。
 
 > ✅ **已定稿（方案 A 变体，user 拍板）**：只给"回退词过宽/不准"的菜补 `shopKeyword`（**店型/品类词，不是菜名**）；中式细分菜系走 `cuisineKeyword` 不补。已在 `gen-dish-candidates.mjs` 落实（`SHOP_KEYWORD` 映射 + 落库 lint 底线），本批 46 道有 `shopKeyword`（见 draft `_meta.shopKeywordMap`）。
 
