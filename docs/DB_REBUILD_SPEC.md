@@ -117,12 +117,22 @@ keywordOf(food) = food.shopKeyword ?? cuisineKeyword(food.cuisine)   // 现状�
 
 ### 2.1 ⚠️ 落库时的 shopKeyword 决策（防"附近可用性偏虚"）
 
-Phase 1 运行时查店仍是 `keywordOf = shopKeyword ?? cuisineKeyword(cuisine)`。但候选草案**只生成 `search`、不生成 `shopKeyword`**。若直接把新菜落库、又不补 `shopKeyword`，则每道新菜查店都退回到宽泛的菜系词（"家常菜/川菜/粤菜"），availability 门控会**偏虚**（几乎总是"附近有"，失去筛掉冷门菜的意义）。落库前**二选一，必须明确**：
+Phase 1 运行时查店仍是 `keywordOf = shopKeyword ?? cuisineKeyword(cuisine)`。但候选草案**只生成 `search`、不生成 `shopKeyword`**。若直接把新菜落库、又不补 `shopKeyword`，则每道新菜查店都退回到宽泛的菜系词（"家常菜/川菜/粤菜"），availability 门控会**偏虚**（几乎总是"附近有"，失去筛掉冷门菜的意义）。
 
-- **方案 A（推荐，若要保 availability 精度）**：落库脚本为每道新菜补 `shopKeyword`。可直接取 `search.displayQuery`（多数即菜名）或人工指定更易命中高德 POI 的店类型词。
-- **方案 B（若接受降级）**：Phase 1 **明确不依赖 availability 精准判断**——门控只做"这一菜系附近有没有店"的粗判，接受新菜普遍 fail-open。需在落库 PR 里写明这一取舍，避免误以为可用性是精确的。
+> ✅ **已定稿（方案 A 变体，user 拍板）**：只给"回退词过宽/不准"的菜补 `shopKeyword`（**店型/品类词，不是菜名**）；中式细分菜系走 `cuisineKeyword` 不补。已在 `gen-dish-candidates.mjs` 落实（`SHOP_KEYWORD` 映射 + 落库 lint 底线），本批 46 道有 `shopKeyword`（见 draft `_meta.shopKeywordMap`）。
 
-> 未定此项前**不得落库**。这是 `search` 与现有 shops API 之间唯一的真实耦合点。
+落库规则：
+
+1. **中式细分菜系**（川/湘/粤/东北/江浙…）默认**不补**——本身就是稳定 POI 类型词，`cuisineKeyword` 够用。
+2. **必须补**的是回退词过宽/不准的菜：
+   - `western-generic` 回退「西餐厅」太宽 → 牛排/焗饭/贝果/凯撒卷补更具体店型（牛排/贝果/轻食沙拉…）。
+   - `jpkr` 拉面/炸鸡/寿司/烤肉 → 补（日式拉面/炸鸡/寿司/日式烧肉），否则全退回「日本料理/韩国料理」太宽。
+   - `exotic`（尤其 `exotic-generic`/`mideast`/`indian`/`sea`）→ 补国别店型（印度菜/越南菜/泰国菜/土耳其烤肉/东南亚菜…）。
+   - 便利店/快餐/小吃品类（三明治/饭团/法包/鸡肉卷…）→ 补。
+3. **禁止**直接用 `displayQuery`（菜名）当 `shopKeyword`——菜名会 fail-closed（赌店招含菜名）。`shopKeyword` 必须是店型/品类词。示例：日式酱油拉面→`日式拉面`、韩式炸鸡→`炸鸡`、战斧牛排→`牛排`、印度咖喱羊肉饭→`印度菜`、越南猪肉法包→`越南菜`。
+4. **落库 lint 底线**（`gen-dish-candidates.mjs` 自检已实现）：凡 `cuisine ∈ {western-generic, exotic-generic, indian, mideast}`，或 `name` 命中 `拉面/炸鸡/牛排/寿司/烤肉/烧肉(非红烧)/三明治/贝果/法包/咖喱`，**必须**显式有 `shopKeyword`，且 `shopKeyword !== name`。缺失或等于菜名即自检失败，阻断落库。
+
+> 阶段目标 = 基础功能质量：availability 不需完美，但不能明显虚。此项已定，S3 可落库。
 
 ---
 

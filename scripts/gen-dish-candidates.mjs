@@ -62,6 +62,79 @@ const CUISINE_SEARCH = {
 };
 
 // ─────────────────────────────────────────────
+// shopKeyword（§2.1 方案 A 变体，user 定稿）
+//   查店暗钥 keywordOf = shopKeyword ?? cuisineKeyword(cuisine)。
+//   规则：只给「回退词过宽/不准」的菜补 shopKeyword，中式细分菜系（川/湘/粤…）够用不补。
+//   ⚠️ 必须是【店型/品类词】，不是菜名（菜名会 fail-closed）。
+//   例：日式酱油拉面→日式拉面 / 韩式炸鸡→炸鸡 / 战斧牛排→牛排 / 印度咖喱羊肉饭→印度菜。
+// ─────────────────────────────────────────────
+const SHOP_KEYWORD = {
+  // —— 中式：仅个别宽泛回退的（cn-generic「家常菜」对具体品类偏虚）——
+  "咖喱牛肉饭": "咖喱饭",
+  // —— western：western-generic 回退「西餐厅」太宽；具体到店型 ——
+  "金枪鱼三明治": "三明治",
+  "火腿芝士帕尼尼": "三明治",       // 帕尼尼即热压三明治，店型归三明治
+  "芝士焗饭": "西餐厅",             // 焗饭无稳定专门店，保留西餐厅（等于回退，但显式声明已评估）
+  "蘑菇鸡肉焗饭": "西餐厅",
+  "美式炸鸡汉堡": "炸鸡",
+  "香煎鸡排饭": "牛排",             // 鸡排/牛排同属牛排简餐店型
+  "烟熏三文鱼贝果": "贝果",
+  "奶油蘑菇汤配面包": "西餐厅",
+  "鸡肉凯撒卷": "轻食沙拉",
+  "惠灵顿牛排": "牛排",
+  "战斧牛排": "牛排",
+  "奶油蘑菇牛排饭": "牛排",
+  "芝士焗龙虾": "西餐厅",
+  "烤羊排": "西餐厅",
+  "西冷牛排配薯条": "牛排",
+  // —— jpkr：拉面/炸鸡/寿司/烤肉等有稳定专门店型，别退回「日本料理/韩国料理」——
+  "韩式辣味拉面": "韩式拉面",
+  "日式酱油拉面": "日式拉面",
+  "日式海鲜拉面": "日式拉面",
+  "日式盐味拉面": "日式拉面",
+  "日式咖喱鸡排饭": "日式咖喱",
+  "日式咖喱牛肉乌冬": "乌冬面",
+  "日式咖喱猪排饭": "日式咖喱",
+  "韩式炸鸡": "炸鸡",
+  "韩式酱油炸鸡": "炸鸡",
+  "日式和牛烧肉": "日式烧肉",
+  "日式特上寿司": "寿司",
+  // —— exotic：exotic-generic / mideast / indian / sea / thai 用更准的国别店型 ——
+  "越南猪肉法包": "越南菜",
+  "泰式海鲜炒河粉": "泰国菜",
+  "泰式绿咖喱鸡饭": "泰国菜",
+  "泰式红咖喱牛肉饭": "泰国菜",
+  "泰式咖喱蟹": "泰国菜",
+  "马来叻沙面": "东南亚菜",
+  "越南香茅烤肉饭": "越南菜",
+  "越南春卷米线": "越南菜",
+  "新加坡海南鸡饭": "海南鸡饭",
+  "印尼炒饭": "东南亚菜",
+  "印度咖喱羊肉饭": "印度菜",
+  "印度玛萨拉咖喱鸡饭": "印度菜",
+  "印度烤羊排配馕": "印度菜",
+  "墨西哥烤鸡肉卷饭": "墨西哥菜",
+  "中东烤鸡肉饭": "中东菜",
+  "中东烤羊肉拼盘": "中东菜",
+  "土耳其烤肉披萨": "土耳其烤肉",
+  "摩洛哥炖羊肉": "中东菜",
+  "西班牙海鲜饭": "西班牙菜",
+};
+
+// 落库 lint 底线（§2.1）：以下情形【必须】显式有 shopKeyword，否则查店偏虚。
+//   1) cuisine ∈ 宽泛回退集（回退词太笼统）；2) name 命中稳定专门店型的品类关键词。
+const SHOPKW_REQUIRED_CUISINE = new Set(["western-generic", "exotic-generic", "indian", "mideast"]);
+const SHOPKW_REQUIRED_NAME = /拉面|炸鸡|牛排|寿司|三明治|贝果|法包|咖喱/;
+// 「烧肉/烤肉」要补，但排除中式「红烧肉」（那是家常菜，走 cuisineKeyword）
+function shopKwRequired(d) {
+  if (SHOPKW_REQUIRED_CUISINE.has(d.cuisine)) return true;
+  if (SHOPKW_REQUIRED_NAME.test(d.name)) return true;
+  if (/烤肉/.test(d.name)) return true;
+  if (/烧肉/.test(d.name) && !/红烧肉/.test(d.name)) return true;
+  return false;
+}
+
+// ─────────────────────────────────────────────
 // 中式候选 +49（已核对不与现有 65 道中式 dish 撞名）
 // ─────────────────────────────────────────────
 const ROWS = [
@@ -263,12 +336,15 @@ function expand(row) {
     // pickLayer 衍生：satiety<3 → side（不进默认单菜池），否则 meal。对齐 spec §1.1 + user fix 4。
     pickLayer: satiety >= 3 ? "meal" : "side",
     // search 嵌套对象，对齐 spec §1.1（fix 1：不再顶层散放）
+    // gateQuery = keywordOf 等价值 = shopKeyword ?? 菜系店类型词（§2）；有 shopKeyword 时以它为门控词。
     search: {
-      gateQuery: cs.gate,
+      gateQuery: SHOP_KEYWORD[name] ?? cs.gate,
       displayQuery: name,
       fallbackQueries: cs.fb,
     },
   };
+  // shopKeyword（§2.1 方案 A 变体）：店型/品类词，仅宽泛回退或专门店型品类的菜显式补。
+  if (SHOP_KEYWORD[name]) obj.shopKeyword = SHOP_KEYWORD[name];
   if (canonicalGroup) obj.canonicalGroup = canonicalGroup;
   return obj;
 }
@@ -309,6 +385,13 @@ for (const d of dishes) {
   // search 结构完整
   if (!d.search || !d.search.gateQuery || !d.search.displayQuery || !Array.isArray(d.search.fallbackQueries) || !d.search.fallbackQueries.length)
     errs.push(`${at} search 结构不完整`);
+  // shopKeyword 底线（§2.1 方案 A 变体）：
+  //   宽泛回退 cuisine 或专门店型品类名 → 必须显式补；且 shopKeyword 不得等于菜名（菜名会 fail-closed）
+  if (shopKwRequired(d) && !d.shopKeyword)
+    errs.push(`${at} 需要 shopKeyword（cuisine=${d.cuisine} 回退过宽或含专门店型品类词），落库会偏虚`);
+  if (d.shopKeyword && d.shopKeyword === d.name)
+    errs.push(`${at} shopKeyword 不得等于菜名（应为店型/品类词，否则查店 fail-closed）`);
+  if (hasMojibake(d.shopKeyword)) errs.push(`${at} shopKeyword 含乱码`);
   // pickLayer 与 satiety 一致（spec §7 规则 4：meal ⟺ satiety>=3）
   if (d.pickLayer === "meal" && d.satiety < 3) errs.push(`${at} meal 层却 satiety<3`);
   if (d.pickLayer === "side" && d.satiety >= 3) errs.push(`${at} side 层却 satiety>=3`);
@@ -412,11 +495,14 @@ const out = {
     layerDistribution: byLayer,
     mealHitsMealLayerOnly: byMeal,
     sideItems: sideNames,
+    shopKeywordCount: dishes.filter((d) => d.shopKeyword).length,
+    shopKeywordMap: Object.fromEntries(dishes.filter((d) => d.shopKeyword).map((d) => [d.name, d.shopKeyword])),
     reviewStatus: "DRAFT — 待审：命名/口味真实性 / spicy / priceTier 归档 / meals 合理性 / canonicalGroup / side 层归类",
     notes: [
       "family 不写进落库对象，由 cuisine→familyOf 推导（草案里 _family 仅供统计，落库脚本须丢弃）。",
       "emoji 落库时定，草案不含。",
-      "search 为嵌套对象 {gateQuery,displayQuery,fallbackQueries}；gateQuery 对齐现有 cuisineKeyword，Phase 1 运行时零改动。",
+      "search 为嵌套对象 {gateQuery,displayQuery,fallbackQueries}；gateQuery 对齐现有 keywordOf(=shopKeyword??cuisineKeyword)，Phase 1 运行时零改动。",
+      `shopKeyword（§2.1 方案 A 变体）：仅给回退过宽/专门店型品类的菜补【店型词】，本批 ${dishes.filter((d) => d.shopKeyword).length} 道（见 shopKeywordMap）。中式细分菜系不补，走 cuisineKeyword。落库 lint 强制：宽泛 cuisine 或含拉面/炸鸡/牛排/寿司/烧烤等品类词的菜必须有 shopKeyword，且不得等于菜名（防 fail-closed）。`,
       `pickLayer=side（satiety<3）不进默认单菜池，落库映射为 side 层；本批 side ${sideNames.length} 项：${sideNames.join("/")}。`,
       "缺口口径 = meal-only：本批 " + dishes.length + " 行中仅 " + mealLayer.length + " 计入 meal 缺口，side " + sideLayer.length + " 不计（见 familyBoard.*.mealByPrice）。",
       `family 缺口看板见 familyBoard：${families.map((f) => `${f} 剩${familyBoard[f].remainingMeal}`).join(" / ")}。remainingMealAllFamilies=${totalRemaining}（>0 禁止收尾）。`,
@@ -437,7 +523,7 @@ fs.writeFileSync(
 
 // —— review 表（markdown）——
 const esc = (s) => String(s).replace(/\|/g, "\\|");
-const cols = ["name","_family","cuisine","priceTier","pickLayer","meals","spicy","tags","satiety","indulgence","convenience","occasion","gateQuery","displayQuery","canonicalGroup"];
+const cols = ["name","_family","cuisine","priceTier","pickLayer","meals","spicy","tags","satiety","indulgence","convenience","occasion","shopKeyword","gateQuery","displayQuery","canonicalGroup"];
 let md = `# 候选菜 review 表（${batchFamilies.join("+")}，共 ${dishes.length} 行）\n\n`;
 md += `> 审阅重点：命名真实性 / 口味(spicy) / 价位归档 / 餐段合理性 / treat 是否够犒劳 / side 层归类 / canonicalGroup 归并。\n`;
 md += `> 层级：meal ${byLayer.meal} · side ${byLayer.side}（**缺口只算 meal 层**）\n`;

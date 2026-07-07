@@ -121,11 +121,61 @@
       "卤味拼盘",
       "夫妻肺片"
     ],
+    "shopKeywordCount": 46,
+    "shopKeywordMap": {
+      "咖喱牛肉饭": "咖喱饭",
+      "金枪鱼三明治": "三明治",
+      "火腿芝士帕尼尼": "三明治",
+      "芝士焗饭": "西餐厅",
+      "蘑菇鸡肉焗饭": "西餐厅",
+      "美式炸鸡汉堡": "炸鸡",
+      "香煎鸡排饭": "牛排",
+      "烟熏三文鱼贝果": "贝果",
+      "奶油蘑菇汤配面包": "西餐厅",
+      "鸡肉凯撒卷": "轻食沙拉",
+      "惠灵顿牛排": "牛排",
+      "战斧牛排": "牛排",
+      "奶油蘑菇牛排饭": "牛排",
+      "芝士焗龙虾": "西餐厅",
+      "烤羊排": "西餐厅",
+      "西冷牛排配薯条": "牛排",
+      "韩式辣味拉面": "韩式拉面",
+      "日式酱油拉面": "日式拉面",
+      "日式咖喱鸡排饭": "日式咖喱",
+      "日式海鲜拉面": "日式拉面",
+      "日式盐味拉面": "日式拉面",
+      "日式咖喱牛肉乌冬": "乌冬面",
+      "韩式炸鸡": "炸鸡",
+      "韩式酱油炸鸡": "炸鸡",
+      "日式咖喱猪排饭": "日式咖喱",
+      "日式和牛烧肉": "日式烧肉",
+      "日式特上寿司": "寿司",
+      "越南猪肉法包": "越南菜",
+      "印尼炒饭": "东南亚菜",
+      "泰式海鲜炒河粉": "泰国菜",
+      "泰式绿咖喱鸡饭": "泰国菜",
+      "泰式红咖喱牛肉饭": "泰国菜",
+      "马来叻沙面": "东南亚菜",
+      "越南香茅烤肉饭": "越南菜",
+      "印度咖喱羊肉饭": "印度菜",
+      "印度玛萨拉咖喱鸡饭": "印度菜",
+      "墨西哥烤鸡肉卷饭": "墨西哥菜",
+      "中东烤鸡肉饭": "中东菜",
+      "新加坡海南鸡饭": "海南鸡饭",
+      "越南春卷米线": "越南菜",
+      "土耳其烤肉披萨": "土耳其烤肉",
+      "泰式咖喱蟹": "泰国菜",
+      "印度烤羊排配馕": "印度菜",
+      "中东烤羊肉拼盘": "中东菜",
+      "摩洛哥炖羊肉": "中东菜",
+      "西班牙海鲜饭": "西班牙菜"
+    },
     "reviewStatus": "DRAFT — 待审：命名/口味真实性 / spicy / priceTier 归档 / meals 合理性 / canonicalGroup / side 层归类",
     "notes": [
       "family 不写进落库对象，由 cuisine→familyOf 推导（草案里 _family 仅供统计，落库脚本须丢弃）。",
       "emoji 落库时定，草案不含。",
-      "search 为嵌套对象 {gateQuery,displayQuery,fallbackQueries}；gateQuery 对齐现有 cuisineKeyword，Phase 1 运行时零改动。",
+      "search 为嵌套对象 {gateQuery,displayQuery,fallbackQueries}；gateQuery 对齐现有 keywordOf(=shopKeyword??cuisineKeyword)，Phase 1 运行时零改动。",
+      "shopKeyword（§2.1 方案 A 变体）：仅给回退过宽/专门店型品类的菜补【店型词】，本批 46 道（见 shopKeywordMap）。中式细分菜系不补，走 cuisineKeyword。落库 lint 强制：宽泛 cuisine 或含拉面/炸鸡/牛排/寿司/烧烤等品类词的菜必须有 shopKeyword，且不得等于菜名（防 fail-closed）。",
       "pickLayer=side（satiety<3）不进默认单菜池，落库映射为 side 层；本批 side 7 项：白粥配小菜/茶叶蛋/咸豆浆/上海小馄饨/皮蛋豆腐/卤味拼盘/夫妻肺片。",
       "缺口口径 = meal-only：本批 136 行中仅 129 计入 meal 缺口，side 7 不计（见 familyBoard.*.mealByPrice）。",
       "family 缺口看板见 familyBoard：chinese 剩0 / western 剩0 / jpkr 剩0 / exotic 剩0。remainingMealAllFamilies=0（>0 禁止收尾）。",
@@ -1870,13 +1920,14 @@
       ],
       "pickLayer": "meal",
       "search": {
-        "gateQuery": "家常菜",
+        "gateQuery": "咖喱饭",
         "displayQuery": "咖喱牛肉饭",
         "fallbackQueries": [
           "家常菜",
           "中餐"
         ]
-      }
+      },
+      "shopKeyword": "咖喱饭"
     },
     {
       "name": "培根鸡蛋堡",
@@ -1960,13 +2011,14 @@
       ],
       "pickLayer": "meal",
       "search": {
-        "gateQuery": "西餐厅",
+        "gateQuery": "三明治",
         "displayQuery": "金枪鱼三明治",
         "fallbackQueries": [
           "西餐厅",
           "西餐"
         ]
-      }
+      },
+      "shopKeyword": "三明治"
     },
     {
       "name": "火腿芝士帕尼尼",
@@ -1991,13 +2043,14 @@
       ],
       "pickLayer": "meal",
       "search": {
-        "gateQuery": "意大利菜",
+        "gateQuery": "三明治",
         "displayQuery": "火腿芝士帕尼尼",
         "fallbackQueries": [
           "意大利菜",
           "西餐厅"
         ]
-      }
+      },
+      "shopKeyword": "三明治"
     },
     {
       "name": "茄汁意面",
@@ -2214,7 +2267,8 @@
           "西餐厅",
           "西餐"
         ]
-      }
+      },
+      "shopKeyword": "西餐厅"
     },
     {
       "name": "蘑菇鸡肉焗饭",
@@ -2245,7 +2299,8 @@
           "西餐厅",
           "西餐"
         ]
-      }
+      },
+      "shopKeyword": "西餐厅"
     },
     {
       "name": "安格斯牛肉堡",
@@ -2395,13 +2450,14 @@
       ],
       "pickLayer": "meal",
       "search": {
-        "gateQuery": "美式餐厅",
+        "gateQuery": "炸鸡",
         "displayQuery": "美式炸鸡汉堡",
         "fallbackQueries": [
           "美式餐厅",
           "西餐厅"
         ]
-      }
+      },
+      "shopKeyword": "炸鸡"
     },
     {
       "name": "香煎鸡排饭",
@@ -2426,13 +2482,14 @@
       ],
       "pickLayer": "meal",
       "search": {
-        "gateQuery": "西餐厅",
+        "gateQuery": "牛排",
         "displayQuery": "香煎鸡排饭",
         "fallbackQueries": [
           "西餐厅",
           "西餐"
         ]
-      }
+      },
+      "shopKeyword": "牛排"
     },
     {
       "name": "烟熏三文鱼贝果",
@@ -2456,13 +2513,14 @@
       ],
       "pickLayer": "meal",
       "search": {
-        "gateQuery": "西餐厅",
+        "gateQuery": "贝果",
         "displayQuery": "烟熏三文鱼贝果",
         "fallbackQueries": [
           "西餐厅",
           "西餐"
         ]
-      }
+      },
+      "shopKeyword": "贝果"
     },
     {
       "name": "奶油蘑菇汤配面包",
@@ -2491,7 +2549,8 @@
           "西餐厅",
           "西餐"
         ]
-      }
+      },
+      "shopKeyword": "西餐厅"
     },
     {
       "name": "鸡肉凯撒卷",
@@ -2516,13 +2575,14 @@
       ],
       "pickLayer": "meal",
       "search": {
-        "gateQuery": "西餐厅",
+        "gateQuery": "轻食沙拉",
         "displayQuery": "鸡肉凯撒卷",
         "fallbackQueries": [
           "西餐厅",
           "西餐"
         ]
-      }
+      },
+      "shopKeyword": "轻食沙拉"
     },
     {
       "name": "惠灵顿牛排",
@@ -2546,13 +2606,14 @@
       ],
       "pickLayer": "meal",
       "search": {
-        "gateQuery": "西餐厅",
+        "gateQuery": "牛排",
         "displayQuery": "惠灵顿牛排",
         "fallbackQueries": [
           "西餐厅",
           "西餐"
         ]
-      }
+      },
+      "shopKeyword": "牛排"
     },
     {
       "name": "战斧牛排",
@@ -2576,13 +2637,14 @@
       ],
       "pickLayer": "meal",
       "search": {
-        "gateQuery": "美式餐厅",
+        "gateQuery": "牛排",
         "displayQuery": "战斧牛排",
         "fallbackQueries": [
           "美式餐厅",
           "西餐厅"
         ]
-      }
+      },
+      "shopKeyword": "牛排"
     },
     {
       "name": "海鲜意面",
@@ -2636,13 +2698,14 @@
       ],
       "pickLayer": "meal",
       "search": {
-        "gateQuery": "西餐厅",
+        "gateQuery": "牛排",
         "displayQuery": "奶油蘑菇牛排饭",
         "fallbackQueries": [
           "西餐厅",
           "西餐"
         ]
-      }
+      },
+      "shopKeyword": "牛排"
     },
     {
       "name": "芝士焗龙虾",
@@ -2671,7 +2734,8 @@
           "西餐厅",
           "西餐"
         ]
-      }
+      },
+      "shopKeyword": "西餐厅"
     },
     {
       "name": "烤羊排",
@@ -2701,7 +2765,8 @@
           "西餐厅",
           "西餐"
         ]
-      }
+      },
+      "shopKeyword": "西餐厅"
     },
     {
       "name": "松露蘑菇意面",
@@ -2755,13 +2820,14 @@
       ],
       "pickLayer": "meal",
       "search": {
-        "gateQuery": "美式餐厅",
+        "gateQuery": "牛排",
         "displayQuery": "西冷牛排配薯条",
         "fallbackQueries": [
           "美式餐厅",
           "西餐厅"
         ]
-      }
+      },
+      "shopKeyword": "牛排"
     },
     {
       "name": "日式鲑鱼茶泡饭",
@@ -2886,13 +2952,14 @@
       ],
       "pickLayer": "meal",
       "search": {
-        "gateQuery": "韩国料理",
+        "gateQuery": "韩式拉面",
         "displayQuery": "韩式辣味拉面",
         "fallbackQueries": [
           "韩国料理",
           "韩式"
         ]
-      }
+      },
+      "shopKeyword": "韩式拉面"
     },
     {
       "name": "日式酱油拉面",
@@ -2917,13 +2984,14 @@
       ],
       "pickLayer": "meal",
       "search": {
-        "gateQuery": "日本料理",
+        "gateQuery": "日式拉面",
         "displayQuery": "日式酱油拉面",
         "fallbackQueries": [
           "日本料理",
           "日料"
         ]
       },
+      "shopKeyword": "日式拉面",
       "canonicalGroup": "ramen"
     },
     {
@@ -2984,13 +3052,14 @@
       ],
       "pickLayer": "meal",
       "search": {
-        "gateQuery": "日本料理",
+        "gateQuery": "日式咖喱",
         "displayQuery": "日式咖喱鸡排饭",
         "fallbackQueries": [
           "日本料理",
           "日料"
         ]
-      }
+      },
+      "shopKeyword": "日式咖喱"
     },
     {
       "name": "日式海鲜拉面",
@@ -3017,13 +3086,14 @@
       ],
       "pickLayer": "meal",
       "search": {
-        "gateQuery": "日本料理",
+        "gateQuery": "日式拉面",
         "displayQuery": "日式海鲜拉面",
         "fallbackQueries": [
           "日本料理",
           "日料"
         ]
       },
+      "shopKeyword": "日式拉面",
       "canonicalGroup": "ramen"
     },
     {
@@ -3050,13 +3120,14 @@
       ],
       "pickLayer": "meal",
       "search": {
-        "gateQuery": "日本料理",
+        "gateQuery": "日式拉面",
         "displayQuery": "日式盐味拉面",
         "fallbackQueries": [
           "日本料理",
           "日料"
         ]
       },
+      "shopKeyword": "日式拉面",
       "canonicalGroup": "ramen"
     },
     {
@@ -3117,13 +3188,14 @@
       ],
       "pickLayer": "meal",
       "search": {
-        "gateQuery": "日本料理",
+        "gateQuery": "乌冬面",
         "displayQuery": "日式咖喱牛肉乌冬",
         "fallbackQueries": [
           "日本料理",
           "日料"
         ]
-      }
+      },
+      "shopKeyword": "乌冬面"
     },
     {
       "name": "韩式泡菜猪肉锅",
@@ -3241,13 +3313,14 @@
       ],
       "pickLayer": "meal",
       "search": {
-        "gateQuery": "韩国料理",
+        "gateQuery": "炸鸡",
         "displayQuery": "韩式炸鸡",
         "fallbackQueries": [
           "韩国料理",
           "韩式"
         ]
       },
+      "shopKeyword": "炸鸡",
       "canonicalGroup": "koreanchicken"
     },
     {
@@ -3272,13 +3345,14 @@
       ],
       "pickLayer": "meal",
       "search": {
-        "gateQuery": "韩国料理",
+        "gateQuery": "炸鸡",
         "displayQuery": "韩式酱油炸鸡",
         "fallbackQueries": [
           "韩国料理",
           "韩式"
         ]
       },
+      "shopKeyword": "炸鸡",
       "canonicalGroup": "koreanchicken"
     },
     {
@@ -3306,13 +3380,14 @@
       ],
       "pickLayer": "meal",
       "search": {
-        "gateQuery": "日本料理",
+        "gateQuery": "日式咖喱",
         "displayQuery": "日式咖喱猪排饭",
         "fallbackQueries": [
           "日本料理",
           "日料"
         ]
-      }
+      },
+      "shopKeyword": "日式咖喱"
     },
     {
       "name": "韩式辣牛肉汤饭",
@@ -3431,13 +3506,14 @@
       ],
       "pickLayer": "meal",
       "search": {
-        "gateQuery": "日本料理",
+        "gateQuery": "日式烧肉",
         "displayQuery": "日式和牛烧肉",
         "fallbackQueries": [
           "日本料理",
           "日料"
         ]
-      }
+      },
+      "shopKeyword": "日式烧肉"
     },
     {
       "name": "日式刺身拼盘",
@@ -3552,13 +3628,14 @@
       ],
       "pickLayer": "meal",
       "search": {
-        "gateQuery": "日本料理",
+        "gateQuery": "寿司",
         "displayQuery": "日式特上寿司",
         "fallbackQueries": [
           "日本料理",
           "日料"
         ]
-      }
+      },
+      "shopKeyword": "寿司"
     },
     {
       "name": "韩式炭火烤牛小排",
@@ -3647,13 +3724,14 @@
       ],
       "pickLayer": "meal",
       "search": {
-        "gateQuery": "东南亚菜",
+        "gateQuery": "越南菜",
         "displayQuery": "越南猪肉法包",
         "fallbackQueries": [
           "东南亚菜",
           "异国料理"
         ]
-      }
+      },
+      "shopKeyword": "越南菜"
     },
     {
       "name": "泰式打抛猪饭",
@@ -3719,7 +3797,8 @@
           "东南亚菜",
           "异国料理"
         ]
-      }
+      },
+      "shopKeyword": "东南亚菜"
     },
     {
       "name": "泰式海鲜炒河粉",
@@ -3752,7 +3831,8 @@
           "泰国菜",
           "东南亚菜"
         ]
-      }
+      },
+      "shopKeyword": "泰国菜"
     },
     {
       "name": "泰式绿咖喱鸡饭",
@@ -3785,7 +3865,8 @@
           "泰国菜",
           "东南亚菜"
         ]
-      }
+      },
+      "shopKeyword": "泰国菜"
     },
     {
       "name": "泰式红咖喱牛肉饭",
@@ -3818,7 +3899,8 @@
           "泰国菜",
           "东南亚菜"
         ]
-      }
+      },
+      "shopKeyword": "泰国菜"
     },
     {
       "name": "泰式冬阴功海鲜面",
@@ -3884,7 +3966,8 @@
           "东南亚菜",
           "异国料理"
         ]
-      }
+      },
+      "shopKeyword": "东南亚菜"
     },
     {
       "name": "越南香茅烤肉饭",
@@ -3911,13 +3994,14 @@
       ],
       "pickLayer": "meal",
       "search": {
-        "gateQuery": "东南亚菜",
+        "gateQuery": "越南菜",
         "displayQuery": "越南香茅烤肉饭",
         "fallbackQueries": [
           "东南亚菜",
           "异国料理"
         ]
-      }
+      },
+      "shopKeyword": "越南菜"
     },
     {
       "name": "印度咖喱羊肉饭",
@@ -3950,7 +4034,8 @@
           "印度菜",
           "异国料理"
         ]
-      }
+      },
+      "shopKeyword": "印度菜"
     },
     {
       "name": "印度玛萨拉咖喱鸡饭",
@@ -3983,7 +4068,8 @@
           "印度菜",
           "异国料理"
         ]
-      }
+      },
+      "shopKeyword": "印度菜"
     },
     {
       "name": "墨西哥烤鸡肉卷饭",
@@ -4010,12 +4096,13 @@
       ],
       "pickLayer": "meal",
       "search": {
-        "gateQuery": "异国料理",
+        "gateQuery": "墨西哥菜",
         "displayQuery": "墨西哥烤鸡肉卷饭",
         "fallbackQueries": [
           "异国料理"
         ]
-      }
+      },
+      "shopKeyword": "墨西哥菜"
     },
     {
       "name": "中东烤鸡肉饭",
@@ -4048,7 +4135,8 @@
           "中东菜",
           "异国料理"
         ]
-      }
+      },
+      "shopKeyword": "中东菜"
     },
     {
       "name": "新加坡海南鸡饭",
@@ -4073,13 +4161,14 @@
       ],
       "pickLayer": "meal",
       "search": {
-        "gateQuery": "东南亚菜",
+        "gateQuery": "海南鸡饭",
         "displayQuery": "新加坡海南鸡饭",
         "fallbackQueries": [
           "东南亚菜",
           "异国料理"
         ]
-      }
+      },
+      "shopKeyword": "海南鸡饭"
     },
     {
       "name": "越南春卷米线",
@@ -4103,13 +4192,14 @@
       ],
       "pickLayer": "meal",
       "search": {
-        "gateQuery": "东南亚菜",
+        "gateQuery": "越南菜",
         "displayQuery": "越南春卷米线",
         "fallbackQueries": [
           "东南亚菜",
           "异国料理"
         ]
-      }
+      },
+      "shopKeyword": "越南菜"
     },
     {
       "name": "土耳其烤肉披萨",
@@ -4135,13 +4225,14 @@
       ],
       "pickLayer": "meal",
       "search": {
-        "gateQuery": "中东菜",
+        "gateQuery": "土耳其烤肉",
         "displayQuery": "土耳其烤肉披萨",
         "fallbackQueries": [
           "中东菜",
           "异国料理"
         ]
-      }
+      },
+      "shopKeyword": "土耳其烤肉"
     },
     {
       "name": "泰式咖喱蟹",
@@ -4171,7 +4262,8 @@
           "泰国菜",
           "东南亚菜"
         ]
-      }
+      },
+      "shopKeyword": "泰国菜"
     },
     {
       "name": "新加坡黑胡椒蟹",
@@ -4232,7 +4324,8 @@
           "印度菜",
           "异国料理"
         ]
-      }
+      },
+      "shopKeyword": "印度菜"
     },
     {
       "name": "中东烤羊肉拼盘",
@@ -4263,7 +4356,8 @@
           "中东菜",
           "异国料理"
         ]
-      }
+      },
+      "shopKeyword": "中东菜"
     },
     {
       "name": "泰式帝王虾",
@@ -4323,7 +4417,8 @@
           "中东菜",
           "异国料理"
         ]
-      }
+      },
+      "shopKeyword": "中东菜"
     },
     {
       "name": "西班牙海鲜饭",
@@ -4347,12 +4442,13 @@
       ],
       "pickLayer": "meal",
       "search": {
-        "gateQuery": "异国料理",
+        "gateQuery": "西班牙菜",
         "displayQuery": "西班牙海鲜饭",
         "fallbackQueries": [
           "异国料理"
         ]
-      }
+      },
+      "shopKeyword": "西班牙菜"
     },
     {
       "name": "泰式火山排骨",
