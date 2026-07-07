@@ -54,7 +54,7 @@
       "缺口口径 = meal-only：本批 49 行中仅 42 计入 meal 缺口，side 7 不计（见 priceDistributionMealLayer）。",
       "treat 全为具体菜，无火锅/烧烤/烤肉/品牌。",
       "treat 质量门不惩罚「清淡」，只看 indulgence / satiety / 「健康轻食」——白灼基围虾这类清爽高质量菜保留在 treat 桶（fix 5，对齐 spec §5.3）。",
-      "tea meal=0 是预期（非缺陷）：下午茶不走 meal-only，由后续 side/drink 池补供给（spec §4.2 / §3.1 foodsByMealForPick）。"
+      "tea meal=0 是预期（非缺陷）：下午茶不走 meal-only，由后续 side/drink 池补供给（spec §4.2 / §3.1 foodsByMealForSinglePick，仅水占）。"
     ]
   },
   "dishes": [

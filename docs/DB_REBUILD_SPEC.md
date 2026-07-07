@@ -153,34 +153,45 @@ export function sideFoods(meal?: MealType): Food[] {
 - `brand` / `dining_style` / `dish_group` **一律不进默认抽签**。
 - `pickLayer === "side"`（satiety<3 的凉菜/小食/配菜）**也不进默认单菜池**——即便它是 `kind:"main", entityType:"dish"`。这是本次新增的第三道门，防止「茶叶蛋/皮蛋豆腐」这类被当成一餐主角抽出。
 - 二级集合（火锅/品牌等）通过独立 selector 暴露，不走 `mainFoodsByMeal`（Phase 1 可先不接 UI，数据留存即可）。
-- `mainFoodsByMeal` 是现有 `useDivinationPick` / `useRoulette` 的共同入口（`useDivinationPick.ts:149`、`useRoulette.ts:179`），改其内核即全链路生效，无需动 hook。
+- **主路径 = 水占单菜抽取（`useDivinationPick`）**。老虎机（`useRoulette`）为早期风格，本阶段视为 **deprecated / out of scope**，不改、不为其复杂化模型（见 §3.1 末）。
 
 ### 3.1 ⚠️ 下午茶(tea) 的取池路径（必须在 S4 落实，否则 tea 会塌池）
 
-**问题**：现有代码里水占单菜（`useDivinationPick.ts:149`）与老虎机（`useRoulette.ts:179`）都调 `mainFoodsByMeal(meal)`。一旦按 §3 把 `pickLayer==="side"` 排除出默认池，`meal==="tea"` 时——因为下午茶几乎全是 side/drink（见 §4.2）——meal 层会**变薄甚至空池**，真实抽取直接塌。
+**问题**：水占单菜（`useDivinationPick.ts:149`）现调 `mainFoodsByMeal(meal)`。一旦按 §3 把 `pickLayer==="side"` 排除出默认池，`meal==="tea"` 时——因为下午茶几乎全是 side/drink（见 §4.2）——meal 层会**变薄甚至空池**，真实抽取直接塌。
 
-**解法**：新增一个「取池」入口，按餐段决定池子构成，**只此一处判 tea**，两个 hook 都改调它：
+**解法**：新增一个**只服务水占单菜抽取**的取池入口 `foodsByMealForSinglePick(meal)`，**只此一处判 tea**。因为水占只产出**一个**结果，下午茶抽到饮品/甜点/小食都成立，所以 tea 可以并入 drink；这不会污染任何"主食轴"概念。
 
 ```ts
 /**
- * 抽签取池入口（S4 起两个 hook 统一改调此函数，替代直接 mainFoodsByMeal）。
- * - 非 tea：默认 meal 层单菜池（干净、顶饱）。
- * - tea（下午茶）：meal 层若有则并入，但主要由 side + drink 承载，避免空池。
- *   注意 drink 一律 pickLayer==="side"（§1.3），这里显式并入下午茶饮品/甜点。
+ * 水占单菜抽取的取池入口（S4 起 useDivinationPick 改调此函数，替代直接 mainFoodsByMeal）。
+ * ⚠️ 仅服务水占（单一结果）。不要用于老虎机——老虎机前两轴是"主食"，混入 drink 会语义错乱（见下）。
+ * - 非 tea：纯 meal 层单菜池（干净、顶饱）。
+ * - tea（下午茶）：meal 层 + side + drink 并集。水占只出一个结果，抽到饮品/甜点/小食都合理。
  */
-export function foodsByMealForPick(meal: MealType): Food[] {
+export function foodsByMealForSinglePick(meal: MealType): Food[] {
   if (meal !== "tea") return mainFoodsByMeal(meal);        // 默认：纯 meal 层
   return [
     ...mainFoodsByMeal("tea"),   // 少量能当正餐的下午茶（若有）
     ...sideFoods("tea"),         // 小食/甜点/配菜（pickLayer==="side"）
-    ...drinkFoodsByMeal("tea"),  // 饮品（kind==="drink"）
+    ...drinkFoodsByMeal("tea"),  // 饮品（kind==="drink"）——仅因水占单结果，抽到饮品成立
   ];
 }
 ```
 
-- **口径界定**：tea 场景是这三池的并集；其它餐段严格只用 meal 层。side/drink 不会泄漏到早/午/晚/宵的默认单菜抽取。
-- **契约影响**：§5.1 抽取顺序里，第 1 步「餐段过滤」对 tea 改用 `foodsByMealForPick("tea")`；后续 family 硬墙、去重、价位桶抽样逻辑不变（桶抽样对 tea 的 side/drink 同样适用，因为它们也有 priceTier）。
-- **落库前提**：tea 的 side/drink 供给量由后续「甜点/小食/饮品批次」补足（§4.2），S4 只负责接通取池路径。**S4 完成的验收**：`foodsByMealForPick("tea")` 非空且不含被 §3 排除的 brand/dining_style/dish_group。
+**老虎机（deprecated，本轮不改）**：`useRoulette.ts:179` 保持现状，**不改调上面的函数**。若未来要让老虎机也支持 tea，必须另设独立入口，且**前两轴绝不能混入 drink**：
+
+```ts
+// 【未来可选，非本阶段任务】老虎机前两轴专用：tea 也只给 main+side，不含 drink；
+// 第三轴仍单独用 drinkFoodsByMeal("tea")。
+export function rouletteMainsByMeal(meal: MealType): Food[] {
+  if (meal !== "tea") return mainFoodsByMeal(meal);
+  return [...mainFoodsByMeal("tea"), ...sideFoods("tea")]; // 不含 drink
+}
+```
+
+- **口径界定**：`foodsByMealForSinglePick` 的 tea 场景是三池并集；其它餐段严格只用 meal 层。side/drink 不会泄漏到早/午/晚/宵的默认单菜抽取。
+- **契约影响**：§5.1 抽取顺序里，第 1 步「餐段过滤」对 tea 改用 `foodsByMealForSinglePick("tea")`；后续 family 硬墙、去重、价位桶抽样逻辑不变（桶抽样对 tea 的 side/drink 同样适用，因为它们也有 priceTier）。
+- **落库前提**：tea 的 side/drink 供给量由后续「甜点/小食/饮品批次」补足（§4.2），S4 只负责接通取池路径。**S4 完成的验收**：`foodsByMealForSinglePick("tea")` 非空且不含被 §3 排除的 brand/dining_style/dish_group。
 
 ---
 
@@ -240,7 +251,7 @@ dish（meal 层）目标 ≈237（满足 240 量级）。各格 = 目标(meal �
 下午茶本质是**小食 / 甜点 / 饮品**场景，不是"一顿正餐"。若强行要求 tea 的 meal 层达到 50，会逼出一堆不真实的「下午茶正餐」。因此：
 
 - **tea 不列入 §4 的 meal-only 硬指标**，也不在 lint 规则「餐段够量」里对 tea 设 meal 阈值。
-- 下午茶供给由 **side 层（`pickLayer==="side"`）+ drink 池** 承担；这些条目 `meals` 含 `"tea"` 即可被下午茶场景取用。**取池路径见 §3.1 `foodsByMealForPick("tea")`（S4 必须落实，否则 tea 塌池）。**
+- 下午茶供给由 **side 层（`pickLayer==="side"`）+ drink 池** 承担；这些条目 `meals` 含 `"tea"` 即可被下午茶场景取用。**取池路径见 §3.1 `foodsByMealForSinglePick("tea")`（S4 必须落实，否则 tea 塌池）。**
 - 目标改为「tea 场景（side+drink，含 `meals:["tea"]`）候选 ≥ 阈值」，放到后续**甜点/小食/饮品批次**统一定量，不占 meal 缺口。
 - 第一批 tea meal = 0 属**预期正确**，非缺陷。
 
@@ -258,7 +269,7 @@ dish（meal 层）目标 ≈237（满足 240 量级）。各格 = 目标(meal �
 
 ### 5.1 插入顺序（严格契约）
 ```
-foodsByMealForPick(meal)     # 1. 餐段过滤（§3.1；非 tea=meal 层单菜池；tea=side+drink 并集，防塌池）
+foodsByMealForSinglePick(meal)  # 1. 餐段过滤（§3.1，仅水占；非 tea=meal 层单菜池；tea=main+side+drink 并集，防塌池）
   → applyFamily(families)    # 2. family 硬墙
   → (已是 dish/合规池)       # 3. 池由 §3/§3.1 入口保证，无需再滤 entityType
   → 去重(排除 seen)          # 4. seen 硬约束；空 = exhausted
@@ -339,7 +350,7 @@ function resolveBucket(mix: Record<PriceTier, number>, nonEmpty: Set<PriceTier>)
 8. **id 唯一**；**canonicalGroup 若存在，组内 cuisine 一致**。
 9. **每家族每餐段非空**（meal 层，**tea 除外**）：4 family × 4 meal（早/午/晚/宵）= 16 格，每格 meal-dish 数 ≥3（防「选西餐+早餐」塌池）。tea 不参与此项。
 10. **无乱码**：任何字符串字段不得含 U+FFFD（`�`）。
-11. **tea 取池非空**（§3.1）：`foodsByMealForPick("tea")` 必须非空，且不含 `brand/dining_style/dish_group`。防止 side 被排除后下午茶真实抽取塌池。
+11. **tea 取池非空**（§3.1）：`foodsByMealForSinglePick("tea")` 必须非空，且不含 `brand/dining_style/dish_group`。防止 side 被排除后下午茶真实抽取塌池。
 
 ---
 
@@ -365,7 +376,7 @@ function resolveBucket(mix: Record<PriceTier, number>, nonEmpty: Set<PriceTier>)
 | S1 | 扩展 `types/food.d.ts`（§1 新字段 + 枚举） | 类型就绪 | — |
 | S2 | 给**存量 108 dish** 补新字段（satiety/indulgence/convenience/occasion/search）；标注 canonicalGroup | 存量迁移完 | S1 |
 | S3 | 把定稿新菜（**129 个 meal-layer dish** + side 额外项）写入 `foods.ts`，字段齐全；按 §4.0 看板核 meal 净增达标（非行数） | 数据达标 | S0,S1 |
-| S4 | 加 `isDefaultPickable` + 改 `mainFoodsByMeal` 内核；**新增 `foodsByMealForPick(meal)`（§3.1）并把两个 hook（`useDivinationPick.ts:149`、`useRoulette.ts:179`）改调它**，落实 tea 取池路径 | 默认池纯净 + tea 不塌 | S1 |
+| S4 | 加 `isDefaultPickable` + 改 `mainFoodsByMeal` 内核；**新增 `foodsByMealForSinglePick(meal)`（§3.1）并只把水占 hook（`useDivinationPick.ts:149`）改调它**，落实 tea 取池路径。**老虎机 `useRoulette` 本轮不改（deprecated）** | 默认池纯净 + tea 不塌 | S1 |
 | S5 | `pick-core` 加桶抽样 + resolveBucket + indulgenceWeight + canonicalGroup 软避；移除旧 budget/richness 软权重（§5,6） | 抽取策略新 | S4 |
 | S6 | 写 `scripts/lint-foods.mjs`（§7）；引入 Vitest + 单测（§8） | 验证就位 | S2-S5 |
 | S7 | 跑 §8 全部验证，修红 | 绿 | S6 |
