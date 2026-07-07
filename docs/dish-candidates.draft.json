@@ -3,7 +3,7 @@
     "purpose": "dish 候选菜草案（脚本生成），供 user + Codex 审后落 foods.ts",
     "generated": "2026-07-07",
     "batch": "中式 第一批",
-    "gapBasis": "meal-only：缺口矩阵只统计 pickLayer=meal；side 单独另计（spec §4/§4.1）",
+    "gapBasis": "meal-only 且按'菜数'计：缺口只统计 pickLayer=meal；side 是额外产出，不占配额（spec §4/§4.1）。收尾判据=meal 净增达标，非行数。",
     "gapTargetMeal": {
       "chinese": 49,
       "western": 29,
@@ -11,6 +11,9 @@
       "exotic": 24,
       "total": 129
     },
+    "chineseMealAchieved": 42,
+    "chineseMealRemaining": 7,
+    "teaPolicy": "tea 不列入 meal-only 硬指标；下午茶走 side/drink 池（spec §4.2）。本批 tea meal=0 属预期。",
     "thisBatchRows": 49,
     "priceDistributionAll": {
       "budget": 18,

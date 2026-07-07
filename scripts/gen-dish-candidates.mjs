@@ -216,14 +216,20 @@ const byLayer = { meal: mealLayer.length, side: sideLayer.length };
 const mealByPrice = Object.fromEntries(prices.map((p) => [p, mealLayer.filter((d) => d.priceTier === p).length]));
 // side 名单：从数据自动生成，永不与备注漂移（fix 4）
 const sideNames = sideLayer.map((d) => d.name);
+// 中式 meal 目标 49，本批达成 = mealLayer.length；剩余缺口自动算，防"按行数收尾"（Codex P1）
+const chineseMealTarget = 49;
+const chineseMealRemaining = Math.max(0, chineseMealTarget - mealLayer.length);
 
 const out = {
   _meta: {
     purpose: "dish 候选菜草案（脚本生成），供 user + Codex 审后落 foods.ts",
     generated: new Date().toISOString().slice(0, 10),
     batch: "中式 第一批",
-    gapBasis: "meal-only：缺口矩阵只统计 pickLayer=meal；side 单独另计（spec §4/§4.1）",
+    gapBasis: "meal-only 且按'菜数'计：缺口只统计 pickLayer=meal；side 是额外产出，不占配额（spec §4/§4.1）。收尾判据=meal 净增达标，非行数。",
     gapTargetMeal: { chinese: 49, western: 29, jpkr: 27, exotic: 24, total: 129 },
+    chineseMealAchieved: mealLayer.length,
+    chineseMealRemaining,   // >0 表示中式 meal 未完成，禁止按"+49 已完成"收尾
+    teaPolicy: "tea 不列入 meal-only 硬指标；下午茶走 side/drink 池（spec §4.2）。本批 tea meal=0 属预期。",
     thisBatchRows: dishes.length,
     priceDistributionAll: byPrice,
     priceDistributionMealLayer: mealByPrice,
@@ -274,5 +280,8 @@ fs.writeFileSync(path.join(process.cwd(), "docs", "dish-candidates.review.md"), 
 console.log(`✓ 生成 ${dishes.length} 道中式候选`);
 console.log(`  价位: budget ${byPrice.budget} / normal ${byPrice.normal} / treat ${byPrice.treat}`);
 console.log(`  层级: meal ${byLayer.meal} / side ${byLayer.side}`);
-console.log(`  餐段命中(meal层): 早${byMeal.breakfast} 午${byMeal.lunch} 茶${byMeal.tea} 晚${byMeal.dinner} 宵${byMeal.midnight}`);
+console.log(`  餐段命中(meal层): 早${byMeal.breakfast} 午${byMeal.lunch} 茶${byMeal.tea}(不设硬指标) 晚${byMeal.dinner} 宵${byMeal.midnight}`);
+console.log(chineseMealRemaining > 0
+  ? `  ⚠ 中式 meal 未完成：达成 ${mealLayer.length}/${chineseMealTarget}，还差 +${chineseMealRemaining}（勿按行数收尾）`
+  : `  ✓ 中式 meal 达标 ${mealLayer.length}/${chineseMealTarget}`);
 console.log(`  → docs/dish-candidates.draft.json + docs/dish-candidates.review.md`);

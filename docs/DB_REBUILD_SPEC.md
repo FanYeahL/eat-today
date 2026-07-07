@@ -115,6 +115,15 @@ keywordOf(food) = food.shopKeyword ?? cuisineKeyword(food.cuisine)   // 现状�
 
 > 迁移开关（Phase 2）：把 `keywordOf` 改读 `food.search.gateQuery`，shops API 展示改读 `displayQuery`、门控放宽改用 `fallbackQueries`。Phase 1 保证「数据已就绪、运行时零改动」，互不阻塞。
 
+### 2.1 ⚠️ 落库时的 shopKeyword 决策（防"附近可用性偏虚"）
+
+Phase 1 运行时查店仍是 `keywordOf = shopKeyword ?? cuisineKeyword(cuisine)`。但候选草案**只生成 `search`、不生成 `shopKeyword`**。若直接把新菜落库、又不补 `shopKeyword`，则每道新菜查店都退回到宽泛的菜系词（"家常菜/川菜/粤菜"），availability 门控会**偏虚**（几乎总是"附近有"，失去筛掉冷门菜的意义）。落库前**二选一，必须明确**：
+
+- **方案 A（推荐，若要保 availability 精度）**：落库脚本为每道新菜补 `shopKeyword`。可直接取 `search.displayQuery`（多数即菜名）或人工指定更易命中高德 POI 的店类型词。
+- **方案 B（若接受降级）**：Phase 1 **明确不依赖 availability 精准判断**——门控只做"这一菜系附近有没有店"的粗判，接受新菜普遍 fail-open。需在落库 PR 里写明这一取舍，避免误以为可用性是精确的。
+
+> 未定此项前**不得落库**。这是 `search` 与现有 shops API 之间唯一的真实耦合点。
+
 ---
 
 ## 3. 默认抽签池规则（额外要求 D）
@@ -150,40 +159,63 @@ export function sideFoods(meal?: MealType): Food[] {
 
 ## 4. 新菜补齐矩阵（目标 & 缺口）
 
-> ⚠️ **口径 = meal 层 only**。缺口矩阵只统计 `pickLayer === "meal"` 的 dish（默认单菜池的真实供给）。
-> `side` 层（satiety<3）单独另计（见 §4.1），**绝不计入下列 meal 缺口**——否则会误以为池子补够、实际早餐/宵夜仍薄。
+> ⚠️ **口径 = meal 层 only，且按"菜数"而非"行数"计**。缺口矩阵只统计 `pickLayer === "meal"` 的 dish（默认单菜池的真实供给）。
+> `side` 层（satiety<3）**是额外产出，不占任何 meal 缺口配额**（见 §4.1）。
+> 收尾判据：**不是"总共写了 129 行"，而是"meal 层净增达到各格目标"**——写了多少 side 行都不算数。
 
-dish（meal 层）目标 ≈237（满足 240 量级）。各格 = 目标(补齐数)。详见 `dish-candidates.draft.json`。
+dish（meal 层）目标 ≈237（满足 240 量级）。各格 = 目标(meal 净增)。详见 `dish-candidates.draft.json`。
 
-| family | budget | normal | treat | 合计 |
+| family | budget | normal | treat | 合计(meal) |
 |---|---|---|---|---|
 | chinese | 35 (+18) | 65 (+22) | 14 (+9) | 114 |
 | western | 10 (+8) | 22 (+13) | 9 (+8) | 41 |
 | jpkr | 10 (+7) | 24 (+13) | 9 (+7) | 43 |
 | exotic | 10 (+4) | 20 (+12) | 9 (+8) | 39 |
-| **补齐合计** | +37 | +60 | +32 | **+129** |
+| **补齐合计(meal)** | +37 | +60 | +32 | **+129 meal** |
 
-> 注：以上 +129 为 **meal 层**目标。中式第一批实际产出 = **meal 42 + side 7 = 49 行**，其中**只有 42 计入 meal 缺口**（budget/normal/treat 的 meal 计数见 review 表），side 7 计入 §4.1。因此中式 meal 层仍差 **+7**（budget 层被 side 占用最多），后续批次或补录时需补齐。
+### 4.0 各批次剩余 meal 缺口（进度看板，按实际 meal 计数滚动更新）
+
+> 中式第一批写了 49 行，但 meal 只有 **42**（budget 12 / normal 21 / treat 9），side 7 行不计。故中式 meal **还差 +7**，主要在 budget 层（原 +18 仅达成 12）。
+
+| family | 目标(meal) | 已达成(meal) | **剩余 meal 缺口** | side 额外产出 |
+|---|---|---|---|---|
+| chinese | +49 | 42 | **+7**（budget +6 / normal +1） | 7 |
+| western | +29 | 0 | **+29** | — |
+| jpkr | +27 | 0 | **+27** | — |
+| exotic | +24 | 0 | **+24** | — |
+| **合计** | +129 | 42 | **+87 meal 待补** | 7 |
+
+> 后续批次目标 = **中式 +7 meal、西餐 +29 meal、日韩 +27 meal、异国 +24 meal**（side/snack 另算，不冲抵）。每批"完成"的判据是它承诺的 **meal 净增**达标，不是行数。**不得以"中式 +49 已完成"收尾——中式 meal 仍差 +7。**
 
 **餐段最低标准（dish **meal 层** 主食，去重按餐段命中）与当前缺口：**
 
 > 口径 = meal 层 only（`pickLayer==="meal"`）。side 层不计入下表。
+> ⚠️ **下午茶(tea) 不列入 meal-only 硬指标**——见 §4.2。
 
-| 餐段 | 现状 | 目标 | 缺口 | 补齐重点 |
+| 餐段 | 现状(meal) | 目标(meal) | 缺口 | 补齐重点 |
 |---|---|---|---|---|
-| 早餐 breakfast | 29 | 40 | +11 | 中式早点、便利店速食（须 satiety≥3 才算 meal） |
+| 早餐 breakfast | 29 | 40 | +11 | 顶饱的早点正餐（须 satiety≥3 才算 meal）；小件早点归 side |
 | 午饭 lunch | 75 | 120 | +45 | 各家族盖饭/面/正餐 |
-| 下午茶 tea | 34 | 50 | +16 | 轻食、小食、甜点向（多为 side 层，见 §4.1） |
+| 下午茶 tea | — | **不设 meal 硬指标** | — | 走 side/snack/drink 池，见 §4.2 |
 | 晚饭 dinner | 79 | 140 | +61 | 正餐主力，treat 集中在此 |
-| 宵夜 midnight | 33 | 70 | +37 | 面/粥/烧烤替代的具体菜、便利店 |
+| 宵夜 midnight | 33 | 70 | +37 | 面/粥/顶饱夜宵正餐；小件归 side |
 
-### 4.1 side 层单独指标（不并入 meal 缺口）
+### 4.1 side 层单独指标（额外产出，不并入 meal 缺口）
 
-`side`（satiety<3：凉菜/小食/配菜/汤水/早点小件）单独计量，服务于「组合推荐 / 加个菜」，**不进默认单菜池**，因此**不计入 §4 与上表的 meal 缺口**。
+`side`（satiety<3：凉菜/小食/配菜/汤水/早点小件）单独计量，服务于「组合推荐 / 加个菜 / 下午茶」，**不进默认单菜池**，因此**不占 §4 任何 meal 配额**。
 
 - 中式第一批 side 产出 = **7**：白粥配小菜 / 茶叶蛋 / 咸豆浆 / 上海小馄饨 / 皮蛋豆腐 / 卤味拼盘 / 夫妻肺片。
 - side 层目标暂不设硬门槛（Phase 1 先积累），落库后按 `sideFoods()` 归入 side 集合。
 - ⚠️ 审查提示：本批 side 多为早餐/宵夜小件，意味着**早餐/宵夜的 meal 层供给比行数看起来更薄**——早餐 meal 命中仅 3、宵夜仅 2（见 review 表），远低于目标，须在后续批次专门补「顶饱的早餐/宵夜正餐」。
+
+### 4.2 下午茶(tea) 口径：走 side/snack/drink，不走 meal-only
+
+下午茶本质是**小食 / 甜点 / 饮品**场景，不是"一顿正餐"。若强行要求 tea 的 meal 层达到 50，会逼出一堆不真实的「下午茶正餐」。因此：
+
+- **tea 不列入 §4 的 meal-only 硬指标**，也不在 lint 规则「餐段够量」里对 tea 设 meal 阈值。
+- 下午茶供给由 **side 层（`pickLayer==="side"`）+ drink 池** 承担；这些条目 `meals` 含 `"tea"` 即可被下午茶场景取用。
+- 目标改为「tea 场景（side+drink，含 `meals:["tea"]`）候选 ≥ 阈值」，放到后续**甜点/小食/饮品批次**统一定量，不占 meal 缺口。
+- 第一批 tea meal = 0 属**预期正确**，非缺陷。
 
 **treat 补齐硬性要求（额外要求 F）**：treat 档新菜必须是**高 indulgence(≥4)、高 satiety(≥3)、非「健康轻食」**的具体菜，禁止用 dining_style 凑数。
 > 注意：treat 门**不惩罚「清淡」**——「清淡」只是口味，不代表不犒劳（白灼基围虾清淡但高质量）。只看 indulgence / satiety / 是否「健康轻食」。详见 §5.3。
@@ -274,11 +306,11 @@ function resolveBucket(mix: Record<PriceTier, number>, nonEmpty: Set<PriceTier>)
 2. **dish 必填字段**：每个 `dish` 必须有 `cuisine / priceTier / meals(非空) / tags(非空) / satiety / indulgence / convenience / occasion(非空) / pickLayer / search.gateQuery / search.displayQuery`。
 3. **枚举合法**：`cuisine/priceTier/spicy/satiety/indulgence/convenience/occasion/tags/meals/pickLayer` 全部落在类型允许值内（防手写拼错）。
 4. **pickLayer 与 satiety 一致**：`pickLayer==="meal"` ⟺ `satiety>=3`；`pickLayer==="side"` ⟺ `satiety<3`（口径单一，防两处漂移）。
-5. **餐段够量**（dish **meal 层**，按餐段命中计，side 不计）：早≥40 / 午≥120 / 茶≥50 / 晚≥140 / 宵≥70。
+5. **餐段够量**（dish **meal 层**，按餐段命中计，side 不计）：早≥40 / 午≥120 / 晚≥140 / 宵≥70。**tea 不设 meal 阈值**（见 §4.2，走 side/drink）。
 6. **family×price 不塌**（仅 meal 层）：每个 family 的每个 priceTier 桶，meal-dish 数 ≥ 阈值（budget≥8, normal≥15, treat≥8）。
 7. **treat 质量门**：每个 `treat` 且 `pickLayer==="meal"` 的 dish 必须 `indulgence>=4 && satiety>=3` 且 tags 不含「健康轻食」（**不检查「清淡」**）。
 8. **id 唯一**；**canonicalGroup 若存在，组内 cuisine 一致**。
-9. **每家族每餐段非空**（meal 层）：4 family × 5 meal = 20 格，每格 meal-dish 数 ≥3（防「选西餐+早餐」塌池）。
+9. **每家族每餐段非空**（meal 层，**tea 除外**）：4 family × 4 meal（早/午/晚/宵）= 16 格，每格 meal-dish 数 ≥3（防「选西餐+早餐」塌池）。tea 不参与此项。
 10. **无乱码**：任何字符串字段不得含 U+FFFD（`�`）。
 
 ---
