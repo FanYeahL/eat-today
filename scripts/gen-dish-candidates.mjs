@@ -7,9 +7,10 @@
 //
 // 设计：核心属性（需人味判断的）手工列在 ROWS，紧凑表；
 // 衍生字段（search.* 查店档案、layer 层级）按规则机械推导，不手填。
-// 产物是「草案」，审定后才落 foods.ts。emoji 在落库时定，草案不含。
+// 产物是「草案」，审定后才落 foods.ts。id/emoji 已由生成器持有并写进草案（id 稳定、emoji 可改）。
 //
-// ROW 字段：[name, cuisine, priceTier, spicy, meals, tags, satiety, indulgence, convenience, occasion, canonicalGroup?]
+// ROW 字段：[id, name, cuisine, priceTier, spicy, meals, tags, satiety, indulgence, convenience, occasion, canonicalGroup?]
+//   id 是稳定引用契约：固化在 ROWS 里，绝不由 name 计算，改 name/emoji 时 id 不变（见 §S3 决策）。
 //   meals 短码: b早 l午 t茶 d晚 n宵 ；occasion 短码: s=solo dt=date f=friends ln=lateNight q=quick
 //
 // pickLayer 层级（衍生，对齐 spec §1.1 PickLayer + user fix 4「satiety<3 不进默认单菜池」）：
@@ -18,6 +19,7 @@
 
 import fs from "fs";
 import path from "path";
+import { readFileSync } from "node:fs";
 
 const M = { b: "breakfast", l: "lunch", t: "tea", d: "dinner", n: "midnight" };
 const O = { s: "solo", dt: "date", f: "friends", ln: "lateNight", q: "quick" };
@@ -139,108 +141,108 @@ function shopKwRequired(d) {
 // ─────────────────────────────────────────────
 const ROWS = [
   // ===== budget ×18（平价日常；覆盖早餐/宵夜真实可吃）=====
-  ["白粥配小菜",     "cn-generic",  "budget", 0, "b",   ["清淡","省钱","暖胃"], 2, 1, "canteen",     "sq"],
-  ["茶叶蛋",         "cn-generic",  "budget", 0, "bn",  ["省钱","快手"],        1, 1, "convenience", "sqln"],
-  ["菜肉包子",       "cn-generic",  "budget", 0, "b",   ["省钱","快手","暖胃"], 3, 2, "takeout",     "sq"],
-  ["手抓饼加蛋",     "cn-beifang",  "budget", 0, "b",   ["快手","解馋","高热量"],3, 2, "takeout",     "sq"],
-  ["咸豆浆",         "cn-jiangzhe", "budget", 0, "b",   ["清淡","暖胃","省钱"], 2, 2, "takeout",     "sq"],
-  ["西红柿鸡蛋面",   "cn-generic",  "budget", 0, "ld",  ["清淡","快手","暖胃"], 3, 2, "dorm",        "sq"],
-  ["阳春面",         "cn-jiangzhe", "budget", 0, "ld",  ["清淡","省钱","暖胃"], 3, 2, "restaurant",  "sq"],
-  ["榨菜肉丝面",     "cn-jiangzhe", "budget", 1, "ldn", ["下饭","快手","暖胃"], 3, 2, "takeout",     "sqln"],
-  ["土豆丝盖饭",     "cn-generic",  "budget", 1, "ld",  ["省钱","下饭","快手"], 4, 2, "canteen",     "sq"],
-  ["青椒肉丝盖饭",   "cn-generic",  "budget", 1, "ld",  ["下饭","省钱"],        4, 2, "canteen",     "sq"],
-  ["家常豆腐盖饭",   "cn-generic",  "budget", 1, "ld",  ["下饭","省钱","暖胃"], 4, 2, "canteen",     "sq"],
-  ["蒜薹炒肉盖饭",   "cn-generic",  "budget", 1, "ld",  ["下饭","省钱"],        4, 2, "canteen",     "sq"],
-  ["大饼卷菜",       "cn-beifang",  "budget", 0, "bl",  ["省钱","快手","解馋"], 3, 2, "takeout",     "sq"],
-  ["白菜炖粉条",     "cn-dongbei",  "budget", 0, "d",   ["暖胃","省钱","下饭"], 4, 2, "canteen",     "sf"],
-  ["醋溜白菜盖饭",   "cn-beifang",  "budget", 0, "ld",  ["清淡","省钱","下饭"], 3, 2, "canteen",     "sq"],
-  ["上海小馄饨",     "cn-jiangzhe", "budget", 0, "bn",  ["清淡","暖胃","快手"], 2, 2, "takeout",     "sqln"],
-  ["皮蛋豆腐",       "cn-generic",  "budget", 0, "dn",  ["清淡","解腻","快手"], 2, 2, "restaurant",  "fln"],
-  ["卤味拼盘",       "cn-generic",  "budget", 1, "dn",  ["解馋","下饭"],        2, 3, "takeout",     "sfln"],
+  ["cn-plain-congee-sides", "白粥配小菜",     "cn-generic",  "budget", 0, "b",   ["清淡","省钱","暖胃"], 2, 1, "canteen",     "sq"],
+  ["cn-tea-egg", "茶叶蛋",         "cn-generic",  "budget", 0, "bn",  ["省钱","快手"],        1, 1, "convenience", "sqln"],
+  ["cn-pork-veggie-bun", "菜肉包子",       "cn-generic",  "budget", 0, "b",   ["省钱","快手","暖胃"], 3, 2, "takeout",     "sq"],
+  ["cn-grabbed-pancake-egg", "手抓饼加蛋",     "cn-beifang",  "budget", 0, "b",   ["快手","解馋","高热量"],3, 2, "takeout",     "sq"],
+  ["cn-savory-soymilk", "咸豆浆",         "cn-jiangzhe", "budget", 0, "b",   ["清淡","暖胃","省钱"], 2, 2, "takeout",     "sq"],
+  ["cn-tomato-egg-noodle", "西红柿鸡蛋面",   "cn-generic",  "budget", 0, "ld",  ["清淡","快手","暖胃"], 3, 2, "dorm",        "sq"],
+  ["cn-yangchun-noodle", "阳春面",         "cn-jiangzhe", "budget", 0, "ld",  ["清淡","省钱","暖胃"], 3, 2, "restaurant",  "sq"],
+  ["cn-zhacai-pork-noodle", "榨菜肉丝面",     "cn-jiangzhe", "budget", 1, "ldn", ["下饭","快手","暖胃"], 3, 2, "takeout",     "sqln"],
+  ["cn-potato-strip-rice", "土豆丝盖饭",     "cn-generic",  "budget", 1, "ld",  ["省钱","下饭","快手"], 4, 2, "canteen",     "sq"],
+  ["cn-pepper-pork-rice", "青椒肉丝盖饭",   "cn-generic",  "budget", 1, "ld",  ["下饭","省钱"],        4, 2, "canteen",     "sq"],
+  ["cn-homestyle-tofu-rice", "家常豆腐盖饭",   "cn-generic",  "budget", 1, "ld",  ["下饭","省钱","暖胃"], 4, 2, "canteen",     "sq"],
+  ["cn-garlic-stem-pork-rice", "蒜薹炒肉盖饭",   "cn-generic",  "budget", 1, "ld",  ["下饭","省钱"],        4, 2, "canteen",     "sq"],
+  ["cn-flatbread-wrap", "大饼卷菜",       "cn-beifang",  "budget", 0, "bl",  ["省钱","快手","解馋"], 3, 2, "takeout",     "sq"],
+  ["cn-cabbage-vermicelli-stew", "白菜炖粉条",     "cn-dongbei",  "budget", 0, "d",   ["暖胃","省钱","下饭"], 4, 2, "canteen",     "sf"],
+  ["cn-vinegar-cabbage-rice", "醋溜白菜盖饭",   "cn-beifang",  "budget", 0, "ld",  ["清淡","省钱","下饭"], 3, 2, "canteen",     "sq"],
+  ["cn-shanghai-wonton", "上海小馄饨",     "cn-jiangzhe", "budget", 0, "bn",  ["清淡","暖胃","快手"], 2, 2, "takeout",     "sqln"],
+  ["cn-century-egg-tofu", "皮蛋豆腐",       "cn-generic",  "budget", 0, "dn",  ["清淡","解腻","快手"], 2, 2, "restaurant",  "fln"],
+  ["cn-braised-platter", "卤味拼盘",       "cn-generic",  "budget", 1, "dn",  ["解馋","下饭"],        2, 3, "takeout",     "sfln"],
 
   // ===== normal ×22（正餐主力）=====
-  ["红烧肉盖饭",     "cn-jiangzhe", "normal", 0, "ld",  ["高热量","下饭","解馋"], 4, 3, "canteen",    "sf"],
-  ["京酱肉丝",       "cn-beifang",  "normal", 0, "d",   ["下饭","解馋"],          3, 3, "restaurant", "f"],
-  ["地三鲜盖饭",     "cn-dongbei",  "normal", 0, "ld",  ["下饭","解馋","高热量"], 4, 3, "canteen",    "sf"],
-  ["小鸡炖蘑菇",     "cn-dongbei",  "normal", 0, "d",   ["暖胃","高蛋白","下饭"], 4, 3, "restaurant", "f"],
-  ["辣子鸡丁",       "cn-chuanyu",  "normal", 3, "ld",  ["解馋","下饭","高蛋白"], 3, 3, "restaurant", "f"],
-  ["口水鸡",         "cn-chuanyu",  "normal", 2, "ld",  ["解馋","高蛋白"],        3, 3, "restaurant", "fs"],
-  ["夫妻肺片",       "cn-chuanyu",  "normal", 2, "d",   ["解馋","下饭"],          2, 3, "restaurant", "f"],
-  ["农家小炒肉",     "cn-hunan",    "normal", 2, "ld",  ["下饭","解馋","高热量"], 4, 3, "restaurant", "sf"],
-  ["白切鸡",         "cn-guangdong","normal", 0, "ld",  ["清淡","高蛋白"],        3, 3, "restaurant", "f"],
-  ["腊味煲仔饭",     "cn-guangdong","normal", 0, "ld",  ["下饭","解馋","暖胃"],   4, 3, "restaurant", "sf", "baozaifan"],
-  ["干锅花菜",       "cn-hunan",    "normal", 2, "d",   ["下饭","解馋"],          3, 3, "restaurant", "f"],
-  ["铁板黑椒牛柳",   "cn-generic",  "normal", 1, "d",   ["高蛋白","下饭","解馋"], 3, 3, "restaurant", "dtf"],
-  ["鱼香茄子煲",     "cn-chuanyu",  "normal", 1, "ld",  ["下饭","解馋"],          3, 3, "canteen",    "s"],
-  ["糖醋里脊",       "cn-generic",  "normal", 0, "ld",  ["解馋","高热量"],        3, 3, "restaurant", "fs"],
-  ["咕咾肉",         "cn-guangdong","normal", 0, "ld",  ["解馋","高热量","下饭"], 3, 3, "restaurant", "fs"],
-  ["葱爆羊肉",       "cn-beifang",  "normal", 1, "d",   ["高蛋白","暖胃","下饭"], 3, 3, "restaurant", "f"],
-  ["羊肉泡馍",       "cn-xibei",    "normal", 0, "ld",  ["暖胃","高蛋白","续命"], 5, 3, "restaurant", "sf"],
-  ["新疆炒米粉",     "cn-xibei",    "normal", 2, "ldn", ["下饭","解馋","高热量"], 4, 3, "takeout",    "sfln"],
-  ["汽锅鸡",         "cn-yunguigui","normal", 0, "d",   ["暖胃","清淡","高蛋白"], 3, 3, "restaurant", "f"],
-  ["大理酸辣鱼",     "cn-yunguigui","normal", 2, "d",   ["下饭","解馋","暖胃"],   4, 3, "restaurant", "f"],
-  ["三杯鸡",         "cn-generic",  "normal", 1, "ld",  ["下饭","解馋","高蛋白"], 3, 3, "restaurant", "fs"],
-  ["梅菜扣肉盖饭",   "cn-guangdong","normal", 0, "ld",  ["下饭","高热量","解馋"], 4, 3, "canteen",    "sf"],
+  ["cn-hongshao-pork-rice", "红烧肉盖饭",     "cn-jiangzhe", "normal", 0, "ld",  ["高热量","下饭","解馋"], 4, 3, "canteen",    "sf"],
+  ["cn-jingjiang-pork", "京酱肉丝",       "cn-beifang",  "normal", 0, "d",   ["下饭","解馋"],          3, 3, "restaurant", "f"],
+  ["cn-disanxian-rice", "地三鲜盖饭",     "cn-dongbei",  "normal", 0, "ld",  ["下饭","解馋","高热量"], 4, 3, "canteen",    "sf"],
+  ["cn-chicken-mushroom-stew", "小鸡炖蘑菇",     "cn-dongbei",  "normal", 0, "d",   ["暖胃","高蛋白","下饭"], 4, 3, "restaurant", "f"],
+  ["cn-laziji", "辣子鸡丁",       "cn-chuanyu",  "normal", 3, "ld",  ["解馋","下饭","高蛋白"], 3, 3, "restaurant", "f"],
+  ["cn-koushui-chicken", "口水鸡",         "cn-chuanyu",  "normal", 2, "ld",  ["解馋","高蛋白"],        3, 3, "restaurant", "fs"],
+  ["cn-fuqi-feipian", "夫妻肺片",       "cn-chuanyu",  "normal", 2, "d",   ["解馋","下饭"],          2, 3, "restaurant", "f"],
+  ["cn-farmhouse-pork", "农家小炒肉",     "cn-hunan",    "normal", 2, "ld",  ["下饭","解馋","高热量"], 4, 3, "restaurant", "sf"],
+  ["cn-white-cut-chicken", "白切鸡",         "cn-guangdong","normal", 0, "ld",  ["清淡","高蛋白"],        3, 3, "restaurant", "f"],
+  ["cn-lapwei-claypot-rice", "腊味煲仔饭",     "cn-guangdong","normal", 0, "ld",  ["下饭","解馋","暖胃"],   4, 3, "restaurant", "sf", "baozaifan"],
+  ["cn-dry-pot-cauliflower", "干锅花菜",       "cn-hunan",    "normal", 2, "d",   ["下饭","解馋"],          3, 3, "restaurant", "f"],
+  ["cn-sizzling-pepper-beef", "铁板黑椒牛柳",   "cn-generic",  "normal", 1, "d",   ["高蛋白","下饭","解馋"], 3, 3, "restaurant", "dtf"],
+  ["cn-yuxiang-eggplant", "鱼香茄子煲",     "cn-chuanyu",  "normal", 1, "ld",  ["下饭","解馋"],          3, 3, "canteen",    "s"],
+  ["cn-sweet-sour-pork", "糖醋里脊",       "cn-generic",  "normal", 0, "ld",  ["解馋","高热量"],        3, 3, "restaurant", "fs"],
+  ["cn-gulao-pork", "咕咾肉",         "cn-guangdong","normal", 0, "ld",  ["解馋","高热量","下饭"], 3, 3, "restaurant", "fs"],
+  ["cn-scallion-lamb", "葱爆羊肉",       "cn-beifang",  "normal", 1, "d",   ["高蛋白","暖胃","下饭"], 3, 3, "restaurant", "f"],
+  ["cn-lamb-paomo", "羊肉泡馍",       "cn-xibei",    "normal", 0, "ld",  ["暖胃","高蛋白","续命"], 5, 3, "restaurant", "sf"],
+  ["cn-xinjiang-rice-noodle", "新疆炒米粉",     "cn-xibei",    "normal", 2, "ldn", ["下饭","解馋","高热量"], 4, 3, "takeout",    "sfln"],
+  ["cn-steampot-chicken", "汽锅鸡",         "cn-yunguigui","normal", 0, "d",   ["暖胃","清淡","高蛋白"], 3, 3, "restaurant", "f"],
+  ["cn-dali-sour-fish", "大理酸辣鱼",     "cn-yunguigui","normal", 2, "d",   ["下饭","解馋","暖胃"],   4, 3, "restaurant", "f"],
+  ["cn-three-cup-chicken", "三杯鸡",         "cn-generic",  "normal", 1, "ld",  ["下饭","解馋","高蛋白"], 3, 3, "restaurant", "fs"],
+  ["cn-meicai-pork-rice", "梅菜扣肉盖饭",   "cn-guangdong","normal", 0, "ld",  ["下饭","高热量","解馋"], 4, 3, "canteen",    "sf"],
 
   // ===== treat ×9（全具体菜，无火锅/烧烤/品牌；indulgence≥4 且 satiety≥3，非轻食）=====
-  ["剁椒鱼头",       "cn-hunan",    "treat", 2, "d",  ["下饭","解馋","高蛋白"], 4, 4, "restaurant", "f"],
-  ["葱烧海参",       "cn-beifang",  "treat", 0, "d",  ["高蛋白","解馋"],        3, 5, "restaurant", "fdt"],
-  ["蟹黄豆腐",       "cn-jiangzhe", "treat", 0, "d",  ["解馋","高蛋白"],        3, 4, "restaurant", "dtf"],
-  ["东坡肉",         "cn-jiangzhe", "treat", 0, "dl", ["高热量","解馋","下饭"], 4, 4, "restaurant", "f"],
-  ["北京烤鸭",       "cn-beifang",  "treat", 0, "d",  ["高热量","解馋","高蛋白"],4, 5, "restaurant", "fdt"],
-  ["白灼基围虾",     "cn-guangdong","treat", 0, "d",  ["清淡","高蛋白","解馋"], 3, 4, "restaurant", "fdt"],
-  ["干锅牛蛙",       "cn-chuanyu",  "treat", 2, "d",  ["解馋","下饭","高蛋白"], 4, 4, "restaurant", "f"],
-  ["水煮鱼",         "cn-chuanyu",  "treat", 3, "dl", ["下饭","解馋","高蛋白"], 4, 4, "restaurant", "f", "shuizhuyu"],
-  ["酸汤肥牛",       "cn-generic",  "treat", 1, "dl", ["下饭","解馋","高蛋白"], 4, 4, "restaurant", "fs"],
+  ["cn-chopped-chili-fish-head", "剁椒鱼头",       "cn-hunan",    "treat", 2, "d",  ["下饭","解馋","高蛋白"], 4, 4, "restaurant", "f"],
+  ["cn-scallion-sea-cucumber", "葱烧海参",       "cn-beifang",  "treat", 0, "d",  ["高蛋白","解馋"],        3, 5, "restaurant", "fdt"],
+  ["cn-crab-roe-tofu", "蟹黄豆腐",       "cn-jiangzhe", "treat", 0, "d",  ["解馋","高蛋白"],        3, 4, "restaurant", "dtf"],
+  ["cn-dongpo-pork", "东坡肉",         "cn-jiangzhe", "treat", 0, "dl", ["高热量","解馋","下饭"], 4, 4, "restaurant", "f"],
+  ["cn-peking-duck", "北京烤鸭",       "cn-beifang",  "treat", 0, "d",  ["高热量","解馋","高蛋白"],4, 5, "restaurant", "fdt"],
+  ["cn-blanched-shrimp", "白灼基围虾",     "cn-guangdong","treat", 0, "d",  ["清淡","高蛋白","解馋"], 3, 4, "restaurant", "fdt"],
+  ["cn-dry-pot-bullfrog", "干锅牛蛙",       "cn-chuanyu",  "treat", 2, "d",  ["解馋","下饭","高蛋白"], 4, 4, "restaurant", "f"],
+  ["cn-shuizhu-fish", "水煮鱼",         "cn-chuanyu",  "treat", 3, "dl", ["下饭","解馋","高蛋白"], 4, 4, "restaurant", "f", "shuizhuyu"],
+  ["cn-sour-soup-beef", "酸汤肥牛",       "cn-generic",  "treat", 1, "dl", ["下饭","解馋","高蛋白"], 4, 4, "restaurant", "fs"],
 
   // ═══════════════════════════════════════════════
   // 中式 +7 meal（补 §4.0 看板缺口：budget +6 / normal +1；均 satiety>=3 保证计入 meal 层）
   // 已核对不与现有 foods.ts 及本文件上方 49 撞名；盖饭类挂 canonicalGroup 防刷屏
   // ═══════════════════════════════════════════════
-  ["扬州炒饭",       "cn-generic",  "budget", 0, "ld",  ["快手","解馋","高热量"], 3, 2, "canteen",    "sq", "chaofan"],
-  ["肉丝炒面",       "cn-generic",  "budget", 1, "ldn", ["快手","下饭","高热量"], 3, 2, "takeout",    "sqln"],
-  ["香菇滑鸡饭",     "cn-guangdong","budget", 0, "ld",  ["下饭","高蛋白","暖胃"], 4, 2, "canteen",    "sq"],
-  ["回锅肉盖饭",     "cn-chuanyu",  "budget", 2, "ld",  ["下饭","解馋","高热量"], 4, 2, "canteen",    "sq"],
-  ["麻婆豆腐盖饭",   "cn-chuanyu",  "budget", 2, "ld",  ["下饭","解馋","暖胃"],   3, 2, "canteen",    "sq"],
-  ["台式卤肉饭",     "cn-generic",  "budget", 0, "ldn", ["下饭","解馋","高热量"], 3, 2, "takeout",    "sqln"],
-  ["咖喱牛肉饭",     "cn-generic",  "normal", 1, "ld",  ["下饭","解馋","高蛋白"], 4, 3, "restaurant", "sf"],
+  ["cn-yangzhou-fried-rice", "扬州炒饭",       "cn-generic",  "budget", 0, "ld",  ["快手","解馋","高热量"], 3, 2, "canteen",    "sq", "chaofan"],
+  ["cn-pork-fried-noodle", "肉丝炒面",       "cn-generic",  "budget", 1, "ldn", ["快手","下饭","高热量"], 3, 2, "takeout",    "sqln"],
+  ["cn-mushroom-chicken-rice", "香菇滑鸡饭",     "cn-guangdong","budget", 0, "ld",  ["下饭","高蛋白","暖胃"], 4, 2, "canteen",    "sq"],
+  ["cn-huiguorou-rice", "回锅肉盖饭",     "cn-chuanyu",  "budget", 2, "ld",  ["下饭","解馋","高热量"], 4, 2, "canteen",    "sq"],
+  ["cn-mapo-tofu-rice", "麻婆豆腐盖饭",   "cn-chuanyu",  "budget", 2, "ld",  ["下饭","解馋","暖胃"],   3, 2, "canteen",    "sq"],
+  ["cn-taiwan-lurou-rice", "台式卤肉饭",     "cn-generic",  "budget", 0, "ldn", ["下饭","解馋","高热量"], 3, 2, "takeout",    "sqln"],
+  ["cn-curry-beef-rice", "咖喱牛肉饭",     "cn-generic",  "normal", 1, "ld",  ["下饭","解馋","高蛋白"], 4, 3, "restaurant", "sf"],
 
   // ═══════════════════════════════════════════════
   // 西餐 +29 meal（budget 8 / normal 13 / treat 8；全为 satiety>=3 的 meal 层具体菜）
   // family=western，由 cuisine→familyOf 推导；已核对不与现有 22 道西餐撞名
   // ═══════════════════════════════════════════════
   // ---- western budget ×8 ----
-  ["培根鸡蛋堡",     "western-american", "budget", 0, "b",   ["高热量","快手","解馋"], 3, 3, "takeout",    "sq"],
-  ["美式炒蛋吐司",   "western-american", "budget", 0, "b",   ["快手","高蛋白"],        3, 3, "takeout",    "sq"],
-  ["金枪鱼三明治",   "western-generic",  "budget", 0, "bl",  ["快手","高蛋白","清淡"], 3, 2, "convenience","sq"],
-  ["火腿芝士帕尼尼", "western-italian",  "budget", 0, "bl",  ["快手","解馋","高热量"], 3, 3, "takeout",    "sq"],
-  ["茄汁意面",       "western-italian",  "budget", 0, "ld",  ["解馋","高热量"],        3, 3, "canteen",    "sq", "yimian"],
-  ["青酱意面",       "western-italian",  "budget", 0, "ld",  ["解馋","高热量"],        3, 3, "canteen",    "sq", "yimian"],
-  ["墨西哥鸡肉卷",   "western-american", "budget", 1, "ldn", ["快手","解馋","高热量"], 3, 3, "takeout",    "sqln"],
-  ["培根薯饼早餐盘", "western-american", "budget", 0, "b",   ["高热量","解馋"],        3, 3, "restaurant", "sf"],
+  ["us-bacon-egg-burger", "培根鸡蛋堡",     "western-american", "budget", 0, "b",   ["高热量","快手","解馋"], 3, 3, "takeout",    "sq"],
+  ["us-scrambled-egg-toast", "美式炒蛋吐司",   "western-american", "budget", 0, "b",   ["快手","高蛋白"],        3, 3, "takeout",    "sq"],
+  ["west-tuna-sandwich", "金枪鱼三明治",   "western-generic",  "budget", 0, "bl",  ["快手","高蛋白","清淡"], 3, 2, "convenience","sq"],
+  ["it-ham-cheese-panini", "火腿芝士帕尼尼", "western-italian",  "budget", 0, "bl",  ["快手","解馋","高热量"], 3, 3, "takeout",    "sq"],
+  ["it-tomato-pasta", "茄汁意面",       "western-italian",  "budget", 0, "ld",  ["解馋","高热量"],        3, 3, "canteen",    "sq", "yimian"],
+  ["it-pesto-pasta", "青酱意面",       "western-italian",  "budget", 0, "ld",  ["解馋","高热量"],        3, 3, "canteen",    "sq", "yimian"],
+  ["us-mexican-chicken-wrap", "墨西哥鸡肉卷",   "western-american", "budget", 1, "ldn", ["快手","解馋","高热量"], 3, 3, "takeout",    "sqln"],
+  ["us-bacon-hashbrown-breakfast", "培根薯饼早餐盘", "western-american", "budget", 0, "b",   ["高热量","解馋"],        3, 3, "restaurant", "sf"],
   // ---- western normal ×13 ----
-  ["玛格丽特披萨",   "western-italian",  "normal", 0, "ld",  ["解馋","高热量"],        4, 3, "restaurant", "fdt", "pizza"],
-  ["意式千层面",     "western-italian",  "normal", 0, "ld",  ["解馋","高热量","暖胃"], 4, 3, "restaurant", "fdt"],
-  ["芝士焗饭",       "western-generic",  "normal", 0, "ld",  ["解馋","高热量","暖胃"], 4, 3, "restaurant", "sf"],
-  ["蘑菇鸡肉焗饭",   "western-generic",  "normal", 0, "ld",  ["解馋","高蛋白","暖胃"], 4, 3, "restaurant", "sf"],
-  ["安格斯牛肉堡",   "western-american", "normal", 0, "ld",  ["高热量","解馋","高蛋白"],4, 3, "restaurant", "fdt"],
-  ["奥尔良烤鸡饭",   "western-american", "normal", 1, "ld",  ["下饭","解馋","高蛋白"], 4, 3, "takeout",    "sf"],
-  ["意式肉丸饭",     "western-italian",  "normal", 0, "ld",  ["下饭","解馋","高蛋白"], 4, 3, "restaurant", "sf"],
-  ["香肠意面",       "western-italian",  "normal", 1, "ld",  ["解馋","高热量"],        4, 3, "restaurant", "sf", "yimian"],
-  ["美式炸鸡汉堡",   "western-american", "normal", 1, "ldn", ["高热量","解馋"],        4, 3, "takeout",    "sfln"],
-  ["香煎鸡排饭",     "western-generic",  "normal", 0, "ld",  ["高蛋白","解馋","下饭"], 4, 3, "restaurant", "sf"],
-  ["烟熏三文鱼贝果", "western-generic",  "normal", 0, "bl",  ["高蛋白","清淡","解馋"], 3, 3, "restaurant", "dt"],
-  ["奶油蘑菇汤配面包","western-generic", "normal", 0, "ld",  ["暖胃","清淡"],          3, 3, "restaurant", "dt"],
-  ["鸡肉凯撒卷",     "western-generic",  "normal", 0, "ld",  ["快手","高蛋白","解馋"], 3, 3, "takeout",    "sq"],
+  ["it-margherita-pizza", "玛格丽特披萨",   "western-italian",  "normal", 0, "ld",  ["解馋","高热量"],        4, 3, "restaurant", "fdt", "pizza"],
+  ["it-lasagna", "意式千层面",     "western-italian",  "normal", 0, "ld",  ["解馋","高热量","暖胃"], 4, 3, "restaurant", "fdt"],
+  ["west-cheese-baked-rice", "芝士焗饭",       "western-generic",  "normal", 0, "ld",  ["解馋","高热量","暖胃"], 4, 3, "restaurant", "sf"],
+  ["west-mushroom-chicken-baked-rice", "蘑菇鸡肉焗饭",   "western-generic",  "normal", 0, "ld",  ["解馋","高蛋白","暖胃"], 4, 3, "restaurant", "sf"],
+  ["us-angus-beef-burger", "安格斯牛肉堡",   "western-american", "normal", 0, "ld",  ["高热量","解馋","高蛋白"],4, 3, "restaurant", "fdt"],
+  ["us-orleans-chicken-rice", "奥尔良烤鸡饭",   "western-american", "normal", 1, "ld",  ["下饭","解馋","高蛋白"], 4, 3, "takeout",    "sf"],
+  ["it-meatball-rice", "意式肉丸饭",     "western-italian",  "normal", 0, "ld",  ["下饭","解馋","高蛋白"], 4, 3, "restaurant", "sf"],
+  ["it-sausage-pasta", "香肠意面",       "western-italian",  "normal", 1, "ld",  ["解馋","高热量"],        4, 3, "restaurant", "sf", "yimian"],
+  ["us-fried-chicken-burger", "美式炸鸡汉堡",   "western-american", "normal", 1, "ldn", ["高热量","解馋"],        4, 3, "takeout",    "sfln"],
+  ["west-pan-chicken-rice", "香煎鸡排饭",     "western-generic",  "normal", 0, "ld",  ["高蛋白","解馋","下饭"], 4, 3, "restaurant", "sf"],
+  ["west-smoked-salmon-bagel", "烟熏三文鱼贝果", "western-generic",  "normal", 0, "bl",  ["高蛋白","清淡","解馋"], 3, 3, "restaurant", "dt"],
+  ["west-cream-mushroom-soup-bread", "奶油蘑菇汤配面包","western-generic", "normal", 0, "ld",  ["暖胃","清淡"],          3, 3, "restaurant", "dt"],
+  ["west-chicken-caesar-wrap", "鸡肉凯撒卷",     "western-generic",  "normal", 0, "ld",  ["快手","高蛋白","解馋"], 3, 3, "takeout",    "sq"],
   // ---- western treat ×8（indulgence>=4 且 satiety>=3；不惩罚清淡）----
-  ["惠灵顿牛排",     "western-generic",  "treat", 0, "d",   ["高热量","解馋","高蛋白"],4, 5, "restaurant", "dtf"],
-  ["战斧牛排",       "western-american", "treat", 0, "d",   ["高热量","解馋","高蛋白"],4, 5, "restaurant", "dtf"],
-  ["海鲜意面",       "western-italian",  "treat", 1, "d",   ["解馋","高蛋白"],        4, 4, "restaurant", "dtf", "yimian"],
-  ["奶油蘑菇牛排饭", "western-generic",  "treat", 0, "d",   ["高热量","解馋","高蛋白"],4, 4, "restaurant", "sf"],
-  ["芝士焗龙虾",     "western-generic",  "treat", 0, "d",   ["解馋","高蛋白"],        4, 5, "restaurant", "dtf"],
-  ["烤羊排",         "western-generic",  "treat", 1, "d",   ["高热量","解馋","高蛋白"],4, 4, "restaurant", "fdt"],
-  ["松露蘑菇意面",   "western-italian",  "treat", 0, "d",   ["解馋","高热量"],        4, 4, "restaurant", "dtf", "yimian"],
-  ["西冷牛排配薯条", "western-american", "treat", 0, "d",   ["高热量","解馋","高蛋白"],4, 4, "restaurant", "dtf"],
+  ["west-beef-wellington", "惠灵顿牛排",     "western-generic",  "treat", 0, "d",   ["高热量","解馋","高蛋白"],4, 5, "restaurant", "dtf"],
+  ["us-tomahawk-steak", "战斧牛排",       "western-american", "treat", 0, "d",   ["高热量","解馋","高蛋白"],4, 5, "restaurant", "dtf"],
+  ["it-seafood-pasta", "海鲜意面",       "western-italian",  "treat", 1, "d",   ["解馋","高蛋白"],        4, 4, "restaurant", "dtf", "yimian"],
+  ["west-cream-mushroom-steak-rice", "奶油蘑菇牛排饭", "western-generic",  "treat", 0, "d",   ["高热量","解馋","高蛋白"],4, 4, "restaurant", "sf"],
+  ["west-cheese-lobster", "芝士焗龙虾",     "western-generic",  "treat", 0, "d",   ["解馋","高蛋白"],        4, 5, "restaurant", "dtf"],
+  ["west-roast-lamb-chop", "烤羊排",         "western-generic",  "treat", 1, "d",   ["高热量","解馋","高蛋白"],4, 4, "restaurant", "fdt"],
+  ["it-truffle-mushroom-pasta", "松露蘑菇意面",   "western-italian",  "treat", 0, "d",   ["解馋","高热量"],        4, 4, "restaurant", "dtf", "yimian"],
+  ["us-sirloin-steak-fries", "西冷牛排配薯条", "western-american", "treat", 0, "d",   ["高热量","解馋","高蛋白"],4, 4, "restaurant", "dtf"],
 
   // ═══════════════════════════════════════════════
   // 日韩 +27 meal（budget 7 / normal 13 / treat 7；全 satiety>=3）
@@ -249,35 +251,35 @@ const ROWS = [
   //   family=jpkr（japanese/korean），已核对不与现有 29 道日韩撞名。
   // ═══════════════════════════════════════════════
   // ---- jpkr budget ×7（含 2 早餐、多夜宵）----
-  ["日式鲑鱼茶泡饭", "japanese", "budget", 0, "bln", ["清淡","快手","暖胃"],   3, 2, "takeout",    "sqln"],
-  ["日式滑蛋牛肉饭", "japanese", "budget", 0, "bld", ["快手","高蛋白","下饭"], 3, 2, "canteen",    "sq"],
-  ["韩式泡菜炒饭",   "korean",   "budget", 1, "ldn", ["下饭","解馋","快手"],   3, 2, "canteen",    "sqln"],
-  ["韩式辣味拉面",   "korean",   "budget", 2, "ldn", ["暖胃","解馋","续命"],   3, 2, "convenience","sqln"],
-  ["日式酱油拉面",   "japanese", "budget", 1, "ldn", ["暖胃","解馋"],          4, 2, "takeout",    "sln",  "ramen"],
-  ["韩式辣炒猪肉盖饭","korean",   "budget", 2, "ldn", ["下饭","解馋","高蛋白"], 4, 2, "canteen",    "sqln"],
-  ["日式咖喱鸡排饭", "japanese", "budget", 1, "ldn", ["下饭","解馋","高热量"], 4, 2, "canteen",    "sqln"],
+  ["jp-salmon-ochazuke", "日式鲑鱼茶泡饭", "japanese", "budget", 0, "bln", ["清淡","快手","暖胃"],   3, 2, "takeout",    "sqln"],
+  ["jp-egg-beef-rice", "日式滑蛋牛肉饭", "japanese", "budget", 0, "bld", ["快手","高蛋白","下饭"], 3, 2, "canteen",    "sq"],
+  ["kr-kimchi-fried-rice", "韩式泡菜炒饭",   "korean",   "budget", 1, "ldn", ["下饭","解馋","快手"],   3, 2, "canteen",    "sqln"],
+  ["kr-spicy-ramen", "韩式辣味拉面",   "korean",   "budget", 2, "ldn", ["暖胃","解馋","续命"],   3, 2, "convenience","sqln"],
+  ["jp-shoyu-ramen", "日式酱油拉面",   "japanese", "budget", 1, "ldn", ["暖胃","解馋"],          4, 2, "takeout",    "sln",  "ramen"],
+  ["kr-spicy-pork-rice", "韩式辣炒猪肉盖饭","korean",   "budget", 2, "ldn", ["下饭","解馋","高蛋白"], 4, 2, "canteen",    "sqln"],
+  ["jp-curry-chicken-cutlet-rice", "日式咖喱鸡排饭", "japanese", "budget", 1, "ldn", ["下饭","解馋","高热量"], 4, 2, "canteen",    "sqln"],
   // ---- jpkr normal ×13（夜宵主力）----
-  ["日式海鲜拉面",   "japanese", "normal", 1, "ldn", ["暖胃","解馋","高蛋白"], 4, 3, "restaurant", "sfln", "ramen"],
-  ["日式盐味拉面",   "japanese", "normal", 0, "ldn", ["暖胃","清淡"],          4, 3, "restaurant", "sfln", "ramen"],
-  ["日式照烧鸡腿饭", "japanese", "normal", 0, "ldn", ["下饭","解馋","高蛋白"], 4, 3, "takeout",    "sfln"],
-  ["日式咖喱牛肉乌冬","japanese", "normal", 1, "ldn", ["暖胃","解馋","下饭"],   4, 3, "restaurant", "sfln"],
-  ["韩式泡菜猪肉锅", "korean",   "normal", 2, "dn",  ["暖胃","下饭","解馋"],   4, 3, "restaurant", "fln"],
-  ["韩式辣炒鱿鱼盖饭","korean",   "normal", 2, "ldn", ["下饭","解馋","高蛋白"], 4, 3, "restaurant", "sfln"],
-  ["日式天妇罗盖饭", "japanese", "normal", 0, "ld",  ["解馋","高热量"],        4, 3, "restaurant", "sf"],
-  ["韩式炸鸡",       "korean",   "normal", 1, "dn",  ["高热量","解馋"],        4, 4, "takeout",    "flln",  "koreanchicken"],
-  ["韩式酱油炸鸡",   "korean",   "normal", 0, "dn",  ["高热量","解馋"],        4, 4, "takeout",    "flln",  "koreanchicken"],
-  ["日式咖喱猪排饭", "japanese", "normal", 1, "ldn", ["下饭","解馋","高热量"], 4, 3, "restaurant", "sfln"],
-  ["韩式辣牛肉汤饭", "korean",   "normal", 2, "ldn", ["暖胃","下饭","高蛋白"], 4, 3, "restaurant", "sfln"],
-  ["韩式海鲜煎饼",   "korean",   "normal", 0, "dn",  ["解馋","高热量"],        3, 3, "restaurant", "fln"],
-  ["日式牛肉时雨煮饭","japanese", "normal", 0, "ld",  ["下饭","高蛋白","解馋"], 4, 3, "takeout",    "sf"],
+  ["jp-seafood-ramen", "日式海鲜拉面",   "japanese", "normal", 1, "ldn", ["暖胃","解馋","高蛋白"], 4, 3, "restaurant", "sfln", "ramen"],
+  ["jp-shio-ramen", "日式盐味拉面",   "japanese", "normal", 0, "ldn", ["暖胃","清淡"],          4, 3, "restaurant", "sfln", "ramen"],
+  ["jp-teriyaki-chicken-rice", "日式照烧鸡腿饭", "japanese", "normal", 0, "ldn", ["下饭","解馋","高蛋白"], 4, 3, "takeout",    "sfln"],
+  ["jp-curry-beef-udon", "日式咖喱牛肉乌冬","japanese", "normal", 1, "ldn", ["暖胃","解馋","下饭"],   4, 3, "restaurant", "sfln"],
+  ["kr-kimchi-pork-stew", "韩式泡菜猪肉锅", "korean",   "normal", 2, "dn",  ["暖胃","下饭","解馋"],   4, 3, "restaurant", "fln"],
+  ["kr-spicy-squid-rice", "韩式辣炒鱿鱼盖饭","korean",   "normal", 2, "ldn", ["下饭","解馋","高蛋白"], 4, 3, "restaurant", "sfln"],
+  ["jp-tempura-donburi", "日式天妇罗盖饭", "japanese", "normal", 0, "ld",  ["解馋","高热量"],        4, 3, "restaurant", "sf"],
+  ["kr-fried-chicken", "韩式炸鸡",       "korean",   "normal", 1, "dn",  ["高热量","解馋"],        4, 4, "takeout",    "flln",  "koreanchicken"],
+  ["kr-soy-fried-chicken", "韩式酱油炸鸡",   "korean",   "normal", 0, "dn",  ["高热量","解馋"],        4, 4, "takeout",    "flln",  "koreanchicken"],
+  ["jp-curry-pork-cutlet-rice", "日式咖喱猪排饭", "japanese", "normal", 1, "ldn", ["下饭","解馋","高热量"], 4, 3, "restaurant", "sfln"],
+  ["kr-spicy-beef-soup-rice", "韩式辣牛肉汤饭", "korean",   "normal", 2, "ldn", ["暖胃","下饭","高蛋白"], 4, 3, "restaurant", "sfln"],
+  ["kr-seafood-pancake", "韩式海鲜煎饼",   "korean",   "normal", 0, "dn",  ["解馋","高热量"],        3, 3, "restaurant", "fln"],
+  ["jp-beef-shigureni-rice", "日式牛肉时雨煮饭","japanese", "normal", 0, "ld",  ["下饭","高蛋白","解馋"], 4, 3, "takeout",    "sf"],
   // ---- jpkr treat ×7（indulgence>=4 & satiety>=3）----
-  ["日式和牛烧肉",   "japanese", "treat", 0, "dn",  ["高热量","解馋","高蛋白"],4, 5, "restaurant", "flln"],
-  ["日式刺身拼盘",   "japanese", "treat", 0, "dn",  ["清淡","高蛋白","解馋"],  3, 4, "restaurant", "fdt"],
-  ["日式鳗鱼三吃",   "japanese", "treat", 0, "d",   ["解馋","高蛋白"],         4, 4, "restaurant", "fdt"],
-  ["韩式烤五花肉套餐","korean",  "treat", 1, "dn",  ["高热量","解馋","高蛋白"],4, 4, "restaurant", "flln"],
-  ["日式特上寿司",   "japanese", "treat", 0, "d",   ["清淡","高蛋白","解馋"],  3, 5, "restaurant", "fdt"],
-  ["韩式炭火烤牛小排","korean",  "treat", 0, "dn",  ["高热量","解馋","高蛋白"],4, 5, "restaurant", "flln"],
-  ["日式蟹肉火锅",   "japanese", "treat", 0, "dn",  ["暖胃","解馋","高蛋白"],  4, 4, "restaurant", "flln"],
+  ["jp-wagyu-yakiniku", "日式和牛烧肉",   "japanese", "treat", 0, "dn",  ["高热量","解馋","高蛋白"],4, 5, "restaurant", "flln"],
+  ["jp-sashimi-platter", "日式刺身拼盘",   "japanese", "treat", 0, "dn",  ["清淡","高蛋白","解馋"],  3, 4, "restaurant", "fdt"],
+  ["jp-unagi-three-ways", "日式鳗鱼三吃",   "japanese", "treat", 0, "d",   ["解馋","高蛋白"],         4, 4, "restaurant", "fdt"],
+  ["kr-pork-belly-bbq-set", "韩式烤五花肉套餐","korean",  "treat", 1, "dn",  ["高热量","解馋","高蛋白"],4, 4, "restaurant", "flln"],
+  ["jp-premium-sushi", "日式特上寿司",   "japanese", "treat", 0, "d",   ["清淡","高蛋白","解馋"],  3, 5, "restaurant", "fdt"],
+  ["kr-charcoal-beef-short-rib", "韩式炭火烤牛小排","korean",  "treat", 0, "dn",  ["高热量","解馋","高蛋白"],4, 5, "restaurant", "flln"],
+  ["jp-crab-hotpot", "日式蟹肉火锅",   "japanese", "treat", 0, "dn",  ["暖胃","解馋","高蛋白"],  4, 4, "restaurant", "flln"],
 
   // ═══════════════════════════════════════════════
   // 异国 +24 meal（budget 4 / normal 12 / treat 8；全 satiety>=3）
@@ -285,43 +287,74 @@ const ROWS = [
   //   family=exotic（thai/sea/mideast/indian/exotic-generic），已核对不与现有 17 道异国撞名。
   // ═══════════════════════════════════════════════
   // ---- exotic budget ×4 ----
-  ["越南猪肉法包",   "sea",     "budget", 0, "bln", ["快手","解馋","清淡"],   3, 2, "takeout",    "sqln"],
-  ["泰式打抛猪饭",   "thai",    "budget", 2, "ldn", ["下饭","解馋","高蛋白"], 3, 2, "takeout",    "sqln"],
-  ["印尼炒饭",       "sea",     "budget", 1, "ldn", ["下饭","解馋","高热量"], 3, 2, "takeout",    "sqln"],
-  ["泰式海鲜炒河粉", "thai",    "budget", 1, "ldn", ["解馋","高热量","下饭"], 3, 2, "takeout",    "sqln"],
+  ["sea-vietnam-pork-banhmi", "越南猪肉法包",   "sea",     "budget", 0, "bln", ["快手","解馋","清淡"],   3, 2, "takeout",    "sqln"],
+  ["th-basil-pork-rice", "泰式打抛猪饭",   "thai",    "budget", 2, "ldn", ["下饭","解馋","高蛋白"], 3, 2, "takeout",    "sqln"],
+  ["sea-indonesia-fried-rice", "印尼炒饭",       "sea",     "budget", 1, "ldn", ["下饭","解馋","高热量"], 3, 2, "takeout",    "sqln"],
+  ["th-seafood-fried-noodle", "泰式海鲜炒河粉", "thai",    "budget", 1, "ldn", ["解馋","高热量","下饭"], 3, 2, "takeout",    "sqln"],
   // ---- exotic normal ×12（夜宵主力）----
-  ["泰式绿咖喱鸡饭", "thai",    "normal", 2, "ldn", ["下饭","解馋","暖胃"],   4, 3, "restaurant", "sfln"],
-  ["泰式红咖喱牛肉饭","thai",   "normal", 2, "ldn", ["下饭","解馋","高蛋白"], 4, 3, "restaurant", "sfln"],
-  ["泰式冬阴功海鲜面","thai",   "normal", 2, "ldn", ["暖胃","解馋","高蛋白"], 4, 3, "restaurant", "sfln"],
-  ["马来叻沙面",     "sea",     "normal", 2, "ldn", ["暖胃","解馋","高热量"], 4, 3, "restaurant", "sfln"],
-  ["越南香茅烤肉饭", "sea",     "normal", 1, "ldn", ["下饭","解馋","高蛋白"], 4, 3, "takeout",    "sfln"],
-  ["印度咖喱羊肉饭", "indian",  "normal", 2, "ldn", ["下饭","解馋","高蛋白"], 4, 3, "restaurant", "sfln"],
-  ["印度玛萨拉咖喱鸡饭","indian", "normal",2, "ldn", ["下饭","解馋","暖胃"],   4, 3, "restaurant", "sfln"],
-  ["墨西哥烤鸡肉卷饭","exotic-generic","normal",1,"ldn",["快手","解馋","高蛋白"],3,3,"takeout",   "sqln"],
-  ["中东烤鸡肉饭",   "mideast", "normal", 1, "ldn", ["下饭","解馋","高蛋白"], 4, 3, "takeout",    "sfln"],
-  ["新加坡海南鸡饭", "sea",     "normal", 0, "ld",  ["清淡","高蛋白","下饭"], 4, 3, "restaurant", "sf"],
-  ["越南春卷米线",   "sea",     "normal", 0, "ld",  ["清淡","快手"],          3, 3, "takeout",    "sq"],
-  ["土耳其烤肉披萨", "mideast", "normal", 0, "ldn", ["解馋","高热量"],        4, 3, "takeout",    "sfln"],
+  ["th-green-curry-chicken-rice", "泰式绿咖喱鸡饭", "thai",    "normal", 2, "ldn", ["下饭","解馋","暖胃"],   4, 3, "restaurant", "sfln"],
+  ["th-red-curry-beef-rice", "泰式红咖喱牛肉饭","thai",   "normal", 2, "ldn", ["下饭","解馋","高蛋白"], 4, 3, "restaurant", "sfln"],
+  ["th-tomyum-seafood-noodle", "泰式冬阴功海鲜面","thai",   "normal", 2, "ldn", ["暖胃","解馋","高蛋白"], 4, 3, "restaurant", "sfln"],
+  ["sea-malay-laksa", "马来叻沙面",     "sea",     "normal", 2, "ldn", ["暖胃","解馋","高热量"], 4, 3, "restaurant", "sfln"],
+  ["sea-vietnam-lemongrass-pork-rice", "越南香茅烤肉饭", "sea",     "normal", 1, "ldn", ["下饭","解馋","高蛋白"], 4, 3, "takeout",    "sfln"],
+  ["in-lamb-curry-rice", "印度咖喱羊肉饭", "indian",  "normal", 2, "ldn", ["下饭","解馋","高蛋白"], 4, 3, "restaurant", "sfln"],
+  ["in-masala-chicken-rice", "印度玛萨拉咖喱鸡饭","indian", "normal",2, "ldn", ["下饭","解馋","暖胃"],   4, 3, "restaurant", "sfln"],
+  ["world-mexican-chicken-burrito-rice", "墨西哥烤鸡肉卷饭","exotic-generic","normal",1,"ldn",["快手","解馋","高蛋白"],3,3,"takeout",   "sqln"],
+  ["me-mideast-chicken-rice", "中东烤鸡肉饭",   "mideast", "normal", 1, "ldn", ["下饭","解馋","高蛋白"], 4, 3, "takeout",    "sfln"],
+  ["sea-hainan-chicken-rice", "新加坡海南鸡饭", "sea",     "normal", 0, "ld",  ["清淡","高蛋白","下饭"], 4, 3, "restaurant", "sf"],
+  ["sea-vietnam-springroll-noodle", "越南春卷米线",   "sea",     "normal", 0, "ld",  ["清淡","快手"],          3, 3, "takeout",    "sq"],
+  ["me-turkish-kebab-pizza", "土耳其烤肉披萨", "mideast", "normal", 0, "ldn", ["解馋","高热量"],        4, 3, "takeout",    "sfln"],
   // ---- exotic treat ×8（indulgence>=4 & satiety>=3）----
-  ["泰式咖喱蟹",     "thai",    "treat", 2, "dn",  ["解馋","高蛋白"],        4, 4, "restaurant", "flln"],
-  ["新加坡黑胡椒蟹", "sea",     "treat", 1, "dn",  ["解馋","高蛋白","高热量"],4, 5, "restaurant", "flln"],
-  ["印度烤羊排配馕", "indian",  "treat", 1, "d",   ["高热量","解馋","高蛋白"],4, 4, "restaurant", "fdt"],
-  ["中东烤羊肉拼盘", "mideast", "treat", 1, "dn",  ["高热量","解馋","高蛋白"],4, 4, "restaurant", "flln"],
-  ["泰式帝王虾",     "thai",    "treat", 1, "d",   ["解馋","高蛋白","清淡"], 3, 4, "restaurant", "fdt"],
-  ["摩洛哥炖羊肉",   "mideast", "treat", 1, "d",   ["暖胃","解馋","高蛋白"], 4, 4, "restaurant", "fdt"],
-  ["西班牙海鲜饭",   "exotic-generic","treat",0, "d",   ["解馋","高蛋白","高热量"],4, 4, "restaurant", "fdt"],
-  ["泰式火山排骨",   "thai",    "treat", 3, "dn",  ["解馋","下饭","高热量"], 4, 4, "restaurant", "flln"],
+  ["th-curry-crab", "泰式咖喱蟹",     "thai",    "treat", 2, "dn",  ["解馋","高蛋白"],        4, 4, "restaurant", "flln"],
+  ["sea-black-pepper-crab", "新加坡黑胡椒蟹", "sea",     "treat", 1, "dn",  ["解馋","高蛋白","高热量"],4, 5, "restaurant", "flln"],
+  ["in-lamb-chop-naan", "印度烤羊排配馕", "indian",  "treat", 1, "d",   ["高热量","解馋","高蛋白"],4, 4, "restaurant", "fdt"],
+  ["me-mideast-lamb-platter", "中东烤羊肉拼盘", "mideast", "treat", 1, "dn",  ["高热量","解馋","高蛋白"],4, 4, "restaurant", "flln"],
+  ["th-king-prawn", "泰式帝王虾",     "thai",    "treat", 1, "d",   ["解馋","高蛋白","清淡"], 3, 4, "restaurant", "fdt"],
+  ["me-morocco-lamb-stew", "摩洛哥炖羊肉",   "mideast", "treat", 1, "d",   ["暖胃","解馋","高蛋白"], 4, 4, "restaurant", "fdt"],
+  ["world-spanish-paella", "西班牙海鲜饭",   "exotic-generic","treat",0, "d",   ["解馋","高蛋白","高热量"],4, 4, "restaurant", "fdt"],
+  ["th-volcano-ribs", "泰式火山排骨",   "thai",    "treat", 3, "dn",  ["解馋","下饭","高热量"], 4, 4, "restaurant", "flln"],
 ];
 
 // —— 展开一行为完整候选对象 ——
+// emoji（展示字段，可后续调整；id 才是引用契约，不随 emoji/name 变）。
+// 关键词兜底，保证任何菜都有 emoji；个别精确覆盖放前面。
+const EMOJI_EXACT = {
+  "北京烤鸭": "🦆", "日式特上寿司": "🍣", "日式刺身拼盘": "🍣", "日式鳗鱼三吃": "🍱",
+  "白灼基围虾": "🦐", "泰式帝王虾": "🦐", "泰式咖喱蟹": "🦀", "新加坡黑胡椒蟹": "🦀",
+  "日式蟹肉火锅": "🦀", "剁椒鱼头": "🐟", "大理酸辣鱼": "🐟", "水煮鱼": "🐟",
+  "葱烧海参": "🦑", "韩式辣炒鱿鱼盖饭": "🦑", "西班牙海鲜饭": "🥘", "泰式冬阴功海鲜面": "🍜",
+  "茶叶蛋": "🥚", "咸豆浆": "🥛", "白粥配小菜": "🍚", "皮蛋豆腐": "🍢",
+};
+function pickEmoji(name, cuisine, kind) {
+  if (EMOJI_EXACT[name]) return EMOJI_EXACT[name];
+  const rules = [
+    [/拉面|乌冬|叻沙|米线|河粉|炒面|汤面|阳春面|泡馍|米粉|馄饨|冬阴功/, "🍜"],
+    [/寿司/, "🍣"], [/炸鸡/, "🍗"], [/牛排/, "🥩"], [/汉堡|肉堡/, "🍔"],
+    [/披萨/, "🍕"], [/意面|帕尼尼|千层面/, "🍝"], [/三明治|贝果|吐司|法包|面包/, "🥪"],
+    [/咖喱/, "🍛"], [/沙拉|凯撒卷/, "🥗"], [/卷饼|卷$|春卷/, "🌯"], [/塔可/, "🌮"],
+    [/烤鸭|烧鸡|烤鸡|白切鸡|口水鸡|三杯鸡|滑鸡|参鸡|照烧鸡/, "🍗"],
+    [/羊|烤肉|五花|烧肉|牛小排|排骨|肋/, "🍖"], [/虾/, "🦐"], [/蟹/, "🦀"], [/鱼/, "🐟"],
+    [/豆腐/, "🍲"], [/粥/, "🍚"], [/饺|包子|馍/, "🥟"], [/煎饼|饼|华夫/, "🥞"],
+    [/盖饭|炒饭|卤肉饭|拌饭|时雨煮饭|茶泡饭|煲仔饭|海南鸡饭|焗饭|丼/, "🍚"],
+    [/汤|锅|煲|炖/, "🍲"], [/蛋/, "🥚"], [/面$/, "🍜"],
+  ];
+  for (const [re, e] of rules) if (re.test(name)) return e;
+  const famEmoji = { chinese: "🥢", western: "🍽️", jpkr: "🍱", exotic: "🌍" };
+  return famEmoji[FAMILY_OF[cuisine]] ?? "🍽️";
+}
+
 function expand(row) {
-  const [name, cuisine, priceTier, spicy, meals, tags, satiety, indulgence, convenience, occasion, canonicalGroup] = row;
+  const [id, name, cuisine, priceTier, spicy, meals, tags, satiety, indulgence, convenience, occasion, canonicalGroup] = row;
   const cs = CUISINE_SEARCH[cuisine];
   if (!cs) throw new Error(`未知 cuisine: ${cuisine}（${name}）`);
   const family = FAMILY_OF[cuisine];
   if (!family) throw new Error(`cuisine 无 family 映射: ${cuisine}（${name}）`);
   const obj = {
+    // id：稳定引用契约。在 ROWS 里固化为字面量，绝不由 name 计算（防 churn）。
+    id,
     name,
+    // emoji：展示字段，可后续改；不影响 id。
+    emoji: pickEmoji(name, cuisine),
     cuisine,
     // family 不落库（由 familyOf 推导，spec §1.1）；此处仅供草案统计用，落库脚本须丢弃
     _family: family,
@@ -351,16 +384,34 @@ function expand(row) {
 
 const dishes = ROWS.map(expand);
 
+// 载入现有 foods.ts 的 id 集合，供新 id 撞名校验（landing 前就拦下）
+const EXISTING_IDS = new Set(
+  [...readFileSync(new URL("../src/config/foods.ts", import.meta.url), "utf8")
+    .matchAll(/^\s{4}id:\s*"([^"]+)"/gm)].map((m) => m[1])
+);
+const KEBAB = /^[a-z0-9]+(-[a-z0-9]+)*$/;
+
 // ─────────────────────────────────────────────
-// 自检（fix 3：枚举/短码/范围/search 结构/乱码/canonicalGroup/layer 全查）
+// 自检（fix 3：枚举/短码/范围/search 结构/乱码/canonicalGroup/layer + id/emoji 全查）
 // ─────────────────────────────────────────────
 const errs = [];
 const seenNames = new Set();
+const seenIds = new Set();
 const hasMojibake = (s) => typeof s === "string" && s.includes("�");
 const LAYER = new Set(["meal", "side"]);
 
 for (const d of dishes) {
   const at = `[${d.name || "??"}]`;
+  // id 契约校验：存在 / kebab-ASCII / 本批唯一 / 不撞现有 foods.ts
+  if (!d.id) errs.push(`${at} 缺 id`);
+  else {
+    if (!KEBAB.test(d.id)) errs.push(`${at} id 非 kebab-ASCII: ${d.id}`);
+    if (seenIds.has(d.id)) errs.push(`${at} id 本批重复: ${d.id}`);
+    seenIds.add(d.id);
+    if (EXISTING_IDS.has(d.id)) errs.push(`${at} id 撞现有 foods.ts: ${d.id}`);
+  }
+  if (!d.emoji) errs.push(`${at} 缺 emoji`);
+  if (hasMojibake(d.emoji)) errs.push(`${at} emoji 含乱码`);
   // 乱码：扫所有字符串字段（含 search、数组元素）
   const strings = [d.name, d.cuisine, d.priceTier, d.convenience, d.pickLayer,
     ...d.meals, ...d.tags, ...d.occasion,
@@ -523,7 +574,7 @@ fs.writeFileSync(
 
 // —— review 表（markdown）——
 const esc = (s) => String(s).replace(/\|/g, "\\|");
-const cols = ["name","_family","cuisine","priceTier","pickLayer","meals","spicy","tags","satiety","indulgence","convenience","occasion","shopKeyword","gateQuery","displayQuery","canonicalGroup"];
+const cols = ["id","emoji","name","_family","cuisine","priceTier","pickLayer","meals","spicy","tags","satiety","indulgence","convenience","occasion","shopKeyword","gateQuery","displayQuery","canonicalGroup"];
 let md = `# 候选菜 review 表（${batchFamilies.join("+")}，共 ${dishes.length} 行）\n\n`;
 md += `> 审阅重点：命名真实性 / 口味(spicy) / 价位归档 / 餐段合理性 / treat 是否够犒劳 / side 层归类 / canonicalGroup 归并。\n`;
 md += `> 层级：meal ${byLayer.meal} · side ${byLayer.side}（**缺口只算 meal 层**）\n`;

@@ -357,7 +357,8 @@ function resolveBucket(mix: Record<PriceTier, number>, nonEmpty: Set<PriceTier>)
 1. **默认池纯净**：`mainFoodsByMeal` 结果必须全部满足 `kind==="main" && entityType==="dish" && pickLayer==="meal"`；`brand/dining_style/dish_group` 及 `pickLayer==="side"` 一律不得出现。
 2. **dish 必填字段**：每个 `dish` 必须有 `cuisine / priceTier / meals(非空) / tags(非空) / satiety / indulgence / convenience / occasion(非空) / pickLayer / search.gateQuery / search.displayQuery`。
 3. **枚举合法**：`cuisine/priceTier/spicy/satiety/indulgence/convenience/occasion/tags/meals/pickLayer` 全部落在类型允许值内（防手写拼错）。
-4. **pickLayer 与 satiety 一致**：`pickLayer==="meal"` ⟺ `satiety>=3`；`pickLayer==="side"` ⟺ `satiety<3`（口径单一，防两处漂移）。
+4. **pickLayer 与 satiety 一致（仅 `entityType==="dish"`）**：对 concrete dish，`pickLayer==="meal"` ⟺ `satiety>=3`、`pickLayer==="side"` ⟺ `satiety<3`。**非 dish（brand/dining_style/dish_group）不参与此双向规则**——它们 `pickLayer` 恒为 `"side"`（抽取策略），但 `satiety` 保留真实值（火锅/烤肉可 4/5）。三者语义正交：**satiety=真实体验属性，pickLayer=抽取层政策，entityType=能否进具体菜池的硬门**。drink 亦豁免（satiety=1/pickLayer=side 固定）。
+   > ⚠️ 实现细节（S4/S5 必守）：`sideFoods()` 取 side 池必须过滤 `entityType==="dish" && pickLayer==="side"`，**不能只按 `pickLayer==="side"`**，否则火锅/品牌/炸鸡泛类会漏进 side 池。默认池同理保持 `kind==="main" && entityType==="dish" && pickLayer==="meal"`。
 5. **餐段够量**（dish **meal 层**，按餐段命中计，side 不计）：早≥40 / 午≥120 / 晚≥140 / 宵≥70。**tea 不设 meal 阈值**（见 §4.2，走 side/drink）。
 6. **family×price 不塌**（仅 meal 层）：每个 family 的每个 priceTier 桶，meal-dish 数 ≥ 阈值（budget≥8, normal≥15, treat≥8）。
 7. **treat 质量门**：每个 `treat` 且 `pickLayer==="meal"` 的 dish 必须 `indulgence>=4 && satiety>=3` 且 tags 不含「健康轻食」（**不检查「清淡」**）。

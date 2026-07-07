@@ -187,7 +187,9 @@
   },
   "dishes": [
     {
+      "id": "cn-plain-congee-sides",
       "name": "白粥配小菜",
+      "emoji": "🍚",
       "cuisine": "cn-generic",
       "priceTier": "budget",
       "meals": [
@@ -217,7 +219,9 @@
       }
     },
     {
+      "id": "cn-tea-egg",
       "name": "茶叶蛋",
+      "emoji": "🥚",
       "cuisine": "cn-generic",
       "priceTier": "budget",
       "meals": [
@@ -248,7 +252,9 @@
       }
     },
     {
+      "id": "cn-pork-veggie-bun",
       "name": "菜肉包子",
+      "emoji": "🥟",
       "cuisine": "cn-generic",
       "priceTier": "budget",
       "meals": [
@@ -278,7 +284,9 @@
       }
     },
     {
+      "id": "cn-grabbed-pancake-egg",
       "name": "手抓饼加蛋",
+      "emoji": "🥞",
       "cuisine": "cn-beifang",
       "priceTier": "budget",
       "meals": [
@@ -309,7 +317,9 @@
       }
     },
     {
+      "id": "cn-savory-soymilk",
       "name": "咸豆浆",
+      "emoji": "🥛",
       "cuisine": "cn-jiangzhe",
       "priceTier": "budget",
       "meals": [
@@ -340,7 +350,9 @@
       }
     },
     {
+      "id": "cn-tomato-egg-noodle",
       "name": "西红柿鸡蛋面",
+      "emoji": "🥚",
       "cuisine": "cn-generic",
       "priceTier": "budget",
       "meals": [
@@ -371,7 +383,9 @@
       }
     },
     {
+      "id": "cn-yangchun-noodle",
       "name": "阳春面",
+      "emoji": "🍜",
       "cuisine": "cn-jiangzhe",
       "priceTier": "budget",
       "meals": [
@@ -403,7 +417,9 @@
       }
     },
     {
+      "id": "cn-zhacai-pork-noodle",
       "name": "榨菜肉丝面",
+      "emoji": "🍜",
       "cuisine": "cn-jiangzhe",
       "priceTier": "budget",
       "meals": [
@@ -437,7 +453,9 @@
       }
     },
     {
+      "id": "cn-potato-strip-rice",
       "name": "土豆丝盖饭",
+      "emoji": "🍚",
       "cuisine": "cn-generic",
       "priceTier": "budget",
       "meals": [
@@ -468,7 +486,9 @@
       }
     },
     {
+      "id": "cn-pepper-pork-rice",
       "name": "青椒肉丝盖饭",
+      "emoji": "🍚",
       "cuisine": "cn-generic",
       "priceTier": "budget",
       "meals": [
@@ -498,7 +518,9 @@
       }
     },
     {
+      "id": "cn-homestyle-tofu-rice",
       "name": "家常豆腐盖饭",
+      "emoji": "🍲",
       "cuisine": "cn-generic",
       "priceTier": "budget",
       "meals": [
@@ -529,7 +551,9 @@
       }
     },
     {
+      "id": "cn-garlic-stem-pork-rice",
       "name": "蒜薹炒肉盖饭",
+      "emoji": "🍚",
       "cuisine": "cn-generic",
       "priceTier": "budget",
       "meals": [
@@ -559,7 +583,9 @@
       }
     },
     {
+      "id": "cn-flatbread-wrap",
       "name": "大饼卷菜",
+      "emoji": "🥞",
       "cuisine": "cn-beifang",
       "priceTier": "budget",
       "meals": [
@@ -591,7 +617,9 @@
       }
     },
     {
+      "id": "cn-cabbage-vermicelli-stew",
       "name": "白菜炖粉条",
+      "emoji": "🍲",
       "cuisine": "cn-dongbei",
       "priceTier": "budget",
       "meals": [
@@ -622,7 +650,9 @@
       }
     },
     {
+      "id": "cn-vinegar-cabbage-rice",
       "name": "醋溜白菜盖饭",
+      "emoji": "🍚",
       "cuisine": "cn-beifang",
       "priceTier": "budget",
       "meals": [
@@ -654,7 +684,9 @@
       }
     },
     {
+      "id": "cn-shanghai-wonton",
       "name": "上海小馄饨",
+      "emoji": "🍜",
       "cuisine": "cn-jiangzhe",
       "priceTier": "budget",
       "meals": [
@@ -687,7 +719,9 @@
       }
     },
     {
+      "id": "cn-century-egg-tofu",
       "name": "皮蛋豆腐",
+      "emoji": "🍢",
       "cuisine": "cn-generic",
       "priceTier": "budget",
       "meals": [
@@ -718,7 +752,9 @@
       }
     },
     {
+      "id": "cn-braised-platter",
       "name": "卤味拼盘",
+      "emoji": "🥢",
       "cuisine": "cn-generic",
       "priceTier": "budget",
       "meals": [
@@ -749,7 +785,9 @@
       }
     },
     {
+      "id": "cn-hongshao-pork-rice",
       "name": "红烧肉盖饭",
+      "emoji": "🍖",
       "cuisine": "cn-jiangzhe",
       "priceTier": "normal",
       "meals": [
@@ -781,7 +819,9 @@
       }
     },
     {
+      "id": "cn-jingjiang-pork",
       "name": "京酱肉丝",
+      "emoji": "🥢",
       "cuisine": "cn-beifang",
       "priceTier": "normal",
       "meals": [
@@ -810,7 +850,9 @@
       }
     },
     {
+      "id": "cn-disanxian-rice",
       "name": "地三鲜盖饭",
+      "emoji": "🍚",
       "cuisine": "cn-dongbei",
       "priceTier": "normal",
       "meals": [
@@ -842,7 +884,9 @@
       }
     },
     {
+      "id": "cn-chicken-mushroom-stew",
       "name": "小鸡炖蘑菇",
+      "emoji": "🍲",
       "cuisine": "cn-dongbei",
       "priceTier": "normal",
       "meals": [
@@ -872,7 +916,9 @@
       }
     },
     {
+      "id": "cn-laziji",
       "name": "辣子鸡丁",
+      "emoji": "🥢",
       "cuisine": "cn-chuanyu",
       "priceTier": "normal",
       "meals": [
@@ -903,7 +949,9 @@
       }
     },
     {
+      "id": "cn-koushui-chicken",
       "name": "口水鸡",
+      "emoji": "🍗",
       "cuisine": "cn-chuanyu",
       "priceTier": "normal",
       "meals": [
@@ -934,7 +982,9 @@
       }
     },
     {
+      "id": "cn-fuqi-feipian",
       "name": "夫妻肺片",
+      "emoji": "🥢",
       "cuisine": "cn-chuanyu",
       "priceTier": "normal",
       "meals": [
@@ -963,7 +1013,9 @@
       }
     },
     {
+      "id": "cn-farmhouse-pork",
       "name": "农家小炒肉",
+      "emoji": "🥢",
       "cuisine": "cn-hunan",
       "priceTier": "normal",
       "meals": [
@@ -995,7 +1047,9 @@
       }
     },
     {
+      "id": "cn-white-cut-chicken",
       "name": "白切鸡",
+      "emoji": "🍗",
       "cuisine": "cn-guangdong",
       "priceTier": "normal",
       "meals": [
@@ -1025,7 +1079,9 @@
       }
     },
     {
+      "id": "cn-lapwei-claypot-rice",
       "name": "腊味煲仔饭",
+      "emoji": "🍚",
       "cuisine": "cn-guangdong",
       "priceTier": "normal",
       "meals": [
@@ -1058,7 +1114,9 @@
       "canonicalGroup": "baozaifan"
     },
     {
+      "id": "cn-dry-pot-cauliflower",
       "name": "干锅花菜",
+      "emoji": "🍲",
       "cuisine": "cn-hunan",
       "priceTier": "normal",
       "meals": [
@@ -1087,7 +1145,9 @@
       }
     },
     {
+      "id": "cn-sizzling-pepper-beef",
       "name": "铁板黑椒牛柳",
+      "emoji": "🥢",
       "cuisine": "cn-generic",
       "priceTier": "normal",
       "meals": [
@@ -1117,7 +1177,9 @@
       }
     },
     {
+      "id": "cn-yuxiang-eggplant",
       "name": "鱼香茄子煲",
+      "emoji": "🐟",
       "cuisine": "cn-chuanyu",
       "priceTier": "normal",
       "meals": [
@@ -1147,7 +1209,9 @@
       }
     },
     {
+      "id": "cn-sweet-sour-pork",
       "name": "糖醋里脊",
+      "emoji": "🥢",
       "cuisine": "cn-generic",
       "priceTier": "normal",
       "meals": [
@@ -1177,7 +1241,9 @@
       }
     },
     {
+      "id": "cn-gulao-pork",
       "name": "咕咾肉",
+      "emoji": "🥢",
       "cuisine": "cn-guangdong",
       "priceTier": "normal",
       "meals": [
@@ -1209,7 +1275,9 @@
       }
     },
     {
+      "id": "cn-scallion-lamb",
       "name": "葱爆羊肉",
+      "emoji": "🍖",
       "cuisine": "cn-beifang",
       "priceTier": "normal",
       "meals": [
@@ -1239,7 +1307,9 @@
       }
     },
     {
+      "id": "cn-lamb-paomo",
       "name": "羊肉泡馍",
+      "emoji": "🍜",
       "cuisine": "cn-xibei",
       "priceTier": "normal",
       "meals": [
@@ -1271,7 +1341,9 @@
       }
     },
     {
+      "id": "cn-xinjiang-rice-noodle",
       "name": "新疆炒米粉",
+      "emoji": "🍜",
       "cuisine": "cn-xibei",
       "priceTier": "normal",
       "meals": [
@@ -1305,7 +1377,9 @@
       }
     },
     {
+      "id": "cn-steampot-chicken",
       "name": "汽锅鸡",
+      "emoji": "🍲",
       "cuisine": "cn-yunguigui",
       "priceTier": "normal",
       "meals": [
@@ -1335,7 +1409,9 @@
       }
     },
     {
+      "id": "cn-dali-sour-fish",
       "name": "大理酸辣鱼",
+      "emoji": "🐟",
       "cuisine": "cn-yunguigui",
       "priceTier": "normal",
       "meals": [
@@ -1365,7 +1441,9 @@
       }
     },
     {
+      "id": "cn-three-cup-chicken",
       "name": "三杯鸡",
+      "emoji": "🍗",
       "cuisine": "cn-generic",
       "priceTier": "normal",
       "meals": [
@@ -1396,7 +1474,9 @@
       }
     },
     {
+      "id": "cn-meicai-pork-rice",
       "name": "梅菜扣肉盖饭",
+      "emoji": "🍚",
       "cuisine": "cn-guangdong",
       "priceTier": "normal",
       "meals": [
@@ -1428,7 +1508,9 @@
       }
     },
     {
+      "id": "cn-chopped-chili-fish-head",
       "name": "剁椒鱼头",
+      "emoji": "🐟",
       "cuisine": "cn-hunan",
       "priceTier": "treat",
       "meals": [
@@ -1458,7 +1540,9 @@
       }
     },
     {
+      "id": "cn-scallion-sea-cucumber",
       "name": "葱烧海参",
+      "emoji": "🦑",
       "cuisine": "cn-beifang",
       "priceTier": "treat",
       "meals": [
@@ -1488,7 +1572,9 @@
       }
     },
     {
+      "id": "cn-crab-roe-tofu",
       "name": "蟹黄豆腐",
+      "emoji": "🦀",
       "cuisine": "cn-jiangzhe",
       "priceTier": "treat",
       "meals": [
@@ -1518,7 +1604,9 @@
       }
     },
     {
+      "id": "cn-dongpo-pork",
       "name": "东坡肉",
+      "emoji": "🥢",
       "cuisine": "cn-jiangzhe",
       "priceTier": "treat",
       "meals": [
@@ -1549,7 +1637,9 @@
       }
     },
     {
+      "id": "cn-peking-duck",
       "name": "北京烤鸭",
+      "emoji": "🦆",
       "cuisine": "cn-beifang",
       "priceTier": "treat",
       "meals": [
@@ -1580,7 +1670,9 @@
       }
     },
     {
+      "id": "cn-blanched-shrimp",
       "name": "白灼基围虾",
+      "emoji": "🦐",
       "cuisine": "cn-guangdong",
       "priceTier": "treat",
       "meals": [
@@ -1611,7 +1703,9 @@
       }
     },
     {
+      "id": "cn-dry-pot-bullfrog",
       "name": "干锅牛蛙",
+      "emoji": "🍲",
       "cuisine": "cn-chuanyu",
       "priceTier": "treat",
       "meals": [
@@ -1641,7 +1735,9 @@
       }
     },
     {
+      "id": "cn-shuizhu-fish",
       "name": "水煮鱼",
+      "emoji": "🐟",
       "cuisine": "cn-chuanyu",
       "priceTier": "treat",
       "meals": [
@@ -1673,7 +1769,9 @@
       "canonicalGroup": "shuizhuyu"
     },
     {
+      "id": "cn-sour-soup-beef",
       "name": "酸汤肥牛",
+      "emoji": "🍲",
       "cuisine": "cn-generic",
       "priceTier": "treat",
       "meals": [
@@ -1704,7 +1802,9 @@
       }
     },
     {
+      "id": "cn-yangzhou-fried-rice",
       "name": "扬州炒饭",
+      "emoji": "🍚",
       "cuisine": "cn-generic",
       "priceTier": "budget",
       "meals": [
@@ -1736,7 +1836,9 @@
       "canonicalGroup": "chaofan"
     },
     {
+      "id": "cn-pork-fried-noodle",
       "name": "肉丝炒面",
+      "emoji": "🍜",
       "cuisine": "cn-generic",
       "priceTier": "budget",
       "meals": [
@@ -1769,7 +1871,9 @@
       }
     },
     {
+      "id": "cn-mushroom-chicken-rice",
       "name": "香菇滑鸡饭",
+      "emoji": "🍗",
       "cuisine": "cn-guangdong",
       "priceTier": "budget",
       "meals": [
@@ -1801,7 +1905,9 @@
       }
     },
     {
+      "id": "cn-huiguorou-rice",
       "name": "回锅肉盖饭",
+      "emoji": "🍚",
       "cuisine": "cn-chuanyu",
       "priceTier": "budget",
       "meals": [
@@ -1833,7 +1939,9 @@
       }
     },
     {
+      "id": "cn-mapo-tofu-rice",
       "name": "麻婆豆腐盖饭",
+      "emoji": "🍲",
       "cuisine": "cn-chuanyu",
       "priceTier": "budget",
       "meals": [
@@ -1865,7 +1973,9 @@
       }
     },
     {
+      "id": "cn-taiwan-lurou-rice",
       "name": "台式卤肉饭",
+      "emoji": "🍚",
       "cuisine": "cn-generic",
       "priceTier": "budget",
       "meals": [
@@ -1898,7 +2008,9 @@
       }
     },
     {
+      "id": "cn-curry-beef-rice",
       "name": "咖喱牛肉饭",
+      "emoji": "🍛",
       "cuisine": "cn-generic",
       "priceTier": "normal",
       "meals": [
@@ -1930,7 +2042,9 @@
       "shopKeyword": "咖喱饭"
     },
     {
+      "id": "us-bacon-egg-burger",
       "name": "培根鸡蛋堡",
+      "emoji": "🥚",
       "cuisine": "western-american",
       "priceTier": "budget",
       "meals": [
@@ -1960,7 +2074,9 @@
       }
     },
     {
+      "id": "us-scrambled-egg-toast",
       "name": "美式炒蛋吐司",
+      "emoji": "🥪",
       "cuisine": "western-american",
       "priceTier": "budget",
       "meals": [
@@ -1989,7 +2105,9 @@
       }
     },
     {
+      "id": "west-tuna-sandwich",
       "name": "金枪鱼三明治",
+      "emoji": "🥪",
       "cuisine": "western-generic",
       "priceTier": "budget",
       "meals": [
@@ -2021,7 +2139,9 @@
       "shopKeyword": "三明治"
     },
     {
+      "id": "it-ham-cheese-panini",
       "name": "火腿芝士帕尼尼",
+      "emoji": "🍝",
       "cuisine": "western-italian",
       "priceTier": "budget",
       "meals": [
@@ -2053,7 +2173,9 @@
       "shopKeyword": "三明治"
     },
     {
+      "id": "it-tomato-pasta",
       "name": "茄汁意面",
+      "emoji": "🍝",
       "cuisine": "western-italian",
       "priceTier": "budget",
       "meals": [
@@ -2084,7 +2206,9 @@
       "canonicalGroup": "yimian"
     },
     {
+      "id": "it-pesto-pasta",
       "name": "青酱意面",
+      "emoji": "🍝",
       "cuisine": "western-italian",
       "priceTier": "budget",
       "meals": [
@@ -2115,7 +2239,9 @@
       "canonicalGroup": "yimian"
     },
     {
+      "id": "us-mexican-chicken-wrap",
       "name": "墨西哥鸡肉卷",
+      "emoji": "🌯",
       "cuisine": "western-american",
       "priceTier": "budget",
       "meals": [
@@ -2148,7 +2274,9 @@
       }
     },
     {
+      "id": "us-bacon-hashbrown-breakfast",
       "name": "培根薯饼早餐盘",
+      "emoji": "🥞",
       "cuisine": "western-american",
       "priceTier": "budget",
       "meals": [
@@ -2177,7 +2305,9 @@
       }
     },
     {
+      "id": "it-margherita-pizza",
       "name": "玛格丽特披萨",
+      "emoji": "🍕",
       "cuisine": "western-italian",
       "priceTier": "normal",
       "meals": [
@@ -2208,7 +2338,9 @@
       "canonicalGroup": "pizza"
     },
     {
+      "id": "it-lasagna",
       "name": "意式千层面",
+      "emoji": "🍝",
       "cuisine": "western-italian",
       "priceTier": "normal",
       "meals": [
@@ -2239,7 +2371,9 @@
       }
     },
     {
+      "id": "west-cheese-baked-rice",
       "name": "芝士焗饭",
+      "emoji": "🍚",
       "cuisine": "western-generic",
       "priceTier": "normal",
       "meals": [
@@ -2271,7 +2405,9 @@
       "shopKeyword": "西餐厅"
     },
     {
+      "id": "west-mushroom-chicken-baked-rice",
       "name": "蘑菇鸡肉焗饭",
+      "emoji": "🍚",
       "cuisine": "western-generic",
       "priceTier": "normal",
       "meals": [
@@ -2303,7 +2439,9 @@
       "shopKeyword": "西餐厅"
     },
     {
+      "id": "us-angus-beef-burger",
       "name": "安格斯牛肉堡",
+      "emoji": "🍔",
       "cuisine": "western-american",
       "priceTier": "normal",
       "meals": [
@@ -2334,7 +2472,9 @@
       }
     },
     {
+      "id": "us-orleans-chicken-rice",
       "name": "奥尔良烤鸡饭",
+      "emoji": "🍗",
       "cuisine": "western-american",
       "priceTier": "normal",
       "meals": [
@@ -2365,7 +2505,9 @@
       }
     },
     {
+      "id": "it-meatball-rice",
       "name": "意式肉丸饭",
+      "emoji": "🍽️",
       "cuisine": "western-italian",
       "priceTier": "normal",
       "meals": [
@@ -2396,7 +2538,9 @@
       }
     },
     {
+      "id": "it-sausage-pasta",
       "name": "香肠意面",
+      "emoji": "🍝",
       "cuisine": "western-italian",
       "priceTier": "normal",
       "meals": [
@@ -2427,7 +2571,9 @@
       "canonicalGroup": "yimian"
     },
     {
+      "id": "us-fried-chicken-burger",
       "name": "美式炸鸡汉堡",
+      "emoji": "🍗",
       "cuisine": "western-american",
       "priceTier": "normal",
       "meals": [
@@ -2460,7 +2606,9 @@
       "shopKeyword": "炸鸡"
     },
     {
+      "id": "west-pan-chicken-rice",
       "name": "香煎鸡排饭",
+      "emoji": "🍽️",
       "cuisine": "western-generic",
       "priceTier": "normal",
       "meals": [
@@ -2492,7 +2640,9 @@
       "shopKeyword": "牛排"
     },
     {
+      "id": "west-smoked-salmon-bagel",
       "name": "烟熏三文鱼贝果",
+      "emoji": "🥪",
       "cuisine": "western-generic",
       "priceTier": "normal",
       "meals": [
@@ -2523,7 +2673,9 @@
       "shopKeyword": "贝果"
     },
     {
+      "id": "west-cream-mushroom-soup-bread",
       "name": "奶油蘑菇汤配面包",
+      "emoji": "🥪",
       "cuisine": "western-generic",
       "priceTier": "normal",
       "meals": [
@@ -2553,7 +2705,9 @@
       "shopKeyword": "西餐厅"
     },
     {
+      "id": "west-chicken-caesar-wrap",
       "name": "鸡肉凯撒卷",
+      "emoji": "🥗",
       "cuisine": "western-generic",
       "priceTier": "normal",
       "meals": [
@@ -2585,7 +2739,9 @@
       "shopKeyword": "轻食沙拉"
     },
     {
+      "id": "west-beef-wellington",
       "name": "惠灵顿牛排",
+      "emoji": "🥩",
       "cuisine": "western-generic",
       "priceTier": "treat",
       "meals": [
@@ -2616,7 +2772,9 @@
       "shopKeyword": "牛排"
     },
     {
+      "id": "us-tomahawk-steak",
       "name": "战斧牛排",
+      "emoji": "🥩",
       "cuisine": "western-american",
       "priceTier": "treat",
       "meals": [
@@ -2647,7 +2805,9 @@
       "shopKeyword": "牛排"
     },
     {
+      "id": "it-seafood-pasta",
       "name": "海鲜意面",
+      "emoji": "🍝",
       "cuisine": "western-italian",
       "priceTier": "treat",
       "meals": [
@@ -2677,7 +2837,9 @@
       "canonicalGroup": "yimian"
     },
     {
+      "id": "west-cream-mushroom-steak-rice",
       "name": "奶油蘑菇牛排饭",
+      "emoji": "🥩",
       "cuisine": "western-generic",
       "priceTier": "treat",
       "meals": [
@@ -2708,7 +2870,9 @@
       "shopKeyword": "牛排"
     },
     {
+      "id": "west-cheese-lobster",
       "name": "芝士焗龙虾",
+      "emoji": "🦐",
       "cuisine": "western-generic",
       "priceTier": "treat",
       "meals": [
@@ -2738,7 +2902,9 @@
       "shopKeyword": "西餐厅"
     },
     {
+      "id": "west-roast-lamb-chop",
       "name": "烤羊排",
+      "emoji": "🍖",
       "cuisine": "western-generic",
       "priceTier": "treat",
       "meals": [
@@ -2769,7 +2935,9 @@
       "shopKeyword": "西餐厅"
     },
     {
+      "id": "it-truffle-mushroom-pasta",
       "name": "松露蘑菇意面",
+      "emoji": "🍝",
       "cuisine": "western-italian",
       "priceTier": "treat",
       "meals": [
@@ -2799,7 +2967,9 @@
       "canonicalGroup": "yimian"
     },
     {
+      "id": "us-sirloin-steak-fries",
       "name": "西冷牛排配薯条",
+      "emoji": "🥩",
       "cuisine": "western-american",
       "priceTier": "treat",
       "meals": [
@@ -2830,7 +3000,9 @@
       "shopKeyword": "牛排"
     },
     {
+      "id": "jp-salmon-ochazuke",
       "name": "日式鲑鱼茶泡饭",
+      "emoji": "🐟",
       "cuisine": "japanese",
       "priceTier": "budget",
       "meals": [
@@ -2863,7 +3035,9 @@
       }
     },
     {
+      "id": "jp-egg-beef-rice",
       "name": "日式滑蛋牛肉饭",
+      "emoji": "🥚",
       "cuisine": "japanese",
       "priceTier": "budget",
       "meals": [
@@ -2895,7 +3069,9 @@
       }
     },
     {
+      "id": "kr-kimchi-fried-rice",
       "name": "韩式泡菜炒饭",
+      "emoji": "🍚",
       "cuisine": "korean",
       "priceTier": "budget",
       "meals": [
@@ -2928,7 +3104,9 @@
       }
     },
     {
+      "id": "kr-spicy-ramen",
       "name": "韩式辣味拉面",
+      "emoji": "🍜",
       "cuisine": "korean",
       "priceTier": "budget",
       "meals": [
@@ -2962,7 +3140,9 @@
       "shopKeyword": "韩式拉面"
     },
     {
+      "id": "jp-shoyu-ramen",
       "name": "日式酱油拉面",
+      "emoji": "🍜",
       "cuisine": "japanese",
       "priceTier": "budget",
       "meals": [
@@ -2995,7 +3175,9 @@
       "canonicalGroup": "ramen"
     },
     {
+      "id": "kr-spicy-pork-rice",
       "name": "韩式辣炒猪肉盖饭",
+      "emoji": "🍚",
       "cuisine": "korean",
       "priceTier": "budget",
       "meals": [
@@ -3028,7 +3210,9 @@
       }
     },
     {
+      "id": "jp-curry-chicken-cutlet-rice",
       "name": "日式咖喱鸡排饭",
+      "emoji": "🍛",
       "cuisine": "japanese",
       "priceTier": "budget",
       "meals": [
@@ -3062,7 +3246,9 @@
       "shopKeyword": "日式咖喱"
     },
     {
+      "id": "jp-seafood-ramen",
       "name": "日式海鲜拉面",
+      "emoji": "🍜",
       "cuisine": "japanese",
       "priceTier": "normal",
       "meals": [
@@ -3097,7 +3283,9 @@
       "canonicalGroup": "ramen"
     },
     {
+      "id": "jp-shio-ramen",
       "name": "日式盐味拉面",
+      "emoji": "🍜",
       "cuisine": "japanese",
       "priceTier": "normal",
       "meals": [
@@ -3131,7 +3319,9 @@
       "canonicalGroup": "ramen"
     },
     {
+      "id": "jp-teriyaki-chicken-rice",
       "name": "日式照烧鸡腿饭",
+      "emoji": "🍗",
       "cuisine": "japanese",
       "priceTier": "normal",
       "meals": [
@@ -3164,7 +3354,9 @@
       }
     },
     {
+      "id": "jp-curry-beef-udon",
       "name": "日式咖喱牛肉乌冬",
+      "emoji": "🍜",
       "cuisine": "japanese",
       "priceTier": "normal",
       "meals": [
@@ -3198,7 +3390,9 @@
       "shopKeyword": "乌冬面"
     },
     {
+      "id": "kr-kimchi-pork-stew",
       "name": "韩式泡菜猪肉锅",
+      "emoji": "🍲",
       "cuisine": "korean",
       "priceTier": "normal",
       "meals": [
@@ -3229,7 +3423,9 @@
       }
     },
     {
+      "id": "kr-spicy-squid-rice",
       "name": "韩式辣炒鱿鱼盖饭",
+      "emoji": "🦑",
       "cuisine": "korean",
       "priceTier": "normal",
       "meals": [
@@ -3262,7 +3458,9 @@
       }
     },
     {
+      "id": "jp-tempura-donburi",
       "name": "日式天妇罗盖饭",
+      "emoji": "🍚",
       "cuisine": "japanese",
       "priceTier": "normal",
       "meals": [
@@ -3292,7 +3490,9 @@
       }
     },
     {
+      "id": "kr-fried-chicken",
       "name": "韩式炸鸡",
+      "emoji": "🍗",
       "cuisine": "korean",
       "priceTier": "normal",
       "meals": [
@@ -3324,7 +3524,9 @@
       "canonicalGroup": "koreanchicken"
     },
     {
+      "id": "kr-soy-fried-chicken",
       "name": "韩式酱油炸鸡",
+      "emoji": "🍗",
       "cuisine": "korean",
       "priceTier": "normal",
       "meals": [
@@ -3356,7 +3558,9 @@
       "canonicalGroup": "koreanchicken"
     },
     {
+      "id": "jp-curry-pork-cutlet-rice",
       "name": "日式咖喱猪排饭",
+      "emoji": "🍛",
       "cuisine": "japanese",
       "priceTier": "normal",
       "meals": [
@@ -3390,7 +3594,9 @@
       "shopKeyword": "日式咖喱"
     },
     {
+      "id": "kr-spicy-beef-soup-rice",
       "name": "韩式辣牛肉汤饭",
+      "emoji": "🍲",
       "cuisine": "korean",
       "priceTier": "normal",
       "meals": [
@@ -3423,7 +3629,9 @@
       }
     },
     {
+      "id": "kr-seafood-pancake",
       "name": "韩式海鲜煎饼",
+      "emoji": "🥞",
       "cuisine": "korean",
       "priceTier": "normal",
       "meals": [
@@ -3453,7 +3661,9 @@
       }
     },
     {
+      "id": "jp-beef-shigureni-rice",
       "name": "日式牛肉时雨煮饭",
+      "emoji": "🍚",
       "cuisine": "japanese",
       "priceTier": "normal",
       "meals": [
@@ -3484,7 +3694,9 @@
       }
     },
     {
+      "id": "jp-wagyu-yakiniku",
       "name": "日式和牛烧肉",
+      "emoji": "🍖",
       "cuisine": "japanese",
       "priceTier": "treat",
       "meals": [
@@ -3516,7 +3728,9 @@
       "shopKeyword": "日式烧肉"
     },
     {
+      "id": "jp-sashimi-platter",
       "name": "日式刺身拼盘",
+      "emoji": "🍣",
       "cuisine": "japanese",
       "priceTier": "treat",
       "meals": [
@@ -3547,7 +3761,9 @@
       }
     },
     {
+      "id": "jp-unagi-three-ways",
       "name": "日式鳗鱼三吃",
+      "emoji": "🍱",
       "cuisine": "japanese",
       "priceTier": "treat",
       "meals": [
@@ -3576,7 +3792,9 @@
       }
     },
     {
+      "id": "kr-pork-belly-bbq-set",
       "name": "韩式烤五花肉套餐",
+      "emoji": "🍖",
       "cuisine": "korean",
       "priceTier": "treat",
       "meals": [
@@ -3607,7 +3825,9 @@
       }
     },
     {
+      "id": "jp-premium-sushi",
       "name": "日式特上寿司",
+      "emoji": "🍣",
       "cuisine": "japanese",
       "priceTier": "treat",
       "meals": [
@@ -3638,7 +3858,9 @@
       "shopKeyword": "寿司"
     },
     {
+      "id": "kr-charcoal-beef-short-rib",
       "name": "韩式炭火烤牛小排",
+      "emoji": "🍖",
       "cuisine": "korean",
       "priceTier": "treat",
       "meals": [
@@ -3669,7 +3891,9 @@
       }
     },
     {
+      "id": "jp-crab-hotpot",
       "name": "日式蟹肉火锅",
+      "emoji": "🦀",
       "cuisine": "japanese",
       "priceTier": "treat",
       "meals": [
@@ -3700,7 +3924,9 @@
       }
     },
     {
+      "id": "sea-vietnam-pork-banhmi",
       "name": "越南猪肉法包",
+      "emoji": "🥪",
       "cuisine": "sea",
       "priceTier": "budget",
       "meals": [
@@ -3734,7 +3960,9 @@
       "shopKeyword": "越南菜"
     },
     {
+      "id": "th-basil-pork-rice",
       "name": "泰式打抛猪饭",
+      "emoji": "🌍",
       "cuisine": "thai",
       "priceTier": "budget",
       "meals": [
@@ -3767,7 +3995,9 @@
       }
     },
     {
+      "id": "sea-indonesia-fried-rice",
       "name": "印尼炒饭",
+      "emoji": "🍚",
       "cuisine": "sea",
       "priceTier": "budget",
       "meals": [
@@ -3801,7 +4031,9 @@
       "shopKeyword": "东南亚菜"
     },
     {
+      "id": "th-seafood-fried-noodle",
       "name": "泰式海鲜炒河粉",
+      "emoji": "🍜",
       "cuisine": "thai",
       "priceTier": "budget",
       "meals": [
@@ -3835,7 +4067,9 @@
       "shopKeyword": "泰国菜"
     },
     {
+      "id": "th-green-curry-chicken-rice",
       "name": "泰式绿咖喱鸡饭",
+      "emoji": "🍛",
       "cuisine": "thai",
       "priceTier": "normal",
       "meals": [
@@ -3869,7 +4103,9 @@
       "shopKeyword": "泰国菜"
     },
     {
+      "id": "th-red-curry-beef-rice",
       "name": "泰式红咖喱牛肉饭",
+      "emoji": "🍛",
       "cuisine": "thai",
       "priceTier": "normal",
       "meals": [
@@ -3903,7 +4139,9 @@
       "shopKeyword": "泰国菜"
     },
     {
+      "id": "th-tomyum-seafood-noodle",
       "name": "泰式冬阴功海鲜面",
+      "emoji": "🍜",
       "cuisine": "thai",
       "priceTier": "normal",
       "meals": [
@@ -3936,7 +4174,9 @@
       }
     },
     {
+      "id": "sea-malay-laksa",
       "name": "马来叻沙面",
+      "emoji": "🍜",
       "cuisine": "sea",
       "priceTier": "normal",
       "meals": [
@@ -3970,7 +4210,9 @@
       "shopKeyword": "东南亚菜"
     },
     {
+      "id": "sea-vietnam-lemongrass-pork-rice",
       "name": "越南香茅烤肉饭",
+      "emoji": "🍖",
       "cuisine": "sea",
       "priceTier": "normal",
       "meals": [
@@ -4004,7 +4246,9 @@
       "shopKeyword": "越南菜"
     },
     {
+      "id": "in-lamb-curry-rice",
       "name": "印度咖喱羊肉饭",
+      "emoji": "🍛",
       "cuisine": "indian",
       "priceTier": "normal",
       "meals": [
@@ -4038,7 +4282,9 @@
       "shopKeyword": "印度菜"
     },
     {
+      "id": "in-masala-chicken-rice",
       "name": "印度玛萨拉咖喱鸡饭",
+      "emoji": "🍛",
       "cuisine": "indian",
       "priceTier": "normal",
       "meals": [
@@ -4072,7 +4318,9 @@
       "shopKeyword": "印度菜"
     },
     {
+      "id": "world-mexican-chicken-burrito-rice",
       "name": "墨西哥烤鸡肉卷饭",
+      "emoji": "🍗",
       "cuisine": "exotic-generic",
       "priceTier": "normal",
       "meals": [
@@ -4105,7 +4353,9 @@
       "shopKeyword": "墨西哥菜"
     },
     {
+      "id": "me-mideast-chicken-rice",
       "name": "中东烤鸡肉饭",
+      "emoji": "🍗",
       "cuisine": "mideast",
       "priceTier": "normal",
       "meals": [
@@ -4139,7 +4389,9 @@
       "shopKeyword": "中东菜"
     },
     {
+      "id": "sea-hainan-chicken-rice",
       "name": "新加坡海南鸡饭",
+      "emoji": "🍚",
       "cuisine": "sea",
       "priceTier": "normal",
       "meals": [
@@ -4171,7 +4423,9 @@
       "shopKeyword": "海南鸡饭"
     },
     {
+      "id": "sea-vietnam-springroll-noodle",
       "name": "越南春卷米线",
+      "emoji": "🍜",
       "cuisine": "sea",
       "priceTier": "normal",
       "meals": [
@@ -4202,7 +4456,9 @@
       "shopKeyword": "越南菜"
     },
     {
+      "id": "me-turkish-kebab-pizza",
       "name": "土耳其烤肉披萨",
+      "emoji": "🍕",
       "cuisine": "mideast",
       "priceTier": "normal",
       "meals": [
@@ -4235,7 +4491,9 @@
       "shopKeyword": "土耳其烤肉"
     },
     {
+      "id": "th-curry-crab",
       "name": "泰式咖喱蟹",
+      "emoji": "🦀",
       "cuisine": "thai",
       "priceTier": "treat",
       "meals": [
@@ -4266,7 +4524,9 @@
       "shopKeyword": "泰国菜"
     },
     {
+      "id": "sea-black-pepper-crab",
       "name": "新加坡黑胡椒蟹",
+      "emoji": "🦀",
       "cuisine": "sea",
       "priceTier": "treat",
       "meals": [
@@ -4297,7 +4557,9 @@
       }
     },
     {
+      "id": "in-lamb-chop-naan",
       "name": "印度烤羊排配馕",
+      "emoji": "🍖",
       "cuisine": "indian",
       "priceTier": "treat",
       "meals": [
@@ -4328,7 +4590,9 @@
       "shopKeyword": "印度菜"
     },
     {
+      "id": "me-mideast-lamb-platter",
       "name": "中东烤羊肉拼盘",
+      "emoji": "🍖",
       "cuisine": "mideast",
       "priceTier": "treat",
       "meals": [
@@ -4360,7 +4624,9 @@
       "shopKeyword": "中东菜"
     },
     {
+      "id": "th-king-prawn",
       "name": "泰式帝王虾",
+      "emoji": "🦐",
       "cuisine": "thai",
       "priceTier": "treat",
       "meals": [
@@ -4390,7 +4656,9 @@
       }
     },
     {
+      "id": "me-morocco-lamb-stew",
       "name": "摩洛哥炖羊肉",
+      "emoji": "🍖",
       "cuisine": "mideast",
       "priceTier": "treat",
       "meals": [
@@ -4421,7 +4689,9 @@
       "shopKeyword": "中东菜"
     },
     {
+      "id": "world-spanish-paella",
       "name": "西班牙海鲜饭",
+      "emoji": "🥘",
       "cuisine": "exotic-generic",
       "priceTier": "treat",
       "meals": [
@@ -4451,7 +4721,9 @@
       "shopKeyword": "西班牙菜"
     },
     {
+      "id": "th-volcano-ribs",
       "name": "泰式火山排骨",
+      "emoji": "🍖",
       "cuisine": "thai",
       "priceTier": "treat",
       "meals": [

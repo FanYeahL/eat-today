@@ -121,6 +121,52 @@ export type RecommendLevel = 1 | 2 | 3 | 4 | 5;
 export type FoodKind = "main" | "drink";
 
 /**
+ * 顶不顶饱 1..5。3 及以上视为「能当一顿饭」（决定 pickLayer）。
+ */
+export type SatietyLevel = 1 | 2 | 3 | 4 | 5;
+
+/**
+ * 犒劳感 / 丰盛度 1..5。treat 桶质量门要求 >=4。
+ */
+export type IndulgenceLevel = 1 | 2 | 3 | 4 | 5;
+
+/**
+ * 主要获取方式（漏斗「场景」/ 后续可用性提示用）。
+ */
+export type Convenience =
+  | "canteen"       // 食堂
+  | "takeout"       // 外卖为主
+  | "restaurant"    // 需堂食/餐厅
+  | "convenience"   // 便利店即取
+  | "dorm";         // 宿舍可自制
+
+/**
+ * 适合场景（可多个）。
+ */
+export type Occasion = "solo" | "date" | "friends" | "lateNight" | "quick";
+
+/**
+ * 决策层级——把「一顿饭级别的具体食物」与「小食/配菜/组合项」分开，
+ * 让默认单菜抽签只出真正能当一餐的东西。
+ * - "meal"：satiety>=3，一道能当一餐主角（进默认单菜池）。
+ * - "side"：satiety<3，凉菜/小食/配菜/汤水/饮品，需搭配或组合（不进默认单菜池）。
+ * 数据里显式写死（不靠运行时用 satiety 推导），保证 lint 与落库口径单一。
+ */
+export type PickLayer = "meal" | "side";
+
+/**
+ * 查店档案（对齐 spec §2）。Phase 1 仅作数据存在，运行时仍走 keywordOf。
+ */
+export interface SearchProfile {
+  /** 「附近有没有这类店」——门控用（Phase 1 = shopKeyword ?? cuisineKeyword 结果） */
+  gateQuery: string;
+  /** 「展示店铺时搜什么」（= 菜名，保留具体菜品身份） */
+  displayQuery: string;
+  /** 兜底关键词（Phase 1 仅存，不启用） */
+  fallbackQueries: string[];
+}
+
+/**
  * 餐段
  * 老虎机按当前时间硬过滤，只摇当前餐段合适的食物。
  */
@@ -197,4 +243,24 @@ export interface Food extends ReelItem {
   spicy: SpicyLevel;
   /** 适合的餐段，可多个；老虎机按当前餐段过滤 */
   meals: MealType[];
+
+  // ——— Phase 1 新增（dish 必填；drink 见 §1.3：satiety=1 / pickLayer=side）———
+  /** 顶不顶饱 1..5 */
+  satiety: SatietyLevel;
+  /** 犒劳感 / 丰盛度 1..5 */
+  indulgence: IndulgenceLevel;
+  /** 主要获取方式 */
+  convenience: Convenience;
+  /** 适合场景（可多个，非空） */
+  occasion: Occasion[];
+  /** 决策层级：meal=一顿饭级别(进默认单菜池) / side=小食配菜(不进) */
+  pickLayer: PickLayer;
+  /** 查店档案（§2，Phase 1 仅数据，不驱动运行时） */
+  search: SearchProfile;
+  /** 归一族：防相似菜连续刷屏（§5.4），可选；同组 cuisine 必须一致 */
+  canonicalGroup?: string;
+  /** 别名（查店/搜索扩展用，Phase 1 仅数据） */
+  aliases?: string[];
+  /** 关联菜谱 id（可选） */
+  recipeIds?: string[];
 }
