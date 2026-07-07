@@ -191,7 +191,8 @@ export function rouletteMainsByMeal(meal: MealType): Food[] {
 
 - **口径界定**：`foodsByMealForSinglePick` 的 tea 场景是三池并集；其它餐段严格只用 meal 层。side/drink 不会泄漏到早/午/晚/宵的默认单菜抽取。
 - **契约影响**：§5.1 抽取顺序里，第 1 步「餐段过滤」对 tea 改用 `foodsByMealForSinglePick("tea")`；后续 family 硬墙、去重、价位桶抽样逻辑不变（桶抽样对 tea 的 side/drink 同样适用，因为它们也有 priceTier）。
-- **落库前提**：tea 的 side/drink 供给量由后续「甜点/小食/饮品批次」补足（§4.2），S4 只负责接通取池路径。**S4 完成的验收**：`foodsByMealForSinglePick("tea")` 非空且不含被 §3 排除的 brand/dining_style/dish_group。
+- ⚠️ **drink 视为 family-neutral（S4 必须明确 + 覆盖测试）**：下午茶的饮品（咖啡/奶茶/气泡水等）不归属任何菜系 family。family 硬墙**只作用于 dish（main/side）**，**不得**用它过滤 drink——否则「西餐 + 下午茶」会把咖啡/奶茶误滤掉，tea 池再次塌薄。实现时 `applyFamily` 对 `kind==="drink"` 直接放行；S4 测试须覆盖「选定某 family + tea」时 drink 仍在池内。
+- **落库前提**：tea 的 side/drink 供给量由后续「甜点/小食/饮品批次」补足（§4.2），S4 只负责接通取池路径。**S4 完成的验收**：`foodsByMealForSinglePick("tea")` 非空且不含被 §3 排除的 brand/dining_style/dish_group；且「任一 family + tea」下 drink 不被 family 墙滤空。
 
 ---
 
@@ -213,17 +214,17 @@ dish（meal 层）目标 ≈237（满足 240 量级）。各格 = 目标(meal �
 
 ### 4.0 各批次剩余 meal 缺口（进度看板，按实际 meal 计数滚动更新）
 
-> 中式第一批写了 49 行，但 meal 只有 **42**（budget 12 / normal 21 / treat 9），side 7 行不计。故中式 meal **还差 +7**，主要在 budget 层（原 +18 仅达成 12）。
+> 更新（第二批后）：中式补 +7 已达标（budget 12→18 / normal 21→22 / treat 9），西餐 +29 一次到位（b8/n13/t8）。看板由 `familyBoard`（draft `_meta`）机器生成，此表与之对齐。
 
 | family | 目标(meal) | 已达成(meal) | **剩余 meal 缺口** | side 额外产出 |
 |---|---|---|---|---|
-| chinese | +49 | 42 | **+7**（budget +6 / normal +1） | 7 |
-| western | +29 | 0 | **+29** | — |
+| chinese | +49 | 49 | **0 ✅** | 7 |
+| western | +29 | 29 | **0 ✅** | 0 |
 | jpkr | +27 | 0 | **+27** | — |
 | exotic | +24 | 0 | **+24** | — |
-| **合计** | +129 | 42 | **+87 meal 待补** | 7 |
+| **合计** | +129 | 78 | **+51 meal 待补** | 7 |
 
-> 后续批次目标 = **中式 +7 meal、西餐 +29 meal、日韩 +27 meal、异国 +24 meal**（side/snack 另算，不冲抵）。每批"完成"的判据是它承诺的 **meal 净增**达标，不是行数。**不得以"中式 +49 已完成"收尾——中式 meal 仍差 +7。**
+> 剩余批次目标 = **日韩 +27 meal、异国 +24 meal**（side/snack 另算，不冲抵）。每批"完成"的判据是它承诺的 **meal 净增**达标，不是行数。draft `_meta.remainingMealAllFamilies` >0 时禁止收尾。
 
 **餐段最低标准（dish **meal 层** 主食，去重按餐段命中）与当前缺口：**
 
@@ -307,10 +308,10 @@ w = regionWeight × moodWeight × (role===main?1.6) × familiarFactor × seedAvo
 
 ## 6. 空桶 fallback 规则（额外要求 E）
 
-抽桶时，若命中的目标桶在**当前 family∩meal∩dish∩unseen 池**内为空：
+抽桶时，若命中的目标桶在**当前候选池（family∩meal∩unseen；tea 场景含 side/drink，见 §3.1）**内为空：
 
-1. **只在当前池内**把该空桶的概率质量，按 mix 里其余**非空**桶的相对比例重新分配。
-2. 绝不回退到全库、绝不跨 family、绝不放宽到 non-dish。
+1. **只在当前候选池内**把该空桶的概率质量，按 mix 里其余**非空**桶的相对比例重新分配。
+2. 绝不回退到全库、绝不跨 family、绝不放宽到 non-candidate（即不越过 §3/§3.1 入口界定的池）。
 3. 若整个池（所有桶）都空 → 上抛 `exhausted`（交 UI 提示换筛选，同现有 A 方案），不硬抽重复。
 
 示例：选 `treat`（mix `{budget:0, normal:0.25, treat:0.75}`），但当前池 treat 桶空、normal/budget 非空：
