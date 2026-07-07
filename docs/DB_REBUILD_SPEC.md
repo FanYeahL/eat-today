@@ -48,6 +48,7 @@ export interface Food extends ReelItem {
   indulgence: IndulgenceLevel;  // 1..5 犒劳感 / 丰盛度
   convenience: Convenience;     // 主要获取方式
   occasion: Occasion[];         // 适合场景（可多）
+  pickLayer: PickLayer;         // ★决策层级：meal=一顿饭级别(进默认单菜池) / side=小食配菜(不进)
   search: SearchProfile;        // 查店档案，见 §2（Phase 1 仅数据，不驱动运行时）
   canonicalGroup?: string;      // 归一族，防相似菜连续刷屏，见 §5.4
   aliases?: string[];           // 别名（查店/搜索扩展用，Phase 1 仅数据）
@@ -63,6 +64,15 @@ export type Convenience =
   | "convenience"   // 便利店即取
   | "dorm";         // 宿舍可自制
 export type Occasion = "solo" | "date" | "friends" | "lateNight" | "quick";
+
+/**
+ * 决策层级——把「一顿饭级别的具体食物」与「小食/配菜/组合项」分开，
+ * 让默认单菜抽签只出真正能当一餐的东西（对齐 user「默认池只出一顿饭级别的具体食物」）。
+ * - "meal"：satiety>=3，一道能当一餐主角（进默认单菜池）。
+ * - "side"：satiety<3，凉菜/小食/配菜/汤水，需搭配或组合（不进默认单菜池，进 side 集合）。
+ * 数据里显式写死（不再靠运行时用 satiety 推导），保证 lint 与落库口径单一。
+ */
+export type PickLayer = "meal" | "side";
 
 export interface SearchProfile {
   gateQuery: string;          // 「附近有没有这类店」——门控用（Phase 1 = 现 keywordOf 结果）
@@ -85,7 +95,7 @@ export interface SearchProfile {
 | 品牌/店（肯德基） | `"brand"` | 排除出默认池 |
 
 ### 1.3 drink 的新字段策略
-饮品/甜点（`kind==="drink"`）：`satiety` 固定填 `1`，`indulgence` 按实际（奶茶/蛋糕可 3-4），`convenience` 多为 `convenience`/`takeout`，`occasion` 据实。`search` 仍填（gateQuery 多为「奶茶店」「便利店」类）。饮品不参与主食价位桶抽样，沿用现有轴3共振逻辑。
+饮品/甜点（`kind==="drink"`）：`satiety` 固定填 `1`，`indulgence` 按实际（奶茶/蛋糕可 3-4），`convenience` 多为 `convenience`/`takeout`，`occasion` 据实，`pickLayer` 恒为 `"side"`（饮品/甜点天然不是「一餐主角」，与 satiety<3 一致）。`search` 仍填（gateQuery 多为「奶茶店」「便利店」类）。饮品不参与主食价位桶抽样，沿用现有轴3共振逻辑。
 
 ---
 
@@ -112,18 +122,27 @@ keywordOf(food) = food.shopKeyword ?? cuisineKeyword(food.cuisine)   // 现状�
 单一入口函数，全项目复用（放 `src/config/foods.ts` 或 `pick-core.ts`）：
 
 ```ts
-/** 默认主抽签池：只有具体可吃的菜进池 */
+/** 默认主抽签池：只有「一顿饭级别的具体菜」进池 */
 export function isDefaultPickable(f: Food): boolean {
-  return f.kind === "main" && f.entityType === "dish";
+  return f.kind === "main" && f.entityType === "dish" && f.pickLayer === "meal";
 }
 
 /** 按餐段取默认池（替换现 mainFoodsByMeal 的实现内核） */
 export function mainFoodsByMeal(meal: MealType): Food[] {
   return foods.filter((f) => isDefaultPickable(f) && f.meals.includes(meal));
 }
+
+/** side 集合：小食/配菜/组合项，供组合推荐/加菜用，不进默认单菜抽签 */
+export function sideFoods(meal?: MealType): Food[] {
+  return foods.filter(
+    (f) => f.kind === "main" && f.entityType === "dish" && f.pickLayer === "side"
+      && (meal ? f.meals.includes(meal) : true),
+  );
+}
 ```
 
 - `brand` / `dining_style` / `dish_group` **一律不进默认抽签**。
+- `pickLayer === "side"`（satiety<3 的凉菜/小食/配菜）**也不进默认单菜池**——即便它是 `kind:"main", entityType:"dish"`。这是本次新增的第三道门，防止「茶叶蛋/皮蛋豆腐」这类被当成一餐主角抽出。
 - 二级集合（火锅/品牌等）通过独立 selector 暴露，不走 `mainFoodsByMeal`（Phase 1 可先不接 UI，数据留存即可）。
 - `mainFoodsByMeal` 是现有 `useDivinationPick` / `useRoulette` 的共同入口（`useDivinationPick.ts:149`），改其内核即全链路生效，无需动 hook。
 
@@ -131,7 +150,10 @@ export function mainFoodsByMeal(meal: MealType): Food[] {
 
 ## 4. 新菜补齐矩阵（目标 & 缺口）
 
-dish 主食目标 ≈237（满足 240 量级）。各格 = 目标(补齐数)。详见 `dish-candidates.draft.json`。
+> ⚠️ **口径 = meal 层 only**。缺口矩阵只统计 `pickLayer === "meal"` 的 dish（默认单菜池的真实供给）。
+> `side` 层（satiety<3）单独另计（见 §4.1），**绝不计入下列 meal 缺口**——否则会误以为池子补够、实际早餐/宵夜仍薄。
+
+dish（meal 层）目标 ≈237（满足 240 量级）。各格 = 目标(补齐数)。详见 `dish-candidates.draft.json`。
 
 | family | budget | normal | treat | 合计 |
 |---|---|---|---|---|
@@ -141,17 +163,31 @@ dish 主食目标 ≈237（满足 240 量级）。各格 = 目标(补齐数)。�
 | exotic | 10 (+4) | 20 (+12) | 9 (+8) | 39 |
 | **补齐合计** | +37 | +60 | +32 | **+129** |
 
-**餐段最低标准（dish 主食，去重按餐段命中）与当前缺口：**
+> 注：以上 +129 为 **meal 层**目标。中式第一批实际产出 = **meal 42 + side 7 = 49 行**，其中**只有 42 计入 meal 缺口**（budget/normal/treat 的 meal 计数见 review 表），side 7 计入 §4.1。因此中式 meal 层仍差 **+7**（budget 层被 side 占用最多），后续批次或补录时需补齐。
+
+**餐段最低标准（dish **meal 层** 主食，去重按餐段命中）与当前缺口：**
+
+> 口径 = meal 层 only（`pickLayer==="meal"`）。side 层不计入下表。
 
 | 餐段 | 现状 | 目标 | 缺口 | 补齐重点 |
 |---|---|---|---|---|
-| 早餐 breakfast | 29 | 40 | +11 | 中式早点、便利店速食 |
+| 早餐 breakfast | 29 | 40 | +11 | 中式早点、便利店速食（须 satiety≥3 才算 meal） |
 | 午饭 lunch | 75 | 120 | +45 | 各家族盖饭/面/正餐 |
-| 下午茶 tea | 34 | 50 | +16 | 轻食、小食、甜点向 |
+| 下午茶 tea | 34 | 50 | +16 | 轻食、小食、甜点向（多为 side 层，见 §4.1） |
 | 晚饭 dinner | 79 | 140 | +61 | 正餐主力，treat 集中在此 |
 | 宵夜 midnight | 33 | 70 | +37 | 面/粥/烧烤替代的具体菜、便利店 |
 
-**treat 补齐硬性要求（额外要求 F）**：treat 档新菜必须是**高 indulgence(≥4)、高 satiety(≥3)、非轻食**的具体菜，禁止用 dining_style 凑数。参考清单（已纳入草案）：
+### 4.1 side 层单独指标（不并入 meal 缺口）
+
+`side`（satiety<3：凉菜/小食/配菜/汤水/早点小件）单独计量，服务于「组合推荐 / 加个菜」，**不进默认单菜池**，因此**不计入 §4 与上表的 meal 缺口**。
+
+- 中式第一批 side 产出 = **7**：白粥配小菜 / 茶叶蛋 / 咸豆浆 / 上海小馄饨 / 皮蛋豆腐 / 卤味拼盘 / 夫妻肺片。
+- side 层目标暂不设硬门槛（Phase 1 先积累），落库后按 `sideFoods()` 归入 side 集合。
+- ⚠️ 审查提示：本批 side 多为早餐/宵夜小件，意味着**早餐/宵夜的 meal 层供给比行数看起来更薄**——早餐 meal 命中仅 3、宵夜仅 2（见 review 表），远低于目标，须在后续批次专门补「顶饱的早餐/宵夜正餐」。
+
+**treat 补齐硬性要求（额外要求 F）**：treat 档新菜必须是**高 indulgence(≥4)、高 satiety(≥3)、非「健康轻食」**的具体菜，禁止用 dining_style 凑数。
+> 注意：treat 门**不惩罚「清淡」**——「清淡」只是口味，不代表不犒劳（白灼基围虾清淡但高质量）。只看 indulgence / satiety / 是否「健康轻食」。详见 §5.3。
+参考清单（已纳入草案）：
 - 中式：毛血旺、酸汤肥牛、椒麻鱼片、蟹黄豆腐、葱烧海参、水煮牛肉、干锅牛蛙…
 - 西餐：惠灵顿牛排、奶油蘑菇牛排饭、海鲜意面、香煎鸡排饭、芝士焗饭…
 - 日韩：鳗鱼饭、寿喜烧牛肉饭、韩式牛排拌饭、刺身盖饭、参鸡汤…
@@ -190,7 +226,8 @@ const budgetBucketMix: Record<Filters["budget"], Record<PriceTier, number>> = {
 w = regionWeight × moodWeight × (role===main?1.6) × familiarFactor × seedAvoidFactor
   × indulgenceWeight(food, bucket)      // ★新增
 ```
-- `indulgenceWeight`：仅 `treat` 桶生效——`indulgence>=4 → ×1.8`，`indulgence<=2 或含「健康轻食/清淡」→ ×0.2`。budget/normal 桶恒 1。
+- `indulgenceWeight`：仅 `treat` 桶生效——`indulgence>=4 → ×1.8`；`indulgence<=2 或 satiety<3 或含「健康轻食」→ ×0.2`。budget/normal 桶恒 1。
+- ⚠️ **不惩罚「清淡」**：清淡是口味、非"不犒劳"的信号。白灼基围虾（清淡、indulgence 4、satiety 3）应留在 treat 桶正常权重。只有「健康轻食」标签或低 indulgence/satiety 才降权。（与生成器 treat 质量门口径一致：`gen-dish-candidates.mjs` §自检、`draft._meta.notes`。）
 - **移除** `budgetWeight` / `richnessWeight` 的 per-dish 软权重（其职责被「桶抽样 + indulgenceWeight」取代），`moodWeight` 保留。
 
 ### 5.4 canonicalGroup 防刷屏
@@ -233,14 +270,16 @@ function resolveBucket(mix: Record<PriceTier, number>, nonEmpty: Set<PriceTier>)
 
 失败即非零退出。规则：
 
-1. **默认池纯净**：`mainFoodsByMeal` 结果中不得出现 `entityType !== "dish"`（等价：所有 `kind==="main" && entityType==="dish"` 之外的条目不得被默认池选中）。
-2. **dish 必填字段**：每个 `dish` 必须有 `cuisine / priceTier / meals(非空) / tags(非空) / satiety / indulgence / convenience / occasion(非空) / search.gateQuery / search.displayQuery`。
-3. **枚举合法**：`cuisine/priceTier/spicy/satiety/indulgence/convenience/occasion/tags/meals` 全部落在类型允许值内（防手写拼错）。
-4. **餐段够量**（dish 主食，按餐段命中计）：早≥40 / 午≥120 / 茶≥50 / 晚≥140 / 宵≥70。
-5. **family×price 不塌**：每个 family 的每个 priceTier 桶，dish 数 ≥ 阈值（budget≥8, normal≥15, treat≥8）。
-6. **treat 质量门**：每个 `treat` dish 必须 `indulgence>=4 && satiety>=3` 且 tags 不含「健康轻食」。
-7. **id 唯一**；**canonicalGroup 若存在，组内 cuisine 一致**。
-8. **每家族每餐段非空**：4 family × 5 meal = 20 格，每格 dish 数 ≥3（防「选西餐+早餐」塌池）。
+1. **默认池纯净**：`mainFoodsByMeal` 结果必须全部满足 `kind==="main" && entityType==="dish" && pickLayer==="meal"`；`brand/dining_style/dish_group` 及 `pickLayer==="side"` 一律不得出现。
+2. **dish 必填字段**：每个 `dish` 必须有 `cuisine / priceTier / meals(非空) / tags(非空) / satiety / indulgence / convenience / occasion(非空) / pickLayer / search.gateQuery / search.displayQuery`。
+3. **枚举合法**：`cuisine/priceTier/spicy/satiety/indulgence/convenience/occasion/tags/meals/pickLayer` 全部落在类型允许值内（防手写拼错）。
+4. **pickLayer 与 satiety 一致**：`pickLayer==="meal"` ⟺ `satiety>=3`；`pickLayer==="side"` ⟺ `satiety<3`（口径单一，防两处漂移）。
+5. **餐段够量**（dish **meal 层**，按餐段命中计，side 不计）：早≥40 / 午≥120 / 茶≥50 / 晚≥140 / 宵≥70。
+6. **family×price 不塌**（仅 meal 层）：每个 family 的每个 priceTier 桶，meal-dish 数 ≥ 阈值（budget≥8, normal≥15, treat≥8）。
+7. **treat 质量门**：每个 `treat` 且 `pickLayer==="meal"` 的 dish 必须 `indulgence>=4 && satiety>=3` 且 tags 不含「健康轻食」（**不检查「清淡」**）。
+8. **id 唯一**；**canonicalGroup 若存在，组内 cuisine 一致**。
+9. **每家族每餐段非空**（meal 层）：4 family × 5 meal = 20 格，每格 meal-dish 数 ≥3（防「选西餐+早餐」塌池）。
+10. **无乱码**：任何字符串字段不得含 U+FFFD（`�`）。
 
 ---
 

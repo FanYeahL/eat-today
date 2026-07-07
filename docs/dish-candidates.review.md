@@ -1,11 +1,12 @@
-# 中式候选菜 review 表（第一批 +49）
+# 中式候选菜 review 表（第一批，共 49 行）
 
 > 审阅重点：命名真实性 / 口味(spicy) / 价位归档 / 餐段合理性 / treat 是否够犒劳 / side 层归类 / canonicalGroup 归并。
-> 分布：budget 18 · normal 22 · treat 9；层级 meal 42 · side 7
+> 层级：meal 42 · side 7（**缺口只算 meal 层**）
+> meal 层价位（计入缺口）：budget 12 · normal 21 · treat 9
 > 餐段命中（仅 meal 层）：早 3 / 午 26 / 茶 0 / 晚 39 / 宵 2
 > tea=0：已知缺口，记入后续甜点/小食/饮品批次补齐，不计作下午茶完成。
 
-| name | cuisine | priceTier | layer | meals | spicy | tags | satiety | indulgence | convenience | occasion | gateQuery | displayQuery | canonicalGroup |
+| name | cuisine | priceTier | pickLayer | meals | spicy | tags | satiety | indulgence | convenience | occasion | gateQuery | displayQuery | canonicalGroup |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | 白粥配小菜 | cn-generic | budget | side | breakfast | 0 | 清淡/省钱/暖胃 | 2 | 1 | canteen | solo/quick | 家常菜 | 白粥配小菜 |  |
 | 茶叶蛋 | cn-generic | budget | side | breakfast/midnight | 0 | 省钱/快手 | 1 | 1 | convenience | solo/quick/lateNight | 家常菜 | 茶叶蛋 |  |

@@ -2,18 +2,24 @@
   "_meta": {
     "purpose": "dish 候选菜草案（脚本生成），供 user + Codex 审后落 foods.ts",
     "generated": "2026-07-07",
-    "batch": "中式 +49（第一批）",
-    "gapTarget": {
+    "batch": "中式 第一批",
+    "gapBasis": "meal-only：缺口矩阵只统计 pickLayer=meal；side 单独另计（spec §4/§4.1）",
+    "gapTargetMeal": {
       "chinese": 49,
       "western": 29,
       "jpkr": 27,
       "exotic": 24,
       "total": 129
     },
-    "thisBatchCount": 49,
-    "priceDistribution": {
+    "thisBatchRows": 49,
+    "priceDistributionAll": {
       "budget": 18,
       "normal": 22,
+      "treat": 9
+    },
+    "priceDistributionMealLayer": {
+      "budget": 12,
+      "normal": 21,
       "treat": 9
     },
     "layerDistribution": {
@@ -27,14 +33,24 @@
       "dinner": 39,
       "midnight": 2
     },
+    "sideItems": [
+      "白粥配小菜",
+      "茶叶蛋",
+      "咸豆浆",
+      "上海小馄饨",
+      "皮蛋豆腐",
+      "卤味拼盘",
+      "夫妻肺片"
+    ],
     "reviewStatus": "DRAFT — 待审：命名/口味真实性 / spicy / priceTier 归档 / meals 合理性 / canonicalGroup / side 层归类",
     "notes": [
       "family 不写，由 cuisine→familyOf 推导。",
       "emoji 落库时定，草案不含。",
       "search 为嵌套对象 {gateQuery,displayQuery,fallbackQueries}；gateQuery 对齐现有 cuisineKeyword，Phase 1 运行时零改动。",
-      "layer=side（satiety<3）不进默认单菜池，落库映射为 snack/side 层；本批 side：白粥配小菜/茶叶蛋/咸豆浆/上海小馄饨/皮蛋豆腐/卤味拼盘。",
+      "pickLayer=side（satiety<3）不进默认单菜池，落库映射为 side 层；本批 side 7 项：白粥配小菜/茶叶蛋/咸豆浆/上海小馄饨/皮蛋豆腐/卤味拼盘/夫妻肺片。",
+      "缺口口径 = meal-only：本批 49 行中仅 42 计入 meal 缺口，side 7 不计（见 priceDistributionMealLayer）。",
       "treat 全为具体菜，无火锅/烧烤/烤肉/品牌。",
-      "treat 权重不再惩罚「清淡」，只看 indulgence 与「健康轻食」——白灼基围虾这类清爽高质量菜保留在 treat 桶（fix 5）。",
+      "treat 质量门不惩罚「清淡」，只看 indulgence / satiety / 「健康轻食」——白灼基围虾这类清爽高质量菜保留在 treat 桶（fix 5，对齐 spec §5.3）。",
       "tea（下午茶）本批=0，属已知缺口，记入后续【甜点/小食/饮品批次】统一补齐，不计作下午茶缺口已完成。"
     ]
   },
@@ -59,7 +75,7 @@
         "solo",
         "quick"
       ],
-      "layer": "side",
+      "pickLayer": "side",
       "search": {
         "gateQuery": "家常菜",
         "displayQuery": "白粥配小菜",
@@ -90,7 +106,7 @@
         "quick",
         "lateNight"
       ],
-      "layer": "side",
+      "pickLayer": "side",
       "search": {
         "gateQuery": "家常菜",
         "displayQuery": "茶叶蛋",
@@ -120,7 +136,7 @@
         "solo",
         "quick"
       ],
-      "layer": "meal",
+      "pickLayer": "meal",
       "search": {
         "gateQuery": "家常菜",
         "displayQuery": "菜肉包子",
@@ -150,7 +166,7 @@
         "solo",
         "quick"
       ],
-      "layer": "meal",
+      "pickLayer": "meal",
       "search": {
         "gateQuery": "北方菜",
         "displayQuery": "手抓饼加蛋",
@@ -181,7 +197,7 @@
         "solo",
         "quick"
       ],
-      "layer": "side",
+      "pickLayer": "side",
       "search": {
         "gateQuery": "江浙菜",
         "displayQuery": "咸豆浆",
@@ -213,7 +229,7 @@
         "solo",
         "quick"
       ],
-      "layer": "meal",
+      "pickLayer": "meal",
       "search": {
         "gateQuery": "家常菜",
         "displayQuery": "西红柿鸡蛋面",
@@ -244,7 +260,7 @@
         "solo",
         "quick"
       ],
-      "layer": "meal",
+      "pickLayer": "meal",
       "search": {
         "gateQuery": "江浙菜",
         "displayQuery": "阳春面",
@@ -278,7 +294,7 @@
         "quick",
         "lateNight"
       ],
-      "layer": "meal",
+      "pickLayer": "meal",
       "search": {
         "gateQuery": "江浙菜",
         "displayQuery": "榨菜肉丝面",
@@ -310,7 +326,7 @@
         "solo",
         "quick"
       ],
-      "layer": "meal",
+      "pickLayer": "meal",
       "search": {
         "gateQuery": "家常菜",
         "displayQuery": "土豆丝盖饭",
@@ -340,7 +356,7 @@
         "solo",
         "quick"
       ],
-      "layer": "meal",
+      "pickLayer": "meal",
       "search": {
         "gateQuery": "家常菜",
         "displayQuery": "青椒肉丝盖饭",
@@ -371,7 +387,7 @@
         "solo",
         "quick"
       ],
-      "layer": "meal",
+      "pickLayer": "meal",
       "search": {
         "gateQuery": "家常菜",
         "displayQuery": "家常豆腐盖饭",
@@ -401,7 +417,7 @@
         "solo",
         "quick"
       ],
-      "layer": "meal",
+      "pickLayer": "meal",
       "search": {
         "gateQuery": "家常菜",
         "displayQuery": "蒜薹炒肉盖饭",
@@ -432,7 +448,7 @@
         "solo",
         "quick"
       ],
-      "layer": "meal",
+      "pickLayer": "meal",
       "search": {
         "gateQuery": "北方菜",
         "displayQuery": "大饼卷菜",
@@ -463,7 +479,7 @@
         "solo",
         "friends"
       ],
-      "layer": "meal",
+      "pickLayer": "meal",
       "search": {
         "gateQuery": "东北菜",
         "displayQuery": "白菜炖粉条",
@@ -495,7 +511,7 @@
         "solo",
         "quick"
       ],
-      "layer": "meal",
+      "pickLayer": "meal",
       "search": {
         "gateQuery": "北方菜",
         "displayQuery": "醋溜白菜盖饭",
@@ -528,7 +544,7 @@
         "quick",
         "lateNight"
       ],
-      "layer": "side",
+      "pickLayer": "side",
       "search": {
         "gateQuery": "江浙菜",
         "displayQuery": "上海小馄饨",
@@ -560,7 +576,7 @@
         "friends",
         "lateNight"
       ],
-      "layer": "side",
+      "pickLayer": "side",
       "search": {
         "gateQuery": "家常菜",
         "displayQuery": "皮蛋豆腐",
@@ -591,7 +607,7 @@
         "friends",
         "lateNight"
       ],
-      "layer": "side",
+      "pickLayer": "side",
       "search": {
         "gateQuery": "家常菜",
         "displayQuery": "卤味拼盘",
@@ -622,7 +638,7 @@
         "solo",
         "friends"
       ],
-      "layer": "meal",
+      "pickLayer": "meal",
       "search": {
         "gateQuery": "江浙菜",
         "displayQuery": "红烧肉盖饭",
@@ -651,7 +667,7 @@
       "occasion": [
         "friends"
       ],
-      "layer": "meal",
+      "pickLayer": "meal",
       "search": {
         "gateQuery": "北方菜",
         "displayQuery": "京酱肉丝",
@@ -683,7 +699,7 @@
         "solo",
         "friends"
       ],
-      "layer": "meal",
+      "pickLayer": "meal",
       "search": {
         "gateQuery": "东北菜",
         "displayQuery": "地三鲜盖饭",
@@ -713,7 +729,7 @@
       "occasion": [
         "friends"
       ],
-      "layer": "meal",
+      "pickLayer": "meal",
       "search": {
         "gateQuery": "东北菜",
         "displayQuery": "小鸡炖蘑菇",
@@ -744,7 +760,7 @@
       "occasion": [
         "friends"
       ],
-      "layer": "meal",
+      "pickLayer": "meal",
       "search": {
         "gateQuery": "川菜",
         "displayQuery": "辣子鸡丁",
@@ -775,7 +791,7 @@
         "friends",
         "solo"
       ],
-      "layer": "meal",
+      "pickLayer": "meal",
       "search": {
         "gateQuery": "川菜",
         "displayQuery": "口水鸡",
@@ -804,7 +820,7 @@
       "occasion": [
         "friends"
       ],
-      "layer": "side",
+      "pickLayer": "side",
       "search": {
         "gateQuery": "川菜",
         "displayQuery": "夫妻肺片",
@@ -836,7 +852,7 @@
         "solo",
         "friends"
       ],
-      "layer": "meal",
+      "pickLayer": "meal",
       "search": {
         "gateQuery": "湘菜",
         "displayQuery": "农家小炒肉",
@@ -866,7 +882,7 @@
       "occasion": [
         "friends"
       ],
-      "layer": "meal",
+      "pickLayer": "meal",
       "search": {
         "gateQuery": "粤菜",
         "displayQuery": "白切鸡",
@@ -898,7 +914,7 @@
         "solo",
         "friends"
       ],
-      "layer": "meal",
+      "pickLayer": "meal",
       "search": {
         "gateQuery": "粤菜",
         "displayQuery": "腊味煲仔饭",
@@ -928,7 +944,7 @@
       "occasion": [
         "friends"
       ],
-      "layer": "meal",
+      "pickLayer": "meal",
       "search": {
         "gateQuery": "湘菜",
         "displayQuery": "干锅花菜",
@@ -959,7 +975,7 @@
         "date",
         "friends"
       ],
-      "layer": "meal",
+      "pickLayer": "meal",
       "search": {
         "gateQuery": "家常菜",
         "displayQuery": "铁板黑椒牛柳",
@@ -988,7 +1004,7 @@
       "occasion": [
         "solo"
       ],
-      "layer": "meal",
+      "pickLayer": "meal",
       "search": {
         "gateQuery": "川菜",
         "displayQuery": "鱼香茄子煲",
@@ -1019,7 +1035,7 @@
         "friends",
         "solo"
       ],
-      "layer": "meal",
+      "pickLayer": "meal",
       "search": {
         "gateQuery": "家常菜",
         "displayQuery": "糖醋里脊",
@@ -1050,7 +1066,7 @@
         "friends",
         "solo"
       ],
-      "layer": "meal",
+      "pickLayer": "meal",
       "search": {
         "gateQuery": "粤菜",
         "displayQuery": "咕咾肉",
@@ -1080,7 +1096,7 @@
       "occasion": [
         "friends"
       ],
-      "layer": "meal",
+      "pickLayer": "meal",
       "search": {
         "gateQuery": "北方菜",
         "displayQuery": "葱爆羊肉",
@@ -1112,7 +1128,7 @@
         "solo",
         "friends"
       ],
-      "layer": "meal",
+      "pickLayer": "meal",
       "search": {
         "gateQuery": "西北菜",
         "displayQuery": "羊肉泡馍",
@@ -1146,7 +1162,7 @@
         "friends",
         "lateNight"
       ],
-      "layer": "meal",
+      "pickLayer": "meal",
       "search": {
         "gateQuery": "西北菜",
         "displayQuery": "新疆炒米粉",
@@ -1176,7 +1192,7 @@
       "occasion": [
         "friends"
       ],
-      "layer": "meal",
+      "pickLayer": "meal",
       "search": {
         "gateQuery": "云南菜",
         "displayQuery": "汽锅鸡",
@@ -1206,7 +1222,7 @@
       "occasion": [
         "friends"
       ],
-      "layer": "meal",
+      "pickLayer": "meal",
       "search": {
         "gateQuery": "云南菜",
         "displayQuery": "大理酸辣鱼",
@@ -1238,7 +1254,7 @@
         "friends",
         "solo"
       ],
-      "layer": "meal",
+      "pickLayer": "meal",
       "search": {
         "gateQuery": "家常菜",
         "displayQuery": "三杯鸡",
@@ -1269,7 +1285,7 @@
         "solo",
         "friends"
       ],
-      "layer": "meal",
+      "pickLayer": "meal",
       "search": {
         "gateQuery": "粤菜",
         "displayQuery": "梅菜扣肉盖饭",
@@ -1299,7 +1315,7 @@
       "occasion": [
         "friends"
       ],
-      "layer": "meal",
+      "pickLayer": "meal",
       "search": {
         "gateQuery": "湘菜",
         "displayQuery": "剁椒鱼头",
@@ -1329,7 +1345,7 @@
         "friends",
         "date"
       ],
-      "layer": "meal",
+      "pickLayer": "meal",
       "search": {
         "gateQuery": "北方菜",
         "displayQuery": "葱烧海参",
@@ -1359,7 +1375,7 @@
         "date",
         "friends"
       ],
-      "layer": "meal",
+      "pickLayer": "meal",
       "search": {
         "gateQuery": "江浙菜",
         "displayQuery": "蟹黄豆腐",
@@ -1390,7 +1406,7 @@
       "occasion": [
         "friends"
       ],
-      "layer": "meal",
+      "pickLayer": "meal",
       "search": {
         "gateQuery": "江浙菜",
         "displayQuery": "东坡肉",
@@ -1421,7 +1437,7 @@
         "friends",
         "date"
       ],
-      "layer": "meal",
+      "pickLayer": "meal",
       "search": {
         "gateQuery": "北方菜",
         "displayQuery": "北京烤鸭",
@@ -1452,7 +1468,7 @@
         "friends",
         "date"
       ],
-      "layer": "meal",
+      "pickLayer": "meal",
       "search": {
         "gateQuery": "粤菜",
         "displayQuery": "白灼基围虾",
@@ -1482,7 +1498,7 @@
       "occasion": [
         "friends"
       ],
-      "layer": "meal",
+      "pickLayer": "meal",
       "search": {
         "gateQuery": "川菜",
         "displayQuery": "干锅牛蛙",
@@ -1513,7 +1529,7 @@
       "occasion": [
         "friends"
       ],
-      "layer": "meal",
+      "pickLayer": "meal",
       "search": {
         "gateQuery": "川菜",
         "displayQuery": "水煮鱼",
@@ -1546,7 +1562,7 @@
         "friends",
         "solo"
       ],
-      "layer": "meal",
+      "pickLayer": "meal",
       "search": {
         "gateQuery": "家常菜",
         "displayQuery": "酸汤肥牛",

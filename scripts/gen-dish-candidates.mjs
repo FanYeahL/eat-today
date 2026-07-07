@@ -10,9 +10,9 @@
 // ROW 字段：[name, cuisine, priceTier, spicy, meals, tags, satiety, indulgence, convenience, occasion, canonicalGroup?]
 //   meals 短码: b早 l午 t茶 d晚 n宵 ；occasion 短码: s=solo dt=date f=friends ln=lateNight q=quick
 //
-// layer 层级（衍生，对齐 user fix 4「satiety<3 不进默认单菜池」）：
+// pickLayer 层级（衍生，对齐 spec §1.1 PickLayer + user fix 4「satiety<3 不进默认单菜池」）：
 //   satiety>=3 → "meal"（一顿饭级别的具体食物，进默认单菜主池）
-//   satiety<3  → "side"（小食/配菜/组合项，落库映射为 snack/side 层，不进默认单菜池）
+//   satiety<3  → "side"（小食/配菜/组合项，落库映射为 side 层，不进默认单菜池）
 
 import fs from "fs";
 import path from "path";
@@ -124,8 +124,8 @@ function expand(row) {
     indulgence,
     convenience,
     occasion: occasion.match(/dt|ln|[sfq]/g).map((c) => O[c]),
-    // layer 衍生：satiety<3 → side（不进默认单菜池），否则 meal。对齐 user fix 4。
-    layer: satiety >= 3 ? "meal" : "side",
+    // pickLayer 衍生：satiety<3 → side（不进默认单菜池），否则 meal。对齐 spec §1.1 + user fix 4。
+    pickLayer: satiety >= 3 ? "meal" : "side",
     // search 嵌套对象，对齐 spec §1.1（fix 1：不再顶层散放）
     search: {
       gateQuery: cs.gate,
@@ -145,17 +145,19 @@ const dishes = ROWS.map(expand);
 const errs = [];
 const seenNames = new Set();
 const hasMojibake = (s) => typeof s === "string" && s.includes("�");
+const LAYER = new Set(["meal", "side"]);
 
 for (const d of dishes) {
   const at = `[${d.name || "??"}]`;
   // 乱码：扫所有字符串字段（含 search、数组元素）
-  const strings = [d.name, d.cuisine, d.priceTier, d.convenience, d.layer,
+  const strings = [d.name, d.cuisine, d.priceTier, d.convenience, d.pickLayer,
     ...d.meals, ...d.tags, ...d.occasion,
     d.search?.gateQuery, d.search?.displayQuery, ...(d.search?.fallbackQueries ?? [])];
   if (strings.some(hasMojibake)) errs.push(`${at} 含乱码 \\uFFFD`);
   // 枚举合法
   if (!CUISINE_SEARCH[d.cuisine]) errs.push(`${at} cuisine 非法: ${d.cuisine}`);
   if (!PRICE.has(d.priceTier)) errs.push(`${at} priceTier 非法: ${d.priceTier}`);
+  if (!LAYER.has(d.pickLayer)) errs.push(`${at} pickLayer 非法: ${d.pickLayer}`);
   d.tags.forEach((t) => { if (!TAGS.has(t)) errs.push(`${at} tag 非法: ${t}`); });
   d.occasion.forEach((o) => { if (!OCCASION.has(o)) errs.push(`${at} occasion 非法: ${o}`); });
   if (!CONVENIENCE.has(d.convenience)) errs.push(`${at} convenience 非法: ${d.convenience}`);
@@ -171,11 +173,11 @@ for (const d of dishes) {
   // search 结构完整
   if (!d.search || !d.search.gateQuery || !d.search.displayQuery || !Array.isArray(d.search.fallbackQueries) || !d.search.fallbackQueries.length)
     errs.push(`${at} search 结构不完整`);
-  // layer 与 satiety 一致（meal 层必须 satiety>=3）
-  if (d.layer === "meal" && d.satiety < 3) errs.push(`${at} meal 层却 satiety<3`);
-  if (d.layer === "side" && d.satiety >= 3) errs.push(`${at} side 层却 satiety>=3`);
+  // pickLayer 与 satiety 一致（spec §7 规则 4：meal ⟺ satiety>=3）
+  if (d.pickLayer === "meal" && d.satiety < 3) errs.push(`${at} meal 层却 satiety<3`);
+  if (d.pickLayer === "side" && d.satiety >= 3) errs.push(`${at} side 层却 satiety>=3`);
   // treat 质量门：仅对 meal 层的 treat 要求 indulgence>=4 且非轻食（fix 5：不惩罚清淡，只看 indulgence/轻食）
-  if (d.priceTier === "treat" && d.layer === "meal") {
+  if (d.priceTier === "treat" && d.pickLayer === "meal") {
     if (d.indulgence < 4 || d.satiety < 3 || d.tags.includes("健康轻食"))
       errs.push(`${at} treat 质量门不过（indulgence>=4 & satiety>=3 & 非健康轻食）`);
   }
@@ -205,29 +207,38 @@ if (errs.length) {
 const prices = ["budget", "normal", "treat"];
 const byPrice = Object.fromEntries(prices.map((p) => [p, dishes.filter((d) => d.priceTier === p).length]));
 const mealsAll = ["breakfast", "lunch", "tea", "dinner", "midnight"];
-// 餐段命中只数 meal 层（默认单菜池的真实供给）
-const mealLayer = dishes.filter((d) => d.layer === "meal");
+// meal 层（默认单菜池的真实供给）——缺口统计一律以此为准（对齐 spec §4 meal-only 口径）
+const mealLayer = dishes.filter((d) => d.pickLayer === "meal");
+const sideLayer = dishes.filter((d) => d.pickLayer === "side");
 const byMeal = Object.fromEntries(mealsAll.map((m) => [m, mealLayer.filter((d) => d.meals.includes(m)).length]));
-const byLayer = { meal: mealLayer.length, side: dishes.length - mealLayer.length };
+const byLayer = { meal: mealLayer.length, side: sideLayer.length };
+// meal 层的价位分布（这才是计入 §4 缺口矩阵的数字）
+const mealByPrice = Object.fromEntries(prices.map((p) => [p, mealLayer.filter((d) => d.priceTier === p).length]));
+// side 名单：从数据自动生成，永不与备注漂移（fix 4）
+const sideNames = sideLayer.map((d) => d.name);
 
 const out = {
   _meta: {
     purpose: "dish 候选菜草案（脚本生成），供 user + Codex 审后落 foods.ts",
     generated: new Date().toISOString().slice(0, 10),
-    batch: "中式 +49（第一批）",
-    gapTarget: { chinese: 49, western: 29, jpkr: 27, exotic: 24, total: 129 },
-    thisBatchCount: dishes.length,
-    priceDistribution: byPrice,
+    batch: "中式 第一批",
+    gapBasis: "meal-only：缺口矩阵只统计 pickLayer=meal；side 单独另计（spec §4/§4.1）",
+    gapTargetMeal: { chinese: 49, western: 29, jpkr: 27, exotic: 24, total: 129 },
+    thisBatchRows: dishes.length,
+    priceDistributionAll: byPrice,
+    priceDistributionMealLayer: mealByPrice,
     layerDistribution: byLayer,
     mealHitsMealLayerOnly: byMeal,
+    sideItems: sideNames,
     reviewStatus: "DRAFT — 待审：命名/口味真实性 / spicy / priceTier 归档 / meals 合理性 / canonicalGroup / side 层归类",
     notes: [
       "family 不写，由 cuisine→familyOf 推导。",
       "emoji 落库时定，草案不含。",
       "search 为嵌套对象 {gateQuery,displayQuery,fallbackQueries}；gateQuery 对齐现有 cuisineKeyword，Phase 1 运行时零改动。",
-      "layer=side（satiety<3）不进默认单菜池，落库映射为 snack/side 层；本批 side：白粥配小菜/茶叶蛋/咸豆浆/上海小馄饨/皮蛋豆腐/卤味拼盘。",
+      `pickLayer=side（satiety<3）不进默认单菜池，落库映射为 side 层；本批 side ${sideNames.length} 项：${sideNames.join("/")}。`,
+      "缺口口径 = meal-only：本批 " + dishes.length + " 行中仅 " + mealLayer.length + " 计入 meal 缺口，side " + sideLayer.length + " 不计（见 priceDistributionMealLayer）。",
       "treat 全为具体菜，无火锅/烧烤/烤肉/品牌。",
-      "treat 权重不再惩罚「清淡」，只看 indulgence 与「健康轻食」——白灼基围虾这类清爽高质量菜保留在 treat 桶（fix 5）。",
+      "treat 质量门不惩罚「清淡」，只看 indulgence / satiety / 「健康轻食」——白灼基围虾这类清爽高质量菜保留在 treat 桶（fix 5，对齐 spec §5.3）。",
       "tea（下午茶）本批=0，属已知缺口，记入后续【甜点/小食/饮品批次】统一补齐，不计作下午茶缺口已完成。",
     ],
   },
@@ -241,10 +252,11 @@ fs.writeFileSync(
 
 // —— review 表（markdown）——
 const esc = (s) => String(s).replace(/\|/g, "\\|");
-const cols = ["name","cuisine","priceTier","layer","meals","spicy","tags","satiety","indulgence","convenience","occasion","gateQuery","displayQuery","canonicalGroup"];
-let md = `# 中式候选菜 review 表（第一批 +${dishes.length}）\n\n`;
+const cols = ["name","cuisine","priceTier","pickLayer","meals","spicy","tags","satiety","indulgence","convenience","occasion","gateQuery","displayQuery","canonicalGroup"];
+let md = `# 中式候选菜 review 表（第一批，共 ${dishes.length} 行）\n\n`;
 md += `> 审阅重点：命名真实性 / 口味(spicy) / 价位归档 / 餐段合理性 / treat 是否够犒劳 / side 层归类 / canonicalGroup 归并。\n`;
-md += `> 分布：budget ${byPrice.budget} · normal ${byPrice.normal} · treat ${byPrice.treat}；层级 meal ${byLayer.meal} · side ${byLayer.side}\n`;
+md += `> 层级：meal ${byLayer.meal} · side ${byLayer.side}（**缺口只算 meal 层**）\n`;
+md += `> meal 层价位（计入缺口）：budget ${mealByPrice.budget} · normal ${mealByPrice.normal} · treat ${mealByPrice.treat}\n`;
 md += `> 餐段命中（仅 meal 层）：早 ${byMeal.breakfast} / 午 ${byMeal.lunch} / 茶 ${byMeal.tea} / 晚 ${byMeal.dinner} / 宵 ${byMeal.midnight}\n`;
 md += `> tea=0：已知缺口，记入后续甜点/小食/饮品批次补齐，不计作下午茶完成。\n\n`;
 md += "| " + cols.join(" | ") + " |\n";
