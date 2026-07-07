@@ -161,7 +161,7 @@ export interface Food extends ReelItem {
    * 查附近店铺时用的搜索词，可选。
    * 当「商品名 ≠ 店铺名」时设它（如「全家轻食便当」要按店铺「全家」搜，
    * 而不是按商品名整串搜，否则高德按字面找不到店）。
-   * 缺省���回退用【所属菜系的店铺类型词】（见 availability.ts keywordOf → cuisineKeyword），
+   * 缺省则回退用【所属菜系的店铺类型词】（见 availability.ts keywordOf → cuisineKeyword），
    * 不是回退用 name——拿菜名硬搜店招里多半没有，会被误判「附近没有」永久踢出池。
    * 所以：通用菜（回锅肉/麻婆豆腐）留空走菜系兜底更稳；只有「菜名本身就是店招/品类」
    * （如黄焖鸡米饭、麻辣烫、麦当劳）才适合显式设成菜名。

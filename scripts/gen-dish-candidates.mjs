@@ -1,21 +1,30 @@
 // scripts/gen-dish-candidates.mjs
 // 生成 dish 候选菜草案 → docs/dish-candidates.draft.json + docs/dish-candidates.review.md
 // ─────────────────────────────────────────────
-// 本批：中式 +49（budget 18 / normal 22 / treat 9），供 user + Codex 审。
-// 审定后再补 western/jpkr/exotic。
+// 本批：中式 +49（budget 18 / normal 22 / treat 9），供 user + Codex 审。审定后再补 western/jpkr/exotic。
 //
 // 设计：核心属性（需人味判断的）手工列在 ROWS，紧凑表；
-// 衍生字段（gateQuery/fallbackQueries/displayQuery）按 cuisine 机械推导，不手填。
+// 衍生字段（search.* 查店档案、layer 层级）按规则机械推导，不手填。
 // 产物是「草案」，审定后才落 foods.ts。emoji 在落库时定，草案不含。
 //
 // ROW 字段：[name, cuisine, priceTier, spicy, meals, tags, satiety, indulgence, convenience, occasion, canonicalGroup?]
-// meals 短码: b早 l午 t茶 d晚 n宵 ；occasion 短码: s=solo dt=date f=friends ln=lateNight q=quick
+//   meals 短码: b早 l午 t茶 d晚 n宵 ；occasion 短码: s=solo dt=date f=friends ln=lateNight q=quick
+//
+// layer 层级（衍生，对齐 user fix 4「satiety<3 不进默认单菜池」）：
+//   satiety>=3 → "meal"（一顿饭级别的具体食物，进默认单菜主池）
+//   satiety<3  → "side"（小食/配菜/组合项，落库映射为 snack/side 层，不进默认单菜池）
 
 import fs from "fs";
 import path from "path";
 
 const M = { b: "breakfast", l: "lunch", t: "tea", d: "dinner", n: "midnight" };
 const O = { s: "solo", dt: "date", f: "friends", ln: "lateNight", q: "quick" };
+
+// —— 枚举合法值（自检用，对齐 src/types/food.d.ts）——
+const TAGS = new Set(["高热量","清淡","适合宿舍","快手","下饭","健康轻食","暖胃","高蛋白","解馋","省钱","提神","续命","解腻"]);
+const CONVENIENCE = new Set(["canteen","takeout","restaurant","convenience","dorm"]);
+const OCCASION = new Set(["solo","date","friends","lateNight","quick"]);
+const PRICE = new Set(["budget","normal","treat"]);
 
 // cuisine → 查店档案。gateQuery 对齐现有 cuisineKeyword()（config/cuisine.ts），保证 Phase 1 运行时零改动。
 const CUISINE_SEARCH = {
@@ -30,7 +39,7 @@ const CUISINE_SEARCH = {
   "cn-beifang":   { gate: "北方菜",   fb: ["北方菜", "家常菜", "中餐"] },
   japanese:       { gate: "日本料理", fb: ["日本料理", "日料"] },
   korean:         { gate: "韩国料理", fb: ["韩国料理", "韩式"] },
-  "western-italian":  { gate: "意��利菜", fb: ["意大利菜", "西餐厅"] },
+  "western-italian":  { gate: "意大利菜", fb: ["意大利菜", "西餐厅"] },
   "western-american": { gate: "美式餐厅", fb: ["美式餐厅", "西餐厅"] },
   "western-generic":  { gate: "西餐厅",   fb: ["西餐厅", "西餐"] },
   thai:           { gate: "泰国菜",   fb: ["泰国菜", "东南亚菜"] },
@@ -89,7 +98,7 @@ const ROWS = [
 
   // ===== treat ×9（全具体菜，无火锅/烧烤/品牌；indulgence≥4 且 satiety≥3，非轻食）=====
   ["剁椒鱼头",       "cn-hunan",    "treat", 2, "d",  ["下饭","解馋","高蛋白"], 4, 4, "restaurant", "f"],
-  ["���烧海参",       "cn-beifang",  "treat", 0, "d",  ["高蛋白","解馋"],        3, 5, "restaurant", "fdt"],
+  ["葱烧海参",       "cn-beifang",  "treat", 0, "d",  ["高蛋白","解馋"],        3, 5, "restaurant", "fdt"],
   ["蟹黄豆腐",       "cn-jiangzhe", "treat", 0, "d",  ["解馋","高蛋白"],        3, 4, "restaurant", "dtf"],
   ["东坡肉",         "cn-jiangzhe", "treat", 0, "dl", ["高热量","解馋","下饭"], 4, 4, "restaurant", "f"],
   ["北京烤鸭",       "cn-beifang",  "treat", 0, "d",  ["高热量","解馋","高蛋白"],4, 5, "restaurant", "fdt"],
@@ -99,18 +108,30 @@ const ROWS = [
   ["酸汤肥牛",       "cn-generic",  "treat", 1, "dl", ["下饭","解馋","高蛋白"], 4, 4, "restaurant", "fs"],
 ];
 
+// —— 展开一行为完整候选对象 ——
 function expand(row) {
   const [name, cuisine, priceTier, spicy, meals, tags, satiety, indulgence, convenience, occasion, canonicalGroup] = row;
   const cs = CUISINE_SEARCH[cuisine];
   if (!cs) throw new Error(`未知 cuisine: ${cuisine}（${name}）`);
   const obj = {
-    name, cuisine, priceTier,
+    name,
+    cuisine,
+    priceTier,
     meals: [...meals].map((c) => M[c]),
-    spicy, tags, satiety, indulgence, convenience,
+    spicy,
+    tags,
+    satiety,
+    indulgence,
+    convenience,
     occasion: occasion.match(/dt|ln|[sfq]/g).map((c) => O[c]),
-    gateQuery: cs.gate,
-    displayQuery: name,
-    fallbackQueries: cs.fb,
+    // layer 衍生：satiety<3 → side（不进默认单菜池），否则 meal。对齐 user fix 4。
+    layer: satiety >= 3 ? "meal" : "side",
+    // search 嵌套对象，对齐 spec §1.1（fix 1：不再顶层散放）
+    search: {
+      gateQuery: cs.gate,
+      displayQuery: name,
+      fallbackQueries: cs.fb,
+    },
   };
   if (canonicalGroup) obj.canonicalGroup = canonicalGroup;
   return obj;
@@ -118,28 +139,76 @@ function expand(row) {
 
 const dishes = ROWS.map(expand);
 
-// —— 自检（对齐 spec §7 lint 规则）——
+// ─────────────────────────────────────────────
+// 自检（fix 3：枚举/短码/范围/search 结构/乱码/canonicalGroup/layer 全查）
+// ─────────────────────────────────────────────
 const errs = [];
-// treat 质量门
-dishes.filter((d) => d.priceTier === "treat")
-  .filter((d) => d.indulgence < 4 || d.satiety < 3 || d.tags.includes("健康轻食"))
-  .forEach((d) => errs.push(`treat 质量门: ${d.name}`));
-// 字段完整
-dishes.forEach((d) => {
-  if (!d.meals.length) errs.push(`meals 空: ${d.name}`);
-  if (!d.tags.length) errs.push(`tags 空: ${d.name}`);
-  if (!d.occasion.length) errs.push(`occasion 空: ${d.name}`);
-});
-// id/name 唯一
-const dup = dishes.map((d) => d.name).filter((n, i, a) => a.indexOf(n) !== i);
-if (dup.length) errs.push(`重名: ${[...new Set(dup)].join(",")}`);
-if (errs.length) { console.error("✗ 自检失败:\n" + errs.join("\n")); process.exit(1); }
+const seenNames = new Set();
+const hasMojibake = (s) => typeof s === "string" && s.includes("�");
 
-// —— 分布统计（给 review 用）——
+for (const d of dishes) {
+  const at = `[${d.name || "??"}]`;
+  // 乱码：扫所有字符串字段（含 search、数组元素）
+  const strings = [d.name, d.cuisine, d.priceTier, d.convenience, d.layer,
+    ...d.meals, ...d.tags, ...d.occasion,
+    d.search?.gateQuery, d.search?.displayQuery, ...(d.search?.fallbackQueries ?? [])];
+  if (strings.some(hasMojibake)) errs.push(`${at} 含乱码 \\uFFFD`);
+  // 枚举合法
+  if (!CUISINE_SEARCH[d.cuisine]) errs.push(`${at} cuisine 非法: ${d.cuisine}`);
+  if (!PRICE.has(d.priceTier)) errs.push(`${at} priceTier 非法: ${d.priceTier}`);
+  d.tags.forEach((t) => { if (!TAGS.has(t)) errs.push(`${at} tag 非法: ${t}`); });
+  d.occasion.forEach((o) => { if (!OCCASION.has(o)) errs.push(`${at} occasion 非法: ${o}`); });
+  if (!CONVENIENCE.has(d.convenience)) errs.push(`${at} convenience 非法: ${d.convenience}`);
+  d.meals.forEach((m) => { if (!Object.values(M).includes(m)) errs.push(`${at} meal 非法: ${m}`); });
+  // 数值范围
+  if (!(Number.isInteger(d.spicy) && d.spicy >= 0 && d.spicy <= 3)) errs.push(`${at} spicy 越界: ${d.spicy}`);
+  if (!(Number.isInteger(d.satiety) && d.satiety >= 1 && d.satiety <= 5)) errs.push(`${at} satiety 越界: ${d.satiety}`);
+  if (!(Number.isInteger(d.indulgence) && d.indulgence >= 1 && d.indulgence <= 5)) errs.push(`${at} indulgence 越界: ${d.indulgence}`);
+  // 非空
+  if (!d.meals.length) errs.push(`${at} meals 空`);
+  if (!d.tags.length) errs.push(`${at} tags 空`);
+  if (!d.occasion.length) errs.push(`${at} occasion 空`);
+  // search 结构完整
+  if (!d.search || !d.search.gateQuery || !d.search.displayQuery || !Array.isArray(d.search.fallbackQueries) || !d.search.fallbackQueries.length)
+    errs.push(`${at} search 结构不完整`);
+  // layer 与 satiety 一致（meal 层必须 satiety>=3）
+  if (d.layer === "meal" && d.satiety < 3) errs.push(`${at} meal 层却 satiety<3`);
+  if (d.layer === "side" && d.satiety >= 3) errs.push(`${at} side 层却 satiety>=3`);
+  // treat 质量门：仅对 meal 层的 treat 要求 indulgence>=4 且非轻食（fix 5：不惩罚清淡，只看 indulgence/轻食）
+  if (d.priceTier === "treat" && d.layer === "meal") {
+    if (d.indulgence < 4 || d.satiety < 3 || d.tags.includes("健康轻食"))
+      errs.push(`${at} treat 质量门不过（indulgence>=4 & satiety>=3 & 非健康轻食）`);
+  }
+  // 重名
+  if (seenNames.has(d.name)) errs.push(`${at} 重名`);
+  seenNames.add(d.name);
+}
+
+// canonicalGroup：同组 cuisine 必须一致
+const groups = {};
+for (const d of dishes) {
+  if (!d.canonicalGroup) continue;
+  (groups[d.canonicalGroup] ??= []).push(d);
+}
+for (const [g, arr] of Object.entries(groups)) {
+  if (new Set(arr.map((d) => d.cuisine)).size > 1) errs.push(`canonicalGroup "${g}" 跨 cuisine`);
+}
+
+if (errs.length) {
+  console.error("✗ 自检失败:\n" + errs.map((e) => "  - " + e).join("\n"));
+  process.exit(1);
+}
+
+// ─────────────────────────────────────────────
+// 分布统计（给 review 用）
+// ─────────────────────────────────────────────
 const prices = ["budget", "normal", "treat"];
 const byPrice = Object.fromEntries(prices.map((p) => [p, dishes.filter((d) => d.priceTier === p).length]));
 const mealsAll = ["breakfast", "lunch", "tea", "dinner", "midnight"];
-const byMeal = Object.fromEntries(mealsAll.map((m) => [m, dishes.filter((d) => d.meals.includes(m)).length]));
+// 餐段命中只数 meal 层（默认单菜池的真实供给）
+const mealLayer = dishes.filter((d) => d.layer === "meal");
+const byMeal = Object.fromEntries(mealsAll.map((m) => [m, mealLayer.filter((d) => d.meals.includes(m)).length]));
+const byLayer = { meal: mealLayer.length, side: dishes.length - mealLayer.length };
 
 const out = {
   _meta: {
@@ -149,13 +218,17 @@ const out = {
     gapTarget: { chinese: 49, western: 29, jpkr: 27, exotic: 24, total: 129 },
     thisBatchCount: dishes.length,
     priceDistribution: byPrice,
-    mealHits: byMeal,
-    reviewStatus: "DRAFT — 待审：命名/口味真实性 / spicy / priceTier 归档 / meals 合理性 / canonicalGroup",
+    layerDistribution: byLayer,
+    mealHitsMealLayerOnly: byMeal,
+    reviewStatus: "DRAFT — 待审：命名/口味真实性 / spicy / priceTier 归档 / meals 合理性 / canonicalGroup / side 层归类",
     notes: [
       "family 不写，由 cuisine→familyOf 推导。",
       "emoji 落库时定，草案不含。",
-      "gateQuery 对齐现有 cuisineKeyword，Phase 1 运行时零改动。",
+      "search 为嵌套对象 {gateQuery,displayQuery,fallbackQueries}；gateQuery 对齐现有 cuisineKeyword，Phase 1 运行时零改动。",
+      "layer=side（satiety<3）不进默认单菜池，落库映射为 snack/side 层；本批 side：白粥配小菜/茶叶蛋/咸豆浆/上海小馄饨/皮蛋豆腐/卤味拼盘。",
       "treat 全为具体菜，无火锅/烧烤/烤肉/品牌。",
+      "treat 权重不再惩罚「清淡」，只看 indulgence 与「健康轻食」——白灼基围虾这类清爽高质量菜保留在 treat 桶（fix 5）。",
+      "tea（下午茶）本批=0，属已知缺口，记入后续【甜点/小食/饮品批次】统一补齐，不计作下午茶缺口已完成。",
     ],
   },
   dishes,
@@ -168,16 +241,18 @@ fs.writeFileSync(
 
 // —— review 表（markdown）——
 const esc = (s) => String(s).replace(/\|/g, "\\|");
-const cols = ["name","cuisine","priceTier","meals","spicy","tags","satiety","indulgence","convenience","occasion","gateQuery","displayQuery","canonicalGroup"];
+const cols = ["name","cuisine","priceTier","layer","meals","spicy","tags","satiety","indulgence","convenience","occasion","gateQuery","displayQuery","canonicalGroup"];
 let md = `# 中式候选菜 review 表（第一批 +${dishes.length}）\n\n`;
-md += `> 审阅重点：命名真实性 / 口味(spicy) / 价位归档 / 餐段合理性 / treat 是否够犒劳 / canonicalGroup 归并。\n`;
-md += `> 分布：budget ${byPrice.budget} · normal ${byPrice.normal} · treat ${byPrice.treat}；`;
-md += `餐段命中 早${byMeal.breakfast}/午${byMeal.lunch}/茶${byMeal.tea}/晚${byMeal.dinner}/宵${byMeal.midnight}\n\n`;
+md += `> 审阅重点：命名真实性 / 口味(spicy) / 价位归档 / 餐段合理性 / treat 是否够犒劳 / side 层归类 / canonicalGroup 归并。\n`;
+md += `> 分布：budget ${byPrice.budget} · normal ${byPrice.normal} · treat ${byPrice.treat}；层级 meal ${byLayer.meal} · side ${byLayer.side}\n`;
+md += `> 餐段命中（仅 meal 层）：早 ${byMeal.breakfast} / 午 ${byMeal.lunch} / 茶 ${byMeal.tea} / 晚 ${byMeal.dinner} / 宵 ${byMeal.midnight}\n`;
+md += `> tea=0：已知缺口，记入后续甜点/小食/饮品批次补齐，不计作下午茶完成。\n\n`;
 md += "| " + cols.join(" | ") + " |\n";
 md += "|" + cols.map(() => "---").join("|") + "|\n";
 for (const d of dishes) {
+  const flat = { ...d, gateQuery: d.search.gateQuery, displayQuery: d.search.displayQuery };
   md += "| " + cols.map((c) => {
-    const v = d[c];
+    const v = flat[c];
     if (Array.isArray(v)) return esc(v.join("/"));
     return esc(v ?? "");
   }).join(" | ") + " |\n";
@@ -186,5 +261,6 @@ fs.writeFileSync(path.join(process.cwd(), "docs", "dish-candidates.review.md"), 
 
 console.log(`✓ 生成 ${dishes.length} 道中式候选`);
 console.log(`  价位: budget ${byPrice.budget} / normal ${byPrice.normal} / treat ${byPrice.treat}`);
-console.log(`  餐段命中: 早${byMeal.breakfast} ��${byMeal.lunch} 茶${byMeal.tea} 晚${byMeal.dinner} 宵${byMeal.midnight}`);
+console.log(`  层级: meal ${byLayer.meal} / side ${byLayer.side}`);
+console.log(`  餐段命中(meal层): 早${byMeal.breakfast} 午${byMeal.lunch} 茶${byMeal.tea} 晚${byMeal.dinner} 宵${byMeal.midnight}`);
 console.log(`  → docs/dish-candidates.draft.json + docs/dish-candidates.review.md`);

@@ -16,19 +16,26 @@
       "normal": 22,
       "treat": 9
     },
-    "mealHits": {
-      "breakfast": 7,
+    "layerDistribution": {
+      "meal": 42,
+      "side": 7
+    },
+    "mealHitsMealLayerOnly": {
+      "breakfast": 3,
       "lunch": 26,
       "tea": 0,
-      "dinner": 42,
-      "midnight": 6
+      "dinner": 39,
+      "midnight": 2
     },
-    "reviewStatus": "DRAFT — 待审：命名/口味真实性 / spicy / priceTier 归档 / meals 合理性 / canonicalGroup",
+    "reviewStatus": "DRAFT — 待审：命名/口味真实性 / spicy / priceTier 归档 / meals 合理性 / canonicalGroup / side 层归类",
     "notes": [
       "family 不写，由 cuisine→familyOf 推导。",
       "emoji 落库时定，草案不含。",
-      "gateQuery 对齐现有 cuisineKeyword，Phase 1 运行时零改动。",
-      "treat 全为具体菜，无火锅/烧烤/烤肉/品牌。"
+      "search 为嵌套对象 {gateQuery,displayQuery,fallbackQueries}；gateQuery 对齐现有 cuisineKeyword，Phase 1 运行时零改动。",
+      "layer=side（satiety<3）不进默认单菜池，落库映射为 snack/side 层；本批 side：白粥配小菜/茶叶蛋/咸豆浆/上海小馄饨/皮蛋豆腐/卤味拼盘。",
+      "treat 全为具体菜，无火锅/烧烤/烤肉/品牌。",
+      "treat 权重不再惩罚「清淡」，只看 indulgence 与「健康轻食」——白灼基围虾这类清爽高质量菜保留在 treat 桶（fix 5）。",
+      "tea（下午茶）本批=0，属已知缺口，记入后续【甜点/小食/饮品批次】统一补齐，不计作下午茶缺口已完成。"
     ]
   },
   "dishes": [
@@ -52,12 +59,15 @@
         "solo",
         "quick"
       ],
-      "gateQuery": "家常菜",
-      "displayQuery": "白粥配小菜",
-      "fallbackQueries": [
-        "家常菜",
-        "中餐"
-      ]
+      "layer": "side",
+      "search": {
+        "gateQuery": "家常菜",
+        "displayQuery": "白粥配小菜",
+        "fallbackQueries": [
+          "家常菜",
+          "中餐"
+        ]
+      }
     },
     {
       "name": "茶叶蛋",
@@ -80,12 +90,15 @@
         "quick",
         "lateNight"
       ],
-      "gateQuery": "家常菜",
-      "displayQuery": "茶叶蛋",
-      "fallbackQueries": [
-        "家常菜",
-        "中餐"
-      ]
+      "layer": "side",
+      "search": {
+        "gateQuery": "家常菜",
+        "displayQuery": "茶叶蛋",
+        "fallbackQueries": [
+          "家常菜",
+          "中餐"
+        ]
+      }
     },
     {
       "name": "菜肉包子",
@@ -107,12 +120,15 @@
         "solo",
         "quick"
       ],
-      "gateQuery": "家常菜",
-      "displayQuery": "菜肉包子",
-      "fallbackQueries": [
-        "家常菜",
-        "中餐"
-      ]
+      "layer": "meal",
+      "search": {
+        "gateQuery": "家常菜",
+        "displayQuery": "菜肉包子",
+        "fallbackQueries": [
+          "家常菜",
+          "中餐"
+        ]
+      }
     },
     {
       "name": "手抓饼加蛋",
@@ -134,13 +150,16 @@
         "solo",
         "quick"
       ],
-      "gateQuery": "北方菜",
-      "displayQuery": "手抓饼加蛋",
-      "fallbackQueries": [
-        "北方菜",
-        "家常菜",
-        "中餐"
-      ]
+      "layer": "meal",
+      "search": {
+        "gateQuery": "北方菜",
+        "displayQuery": "手抓饼加蛋",
+        "fallbackQueries": [
+          "北方菜",
+          "家常菜",
+          "中餐"
+        ]
+      }
     },
     {
       "name": "咸豆浆",
@@ -162,13 +181,16 @@
         "solo",
         "quick"
       ],
-      "gateQuery": "江浙菜",
-      "displayQuery": "咸豆浆",
-      "fallbackQueries": [
-        "江浙菜",
-        "家常菜",
-        "中餐"
-      ]
+      "layer": "side",
+      "search": {
+        "gateQuery": "江浙菜",
+        "displayQuery": "咸豆浆",
+        "fallbackQueries": [
+          "江浙菜",
+          "家常菜",
+          "中餐"
+        ]
+      }
     },
     {
       "name": "西红柿鸡蛋面",
@@ -191,12 +213,15 @@
         "solo",
         "quick"
       ],
-      "gateQuery": "家常菜",
-      "displayQuery": "西红柿鸡蛋面",
-      "fallbackQueries": [
-        "家常菜",
-        "中餐"
-      ]
+      "layer": "meal",
+      "search": {
+        "gateQuery": "家常菜",
+        "displayQuery": "西红柿鸡蛋面",
+        "fallbackQueries": [
+          "家常菜",
+          "中餐"
+        ]
+      }
     },
     {
       "name": "阳春面",
@@ -219,13 +244,16 @@
         "solo",
         "quick"
       ],
-      "gateQuery": "江浙菜",
-      "displayQuery": "阳春面",
-      "fallbackQueries": [
-        "江浙菜",
-        "家常菜",
-        "中餐"
-      ]
+      "layer": "meal",
+      "search": {
+        "gateQuery": "江浙菜",
+        "displayQuery": "阳春面",
+        "fallbackQueries": [
+          "江浙菜",
+          "家常菜",
+          "中餐"
+        ]
+      }
     },
     {
       "name": "榨菜肉丝面",
@@ -250,13 +278,16 @@
         "quick",
         "lateNight"
       ],
-      "gateQuery": "江浙菜",
-      "displayQuery": "榨菜肉丝面",
-      "fallbackQueries": [
-        "江浙菜",
-        "家常菜",
-        "中餐"
-      ]
+      "layer": "meal",
+      "search": {
+        "gateQuery": "江浙菜",
+        "displayQuery": "榨菜肉丝面",
+        "fallbackQueries": [
+          "江浙菜",
+          "家常菜",
+          "中餐"
+        ]
+      }
     },
     {
       "name": "土豆丝盖饭",
@@ -279,12 +310,15 @@
         "solo",
         "quick"
       ],
-      "gateQuery": "家常菜",
-      "displayQuery": "土豆丝盖饭",
-      "fallbackQueries": [
-        "家常菜",
-        "中餐"
-      ]
+      "layer": "meal",
+      "search": {
+        "gateQuery": "家常菜",
+        "displayQuery": "土豆丝盖饭",
+        "fallbackQueries": [
+          "家常菜",
+          "中餐"
+        ]
+      }
     },
     {
       "name": "青椒肉丝盖饭",
@@ -306,12 +340,15 @@
         "solo",
         "quick"
       ],
-      "gateQuery": "家常菜",
-      "displayQuery": "青椒肉丝盖饭",
-      "fallbackQueries": [
-        "家常菜",
-        "中餐"
-      ]
+      "layer": "meal",
+      "search": {
+        "gateQuery": "家常菜",
+        "displayQuery": "青椒肉丝盖饭",
+        "fallbackQueries": [
+          "家常菜",
+          "中餐"
+        ]
+      }
     },
     {
       "name": "家常豆腐盖饭",
@@ -334,12 +371,15 @@
         "solo",
         "quick"
       ],
-      "gateQuery": "家常菜",
-      "displayQuery": "家常豆腐盖饭",
-      "fallbackQueries": [
-        "家常菜",
-        "中餐"
-      ]
+      "layer": "meal",
+      "search": {
+        "gateQuery": "家常菜",
+        "displayQuery": "家常豆腐盖饭",
+        "fallbackQueries": [
+          "家常菜",
+          "中餐"
+        ]
+      }
     },
     {
       "name": "蒜薹炒肉盖饭",
@@ -361,12 +401,15 @@
         "solo",
         "quick"
       ],
-      "gateQuery": "家常菜",
-      "displayQuery": "蒜薹炒肉盖饭",
-      "fallbackQueries": [
-        "家常菜",
-        "中餐"
-      ]
+      "layer": "meal",
+      "search": {
+        "gateQuery": "家常菜",
+        "displayQuery": "蒜薹炒肉盖饭",
+        "fallbackQueries": [
+          "家常菜",
+          "中餐"
+        ]
+      }
     },
     {
       "name": "大饼卷菜",
@@ -389,13 +432,16 @@
         "solo",
         "quick"
       ],
-      "gateQuery": "北方菜",
-      "displayQuery": "大饼卷菜",
-      "fallbackQueries": [
-        "北方菜",
-        "家常菜",
-        "中餐"
-      ]
+      "layer": "meal",
+      "search": {
+        "gateQuery": "北方菜",
+        "displayQuery": "大饼卷菜",
+        "fallbackQueries": [
+          "北方菜",
+          "家常菜",
+          "中餐"
+        ]
+      }
     },
     {
       "name": "白菜炖粉条",
@@ -417,13 +463,16 @@
         "solo",
         "friends"
       ],
-      "gateQuery": "东北菜",
-      "displayQuery": "白菜炖粉条",
-      "fallbackQueries": [
-        "东北菜",
-        "家常菜",
-        "中餐"
-      ]
+      "layer": "meal",
+      "search": {
+        "gateQuery": "东北菜",
+        "displayQuery": "白菜炖粉条",
+        "fallbackQueries": [
+          "东北菜",
+          "家常菜",
+          "中餐"
+        ]
+      }
     },
     {
       "name": "醋溜白菜盖饭",
@@ -446,13 +495,16 @@
         "solo",
         "quick"
       ],
-      "gateQuery": "北方菜",
-      "displayQuery": "醋溜白菜盖饭",
-      "fallbackQueries": [
-        "北方菜",
-        "家常菜",
-        "中餐"
-      ]
+      "layer": "meal",
+      "search": {
+        "gateQuery": "北方菜",
+        "displayQuery": "醋溜白菜盖饭",
+        "fallbackQueries": [
+          "北方菜",
+          "家常菜",
+          "中餐"
+        ]
+      }
     },
     {
       "name": "上海小馄饨",
@@ -476,13 +528,16 @@
         "quick",
         "lateNight"
       ],
-      "gateQuery": "江浙菜",
-      "displayQuery": "上海小馄饨",
-      "fallbackQueries": [
-        "江浙菜",
-        "家常菜",
-        "中餐"
-      ]
+      "layer": "side",
+      "search": {
+        "gateQuery": "江浙菜",
+        "displayQuery": "上海小馄饨",
+        "fallbackQueries": [
+          "江浙菜",
+          "家常菜",
+          "中餐"
+        ]
+      }
     },
     {
       "name": "皮蛋豆腐",
@@ -505,12 +560,15 @@
         "friends",
         "lateNight"
       ],
-      "gateQuery": "家常菜",
-      "displayQuery": "皮蛋豆腐",
-      "fallbackQueries": [
-        "家常菜",
-        "中餐"
-      ]
+      "layer": "side",
+      "search": {
+        "gateQuery": "家常菜",
+        "displayQuery": "皮蛋豆腐",
+        "fallbackQueries": [
+          "家常菜",
+          "中餐"
+        ]
+      }
     },
     {
       "name": "卤味拼盘",
@@ -533,12 +591,15 @@
         "friends",
         "lateNight"
       ],
-      "gateQuery": "家常菜",
-      "displayQuery": "卤味拼盘",
-      "fallbackQueries": [
-        "家常菜",
-        "中餐"
-      ]
+      "layer": "side",
+      "search": {
+        "gateQuery": "家常菜",
+        "displayQuery": "卤味拼盘",
+        "fallbackQueries": [
+          "家常菜",
+          "中餐"
+        ]
+      }
     },
     {
       "name": "红烧肉盖饭",
@@ -561,13 +622,16 @@
         "solo",
         "friends"
       ],
-      "gateQuery": "江浙菜",
-      "displayQuery": "红烧肉盖饭",
-      "fallbackQueries": [
-        "江浙菜",
-        "家常菜",
-        "中餐"
-      ]
+      "layer": "meal",
+      "search": {
+        "gateQuery": "江浙菜",
+        "displayQuery": "红烧肉盖饭",
+        "fallbackQueries": [
+          "江浙菜",
+          "家常菜",
+          "中餐"
+        ]
+      }
     },
     {
       "name": "京酱肉丝",
@@ -587,13 +651,16 @@
       "occasion": [
         "friends"
       ],
-      "gateQuery": "北方菜",
-      "displayQuery": "京酱肉丝",
-      "fallbackQueries": [
-        "北方菜",
-        "家常菜",
-        "中餐"
-      ]
+      "layer": "meal",
+      "search": {
+        "gateQuery": "北方菜",
+        "displayQuery": "京酱肉丝",
+        "fallbackQueries": [
+          "北方菜",
+          "家常菜",
+          "中餐"
+        ]
+      }
     },
     {
       "name": "地三鲜盖饭",
@@ -616,13 +683,16 @@
         "solo",
         "friends"
       ],
-      "gateQuery": "东北菜",
-      "displayQuery": "地三鲜盖饭",
-      "fallbackQueries": [
-        "东北菜",
-        "家常菜",
-        "中餐"
-      ]
+      "layer": "meal",
+      "search": {
+        "gateQuery": "东北菜",
+        "displayQuery": "地三鲜盖饭",
+        "fallbackQueries": [
+          "东北菜",
+          "家常菜",
+          "中餐"
+        ]
+      }
     },
     {
       "name": "小鸡炖蘑菇",
@@ -643,13 +713,16 @@
       "occasion": [
         "friends"
       ],
-      "gateQuery": "东北菜",
-      "displayQuery": "小鸡炖蘑菇",
-      "fallbackQueries": [
-        "东北菜",
-        "家常菜",
-        "中餐"
-      ]
+      "layer": "meal",
+      "search": {
+        "gateQuery": "东北菜",
+        "displayQuery": "小鸡炖蘑菇",
+        "fallbackQueries": [
+          "东北菜",
+          "家常菜",
+          "中餐"
+        ]
+      }
     },
     {
       "name": "辣子鸡丁",
@@ -671,13 +744,16 @@
       "occasion": [
         "friends"
       ],
-      "gateQuery": "川菜",
-      "displayQuery": "辣子鸡丁",
-      "fallbackQueries": [
-        "川菜",
-        "家常菜",
-        "中餐"
-      ]
+      "layer": "meal",
+      "search": {
+        "gateQuery": "川菜",
+        "displayQuery": "辣子鸡丁",
+        "fallbackQueries": [
+          "川菜",
+          "家常菜",
+          "中餐"
+        ]
+      }
     },
     {
       "name": "口水鸡",
@@ -699,13 +775,16 @@
         "friends",
         "solo"
       ],
-      "gateQuery": "川菜",
-      "displayQuery": "口水鸡",
-      "fallbackQueries": [
-        "川菜",
-        "家常菜",
-        "中餐"
-      ]
+      "layer": "meal",
+      "search": {
+        "gateQuery": "川菜",
+        "displayQuery": "口水鸡",
+        "fallbackQueries": [
+          "川菜",
+          "家常菜",
+          "中餐"
+        ]
+      }
     },
     {
       "name": "夫妻肺片",
@@ -725,13 +804,16 @@
       "occasion": [
         "friends"
       ],
-      "gateQuery": "川菜",
-      "displayQuery": "夫妻肺片",
-      "fallbackQueries": [
-        "川菜",
-        "家常菜",
-        "中餐"
-      ]
+      "layer": "side",
+      "search": {
+        "gateQuery": "川菜",
+        "displayQuery": "夫妻肺片",
+        "fallbackQueries": [
+          "川菜",
+          "家常菜",
+          "中餐"
+        ]
+      }
     },
     {
       "name": "农家小炒肉",
@@ -754,13 +836,16 @@
         "solo",
         "friends"
       ],
-      "gateQuery": "湘菜",
-      "displayQuery": "农家小炒肉",
-      "fallbackQueries": [
-        "湘菜",
-        "家常菜",
-        "中餐"
-      ]
+      "layer": "meal",
+      "search": {
+        "gateQuery": "湘菜",
+        "displayQuery": "农家小炒肉",
+        "fallbackQueries": [
+          "湘菜",
+          "家常菜",
+          "中餐"
+        ]
+      }
     },
     {
       "name": "白切鸡",
@@ -781,13 +866,16 @@
       "occasion": [
         "friends"
       ],
-      "gateQuery": "粤菜",
-      "displayQuery": "白切鸡",
-      "fallbackQueries": [
-        "粤菜",
-        "家常菜",
-        "中餐"
-      ]
+      "layer": "meal",
+      "search": {
+        "gateQuery": "粤菜",
+        "displayQuery": "白切鸡",
+        "fallbackQueries": [
+          "粤菜",
+          "家常菜",
+          "中餐"
+        ]
+      }
     },
     {
       "name": "腊味煲仔饭",
@@ -810,13 +898,16 @@
         "solo",
         "friends"
       ],
-      "gateQuery": "粤菜",
-      "displayQuery": "腊味煲仔饭",
-      "fallbackQueries": [
-        "粤菜",
-        "家常菜",
-        "中餐"
-      ],
+      "layer": "meal",
+      "search": {
+        "gateQuery": "粤菜",
+        "displayQuery": "腊味煲仔饭",
+        "fallbackQueries": [
+          "粤菜",
+          "家常菜",
+          "中餐"
+        ]
+      },
       "canonicalGroup": "baozaifan"
     },
     {
@@ -837,13 +928,16 @@
       "occasion": [
         "friends"
       ],
-      "gateQuery": "湘菜",
-      "displayQuery": "干锅花菜",
-      "fallbackQueries": [
-        "湘菜",
-        "家常菜",
-        "中餐"
-      ]
+      "layer": "meal",
+      "search": {
+        "gateQuery": "湘菜",
+        "displayQuery": "干锅花菜",
+        "fallbackQueries": [
+          "湘菜",
+          "家常菜",
+          "中餐"
+        ]
+      }
     },
     {
       "name": "铁板黑椒牛柳",
@@ -865,12 +959,15 @@
         "date",
         "friends"
       ],
-      "gateQuery": "家常菜",
-      "displayQuery": "铁板黑椒牛柳",
-      "fallbackQueries": [
-        "家常菜",
-        "中餐"
-      ]
+      "layer": "meal",
+      "search": {
+        "gateQuery": "家常菜",
+        "displayQuery": "铁板黑椒牛柳",
+        "fallbackQueries": [
+          "家常菜",
+          "中餐"
+        ]
+      }
     },
     {
       "name": "鱼香茄子煲",
@@ -891,13 +988,16 @@
       "occasion": [
         "solo"
       ],
-      "gateQuery": "川菜",
-      "displayQuery": "鱼香茄子煲",
-      "fallbackQueries": [
-        "川菜",
-        "家常菜",
-        "中餐"
-      ]
+      "layer": "meal",
+      "search": {
+        "gateQuery": "川菜",
+        "displayQuery": "鱼香茄子煲",
+        "fallbackQueries": [
+          "川菜",
+          "家常菜",
+          "中餐"
+        ]
+      }
     },
     {
       "name": "糖醋里脊",
@@ -919,12 +1019,15 @@
         "friends",
         "solo"
       ],
-      "gateQuery": "家常菜",
-      "displayQuery": "糖醋里脊",
-      "fallbackQueries": [
-        "家常菜",
-        "中餐"
-      ]
+      "layer": "meal",
+      "search": {
+        "gateQuery": "家常菜",
+        "displayQuery": "糖醋里脊",
+        "fallbackQueries": [
+          "家常菜",
+          "中餐"
+        ]
+      }
     },
     {
       "name": "咕咾肉",
@@ -947,13 +1050,16 @@
         "friends",
         "solo"
       ],
-      "gateQuery": "粤菜",
-      "displayQuery": "咕咾肉",
-      "fallbackQueries": [
-        "粤菜",
-        "家常菜",
-        "中餐"
-      ]
+      "layer": "meal",
+      "search": {
+        "gateQuery": "粤菜",
+        "displayQuery": "咕咾肉",
+        "fallbackQueries": [
+          "粤菜",
+          "家常菜",
+          "中餐"
+        ]
+      }
     },
     {
       "name": "葱爆羊肉",
@@ -974,13 +1080,16 @@
       "occasion": [
         "friends"
       ],
-      "gateQuery": "北方菜",
-      "displayQuery": "葱爆羊肉",
-      "fallbackQueries": [
-        "北方菜",
-        "家常菜",
-        "中餐"
-      ]
+      "layer": "meal",
+      "search": {
+        "gateQuery": "北方菜",
+        "displayQuery": "葱爆羊肉",
+        "fallbackQueries": [
+          "北方菜",
+          "家常菜",
+          "中餐"
+        ]
+      }
     },
     {
       "name": "羊肉泡馍",
@@ -1003,13 +1112,16 @@
         "solo",
         "friends"
       ],
-      "gateQuery": "西北菜",
-      "displayQuery": "羊肉泡馍",
-      "fallbackQueries": [
-        "西北菜",
-        "家常菜",
-        "中餐"
-      ]
+      "layer": "meal",
+      "search": {
+        "gateQuery": "西北菜",
+        "displayQuery": "羊肉泡馍",
+        "fallbackQueries": [
+          "西北菜",
+          "家常菜",
+          "中餐"
+        ]
+      }
     },
     {
       "name": "新疆炒米粉",
@@ -1034,13 +1146,16 @@
         "friends",
         "lateNight"
       ],
-      "gateQuery": "西北菜",
-      "displayQuery": "新疆炒米粉",
-      "fallbackQueries": [
-        "西北菜",
-        "家常菜",
-        "中餐"
-      ]
+      "layer": "meal",
+      "search": {
+        "gateQuery": "西北菜",
+        "displayQuery": "新疆炒米粉",
+        "fallbackQueries": [
+          "西北菜",
+          "家常菜",
+          "中餐"
+        ]
+      }
     },
     {
       "name": "汽锅鸡",
@@ -1061,13 +1176,16 @@
       "occasion": [
         "friends"
       ],
-      "gateQuery": "云南菜",
-      "displayQuery": "汽锅鸡",
-      "fallbackQueries": [
-        "云南菜",
-        "家常菜",
-        "中餐"
-      ]
+      "layer": "meal",
+      "search": {
+        "gateQuery": "云南菜",
+        "displayQuery": "汽锅鸡",
+        "fallbackQueries": [
+          "云南菜",
+          "家常菜",
+          "中餐"
+        ]
+      }
     },
     {
       "name": "大理酸辣鱼",
@@ -1088,13 +1206,16 @@
       "occasion": [
         "friends"
       ],
-      "gateQuery": "云南菜",
-      "displayQuery": "大理酸辣鱼",
-      "fallbackQueries": [
-        "云南菜",
-        "家常菜",
-        "中餐"
-      ]
+      "layer": "meal",
+      "search": {
+        "gateQuery": "云南菜",
+        "displayQuery": "大理酸辣鱼",
+        "fallbackQueries": [
+          "云南菜",
+          "家常菜",
+          "中餐"
+        ]
+      }
     },
     {
       "name": "三杯鸡",
@@ -1117,12 +1238,15 @@
         "friends",
         "solo"
       ],
-      "gateQuery": "家常菜",
-      "displayQuery": "三杯鸡",
-      "fallbackQueries": [
-        "家常菜",
-        "中餐"
-      ]
+      "layer": "meal",
+      "search": {
+        "gateQuery": "家常菜",
+        "displayQuery": "三杯鸡",
+        "fallbackQueries": [
+          "家常菜",
+          "中餐"
+        ]
+      }
     },
     {
       "name": "梅菜扣肉盖饭",
@@ -1145,13 +1269,16 @@
         "solo",
         "friends"
       ],
-      "gateQuery": "粤菜",
-      "displayQuery": "梅菜扣肉盖饭",
-      "fallbackQueries": [
-        "粤菜",
-        "家常菜",
-        "中餐"
-      ]
+      "layer": "meal",
+      "search": {
+        "gateQuery": "粤菜",
+        "displayQuery": "梅菜扣肉盖饭",
+        "fallbackQueries": [
+          "粤菜",
+          "家常菜",
+          "中餐"
+        ]
+      }
     },
     {
       "name": "剁椒鱼头",
@@ -1172,16 +1299,19 @@
       "occasion": [
         "friends"
       ],
-      "gateQuery": "湘菜",
-      "displayQuery": "剁椒鱼头",
-      "fallbackQueries": [
-        "湘菜",
-        "家常菜",
-        "中餐"
-      ]
+      "layer": "meal",
+      "search": {
+        "gateQuery": "湘菜",
+        "displayQuery": "剁椒鱼头",
+        "fallbackQueries": [
+          "湘菜",
+          "家常菜",
+          "中餐"
+        ]
+      }
     },
     {
-      "name": "���烧海参",
+      "name": "葱烧海参",
       "cuisine": "cn-beifang",
       "priceTier": "treat",
       "meals": [
@@ -1199,13 +1329,16 @@
         "friends",
         "date"
       ],
-      "gateQuery": "北方菜",
-      "displayQuery": "���烧海参",
-      "fallbackQueries": [
-        "北方菜",
-        "家常菜",
-        "中餐"
-      ]
+      "layer": "meal",
+      "search": {
+        "gateQuery": "北方菜",
+        "displayQuery": "葱烧海参",
+        "fallbackQueries": [
+          "北方菜",
+          "家常菜",
+          "中餐"
+        ]
+      }
     },
     {
       "name": "蟹黄豆腐",
@@ -1226,13 +1359,16 @@
         "date",
         "friends"
       ],
-      "gateQuery": "江浙菜",
-      "displayQuery": "蟹黄豆腐",
-      "fallbackQueries": [
-        "江浙菜",
-        "家常菜",
-        "中餐"
-      ]
+      "layer": "meal",
+      "search": {
+        "gateQuery": "江浙菜",
+        "displayQuery": "蟹黄豆腐",
+        "fallbackQueries": [
+          "江浙菜",
+          "家常菜",
+          "中餐"
+        ]
+      }
     },
     {
       "name": "东坡肉",
@@ -1254,13 +1390,16 @@
       "occasion": [
         "friends"
       ],
-      "gateQuery": "江浙菜",
-      "displayQuery": "东坡肉",
-      "fallbackQueries": [
-        "江浙菜",
-        "家常菜",
-        "中餐"
-      ]
+      "layer": "meal",
+      "search": {
+        "gateQuery": "江浙菜",
+        "displayQuery": "东坡肉",
+        "fallbackQueries": [
+          "江浙菜",
+          "家常菜",
+          "中餐"
+        ]
+      }
     },
     {
       "name": "北京烤鸭",
@@ -1282,13 +1421,16 @@
         "friends",
         "date"
       ],
-      "gateQuery": "北方菜",
-      "displayQuery": "北京烤鸭",
-      "fallbackQueries": [
-        "北方菜",
-        "家常菜",
-        "中餐"
-      ]
+      "layer": "meal",
+      "search": {
+        "gateQuery": "北方菜",
+        "displayQuery": "北京烤鸭",
+        "fallbackQueries": [
+          "北方菜",
+          "家常菜",
+          "中餐"
+        ]
+      }
     },
     {
       "name": "白灼基围虾",
@@ -1310,13 +1452,16 @@
         "friends",
         "date"
       ],
-      "gateQuery": "粤菜",
-      "displayQuery": "白灼基围虾",
-      "fallbackQueries": [
-        "粤菜",
-        "家常菜",
-        "中餐"
-      ]
+      "layer": "meal",
+      "search": {
+        "gateQuery": "粤菜",
+        "displayQuery": "白灼基围虾",
+        "fallbackQueries": [
+          "粤菜",
+          "家常菜",
+          "中餐"
+        ]
+      }
     },
     {
       "name": "干锅牛蛙",
@@ -1337,13 +1482,16 @@
       "occasion": [
         "friends"
       ],
-      "gateQuery": "川菜",
-      "displayQuery": "干锅牛蛙",
-      "fallbackQueries": [
-        "川菜",
-        "家常菜",
-        "中餐"
-      ]
+      "layer": "meal",
+      "search": {
+        "gateQuery": "川菜",
+        "displayQuery": "干锅牛蛙",
+        "fallbackQueries": [
+          "川菜",
+          "家常菜",
+          "中餐"
+        ]
+      }
     },
     {
       "name": "水煮鱼",
@@ -1365,13 +1513,16 @@
       "occasion": [
         "friends"
       ],
-      "gateQuery": "川菜",
-      "displayQuery": "水煮鱼",
-      "fallbackQueries": [
-        "川菜",
-        "家常菜",
-        "中餐"
-      ],
+      "layer": "meal",
+      "search": {
+        "gateQuery": "川菜",
+        "displayQuery": "水煮鱼",
+        "fallbackQueries": [
+          "川菜",
+          "家常菜",
+          "中餐"
+        ]
+      },
       "canonicalGroup": "shuizhuyu"
     },
     {
@@ -1395,12 +1546,15 @@
         "friends",
         "solo"
       ],
-      "gateQuery": "家常菜",
-      "displayQuery": "酸汤肥牛",
-      "fallbackQueries": [
-        "家常菜",
-        "中餐"
-      ]
+      "layer": "meal",
+      "search": {
+        "gateQuery": "家常菜",
+        "displayQuery": "酸汤肥牛",
+        "fallbackQueries": [
+          "家常菜",
+          "中餐"
+        ]
+      }
     }
   ]
 }

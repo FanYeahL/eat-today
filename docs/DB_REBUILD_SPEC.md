@@ -49,7 +49,7 @@ export interface Food extends ReelItem {
   convenience: Convenience;     // 主要获取方式
   occasion: Occasion[];         // 适合场景（可多）
   search: SearchProfile;        // 查店档案，见 §2（Phase 1 仅数据，不驱动运行时）
-  canonicalGroup?: string;      // 归一族，防相似��连续刷屏，见 §5.4
+  canonicalGroup?: string;      // 归一族，防相似菜连续刷屏，见 §5.4
   aliases?: string[];           // 别名（查店/搜索扩展用，Phase 1 仅数据）
   recipeIds?: string[];         // 关联菜谱 id（可选）
 }
@@ -194,7 +194,7 @@ w = regionWeight × moodWeight × (role===main?1.6) × familiarFactor × seedAvo
 - **移除** `budgetWeight` / `richnessWeight` 的 per-dish 软权重（其职责被「桶抽样 + indulgenceWeight」取代），`moodWeight` 保留。
 
 ### 5.4 canonicalGroup 防刷屏
-连占时，已见过的菜若与候选**同 canonicalGroup**，候选权重 ×0.15（软避，非硬排）。避免「麻辣小龙虾 / 蒜香小龙虾 / 十三香小龙虾」连续出现��seen 仍按 id 精确去重，canonicalGroup 是额外的相似度软避。
+连占时，已见过的菜若与候选**同 canonicalGroup**，候选权重 ×0.15（软避，非硬排）。避免「麻辣小龙虾 / 蒜香小龙虾 / 十三香小龙虾」连续出现。seen 仍按 id 精确去重，canonicalGroup 是额外的相似度软避。
 
 ---
 
@@ -208,7 +208,7 @@ w = regionWeight × moodWeight × (role===main?1.6) × familiarFactor × seedAvo
 
 示例：选 `treat`（mix `{budget:0, normal:0.25, treat:0.75}`），但当前池 treat 桶空、normal/budget 非空：
 - 归一非空桶：normal:0.25 → 重分为 normal:1.0（budget 原本就 0）。即退化为「全抽 normal 桶」。
-- 若 normal 也空、只剩 budget：���抽 budget。
+- 若 normal 也空、只剩 budget：抽 budget。
 - 三桶全空 → exhausted。
 
 ```ts
