@@ -1,11 +1,11 @@
-# 候选菜 review 表（chinese+western+jpkr+exotic，共 136 行）
+# 候选菜 review 表（chinese+western+jpkr+exotic，共 154 行）
 
 > 审阅重点：命名真实性 / 口味(spicy) / 价位归档 / 餐段合理性 / treat 是否够犒劳 / side 层归类 / canonicalGroup 归并。
-> 层级：meal 129 · side 7（**缺口只算 meal 层**）
-> meal 层价位（计入缺口）：budget 37 · normal 60 · treat 32
-> 餐段命中（仅 meal 层，本批）：早 12 / 午 83 / 茶 0 / 晚 118 / 宵 46
-> family meal 缺口：chinese 达成49/49(剩0) · western 达成29/29(剩0) · jpkr 达成27/27(剩0) · exotic 达成24/24(剩0)
-> 餐段剩余缺口（存量+本批 vs 目标，不含 tea）：breakfast 41/40(剩0) · lunch 158/120(剩0) · dinner 197/140(剩0) · midnight 79/70(剩0) —— 合计剩 0
+> 层级：meal 147 · side 7（**缺口只算 meal 层**）
+> meal 层价位（计入缺口）：budget 49 · normal 66 · treat 32
+> 餐段命中（仅 meal 层，本批）：早 21 / 午 92 / 茶 0 / 晚 127 / 宵 55
+> family meal 缺口：chinese 达成63/49(剩0) · western 达成31/29(剩0) · jpkr 达成28/27(剩0) · exotic 达成25/24(剩0)
+> 餐段剩余缺口（存量+本批 vs 目标，不含 tea）：breakfast 40/40(剩0) · lunch 158/120(剩0) · dinner 192/140(剩0) · midnight 70/70(剩0) —— 合计剩 0
 > tea meal=0 是预期：下午茶不走 meal-only，由后续 side/drink 池补供给（spec §4.2 / §3.1）。
 
 | id | emoji | name | _family | cuisine | priceTier | pickLayer | meals | spicy | tags | satiety | indulgence | convenience | occasion | shopKeyword | gateQuery | displayQuery | canonicalGroup |
@@ -146,3 +146,21 @@
 | me-morocco-lamb-stew | 🍖 | 摩洛哥炖羊肉 | exotic | mideast | treat | meal | dinner | 1 | 暖胃/解馋/高蛋白 | 4 | 4 | restaurant | friends/date | 中东菜 | 中东菜 | 摩洛哥炖羊肉 |  |
 | world-spanish-paella | 🥘 | 西班牙海鲜饭 | exotic | exotic-generic | treat | meal | dinner | 0 | 解馋/高蛋白/高热量 | 4 | 4 | restaurant | friends/date | 西班牙菜 | 西班牙菜 | 西班牙海鲜饭 |  |
 | th-volcano-ribs | 🍖 | 泰式火山排骨 | exotic | thai | treat | meal | dinner/midnight | 3 | 解馋/下饭/高热量 | 4 | 4 | restaurant | friends/lateNight |  | 泰国菜 | 泰式火山排骨 |  |
+| cn-breakfast-sandwich | 🥪 | 早餐三明治 | western | western-generic | budget | meal | breakfast | 0 | 快手/省钱/高蛋白 | 3 | 2 | convenience | solo/quick | 三明治 | 三明治 | 早餐三明治 |  |
+| cn-egg-stuffed-pancake | 🥞 | 鸡蛋灌饼 | chinese | cn-beifang | budget | meal | breakfast/lunch | 0 | 快手/省钱/解馋 | 3 | 2 | takeout | solo/quick |  | 北方菜 | 鸡蛋灌饼 |  |
+| cn-beef-pie | 🥞 | 牛肉馅饼 | chinese | cn-beifang | budget | meal | breakfast/lunch | 0 | 解馋/高热量/下饭 | 3 | 2 | takeout | solo/quick |  | 北方菜 | 牛肉馅饼 |  |
+| cn-zifan-rice-roll | 🥢 | 粢饭团 | chinese | cn-jiangzhe | budget | meal | breakfast | 0 | 快手/省钱/暖胃 | 3 | 2 | takeout | solo/quick |  | 江浙菜 | 粢饭团 |  |
+| cn-rice-noodle-roll-set | 🥢 | 肠粉套餐 | chinese | cn-guangdong | budget | meal | breakfast/lunch | 0 | 清淡/快手/暖胃 | 3 | 2 | restaurant | solo/quick |  | 粤菜 | 肠粉套餐 |  |
+| cn-shaomai-set | 🥢 | 烧卖套餐 | chinese | cn-guangdong | budget | meal | breakfast/lunch | 0 | 快手/解馋/暖胃 | 3 | 2 | restaurant | solo/quick |  | 粤菜 | 烧卖套餐 |  |
+| west-bagel-breakfast-plate | 🥪 | 贝果早餐盘 | western | western-generic | normal | meal | breakfast | 0 | 高蛋白/健康轻食/快手 | 3 | 3 | restaurant | solo/quick | 贝果 | 贝果 | 贝果早餐盘 |  |
+| cn-taiwan-rice-ball | 🥢 | 台式饭团 | chinese | cn-generic | budget | meal | breakfast | 0 | 快手/省钱/解馋 | 3 | 2 | takeout | solo/quick |  | 家常菜 | 台式饭团 |  |
+| cn-spicy-soup-mo | 🥟 | 胡辣汤配馍 | chinese | cn-beifang | budget | meal | breakfast/lunch | 1 | 暖胃/下饭/续命 | 3 | 2 | restaurant | solo/quick |  | 北方菜 | 胡辣汤配馍 |  |
+| kr-kimchi-ramen | 🍜 | 韩式泡菜拉面 | jpkr | korean | budget | meal | dinner/midnight | 2 | 暖胃/解馋/续命 | 3 | 2 | takeout | solo/quick/lateNight | 韩式拉面 | 韩式拉面 | 韩式泡菜拉面 |  |
+| th-char-kway-teow | 🌍 | 泰式炒粿条 | exotic | thai | budget | meal | lunch/dinner/midnight | 1 | 解馋/高热量/快手 | 3 | 2 | takeout | solo/quick/lateNight |  | 泰国菜 | 泰式炒粿条 |  |
+| cn-late-night-beef-rice | 🍚 | 夜宵牛肉盖饭 | chinese | cn-generic | normal | meal | dinner/midnight | 1 | 下饭/解馋/续命 | 4 | 3 | takeout | solo/friends/lateNight |  | 家常菜 | 夜宵牛肉盖饭 |  |
+| cn-popcorn-chicken-rice | 🥢 | 盐酥鸡饭 | chinese | cn-generic | normal | meal | dinner/midnight | 1 | 解馋/高热量/续命 | 3 | 3 | takeout | solo/quick/lateNight |  | 家常菜 | 盐酥鸡饭 |  |
+| cn-soy-fried-noodle | 🍜 | 豉油皇炒面 | chinese | cn-guangdong | budget | meal | lunch/dinner/midnight | 0 | 快手/解馋/高热量 | 3 | 2 | takeout | solo/quick/lateNight |  | 粤菜 | 豉油皇炒面 |  |
+| cn-shrimp-wonton-noodle | 🍜 | 鲜虾馄饨面 | chinese | cn-guangdong | normal | meal | lunch/dinner/midnight | 0 | 清淡/暖胃/续命 | 3 | 3 | takeout | solo/quick/lateNight |  | 粤菜 | 鲜虾馄饨面 |  |
+| cn-clay-pot-chicken-noodle | 🍲 | 砂锅鸡杂粉 | chinese | cn-yunguigui | normal | meal | dinner/midnight | 2 | 暖胃/解馋/续命 | 4 | 3 | restaurant | solo/friends/lateNight |  | 云南菜 | 砂锅鸡杂粉 |  |
+| cn-lurou-mixed-noodle | 🍜 | 卤肉拌面 | chinese | cn-generic | budget | meal | lunch/dinner/midnight | 1 | 下饭/解馋/快手 | 3 | 2 | takeout | solo/quick/lateNight |  | 家常菜 | 卤肉拌面 |  |
+| cn-spicy-beef-noodle | 🍜 | 麻辣牛肉面 | chinese | cn-chuanyu | normal | meal | dinner/midnight | 3 | 暖胃/解馋/下饭 | 4 | 3 | takeout | solo/friends/lateNight |  | 川菜 | 麻辣牛肉面 |  |

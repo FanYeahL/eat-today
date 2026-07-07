@@ -75,6 +75,8 @@ const SHOP_KEYWORD = {
   "咖喱牛肉饭": "咖喱饭",
   // —— western：western-generic 回退「西餐厅」太宽；具体到店型 ——
   "金枪鱼三明治": "三明治",
+  "早餐三明治": "三明治",
+  "贝果早餐盘": "贝果",
   "火腿芝士帕尼尼": "三明治",       // 帕尼尼即热压三明治，店型归三明治
   "芝士焗饭": "西餐厅",             // 焗饭无稳定专门店，保留西餐厅（等于回退，但显式声明已评估）
   "蘑菇鸡肉焗饭": "西餐厅",
@@ -91,6 +93,7 @@ const SHOP_KEYWORD = {
   "西冷牛排配薯条": "牛排",
   // —— jpkr：拉面/炸鸡/寿司/烤肉等有稳定专门店型，别退回「日本料理/韩国料理」——
   "韩式辣味拉面": "韩式拉面",
+  "韩式泡菜拉面": "韩式拉面",
   "日式酱油拉面": "日式拉面",
   "日式海鲜拉面": "日式拉面",
   "日式盐味拉面": "日式拉面",
@@ -313,6 +316,33 @@ const ROWS = [
   ["me-morocco-lamb-stew", "摩洛哥炖羊肉",   "mideast", "treat", 1, "d",   ["暖胃","解馋","高蛋白"], 4, 4, "restaurant", "fdt"],
   ["world-spanish-paella", "西班牙海鲜饭",   "exotic-generic","treat",0, "d",   ["解馋","高蛋白","高热量"],4, 4, "restaurant", "fdt"],
   ["th-volcano-ribs", "泰式火山排骨",   "thai",    "treat", 3, "dn",  ["解馋","下饭","高热量"], 4, 4, "restaurant", "flln"],
+
+  // ═══════════════════════════════════════════════
+  // S3 后补批 +18：真实硬缺口（§7 lint 口径，非 §4 旧 baseline）
+  //   breakfast +9 / midnight +9；含 jpkr-budget +1（韩式泡菜拉面）、exotic-budget +1（泰式炒粿条）修 family×price。
+  //   全 satiety>=3 = meal 层；已核对不与现有全库 + 本文件撞名。
+  // ═══════════════════════════════════════════════
+  // —— breakfast meal ×9 ——
+  ["cn-breakfast-sandwich", "早餐三明治",   "western-generic","budget",0,"b",  ["快手","省钱","高蛋白"], 3, 2, "convenience","sq"],
+  ["cn-egg-stuffed-pancake", "鸡蛋灌饼",     "cn-beifang",  "budget", 0, "bl",  ["快手","省钱","解馋"],   3, 2, "takeout",    "sq"],
+  ["cn-beef-pie", "牛肉馅饼",     "cn-beifang",  "budget", 0, "bl",  ["解馋","高热量","下饭"], 3, 2, "takeout",    "sq"],
+  ["cn-zifan-rice-roll", "粢饭团",       "cn-jiangzhe", "budget", 0, "b",   ["快手","省钱","暖胃"],   3, 2, "takeout",    "sq"],
+  ["cn-rice-noodle-roll-set", "肠粉套餐",     "cn-guangdong","budget", 0, "bl",  ["清淡","快手","暖胃"],   3, 2, "restaurant", "sq"],
+  ["cn-shaomai-set", "烧卖套餐",     "cn-guangdong","budget", 0, "bl",  ["快手","解馋","暖胃"],   3, 2, "restaurant", "sq"],
+  ["west-bagel-breakfast-plate", "贝果早餐盘",   "western-generic","normal",0,"b", ["高蛋白","健康轻食","快手"],3, 3, "restaurant","sq"],
+  ["cn-taiwan-rice-ball", "台式饭团",     "cn-generic",  "budget", 0, "b",   ["快手","省钱","解馋"],   3, 2, "takeout",    "sq"],
+  ["cn-spicy-soup-mo", "胡辣汤配馍",   "cn-beifang",  "budget", 1, "bl",  ["暖胃","下饭","续命"],   3, 2, "restaurant", "sq"],
+
+  // —— midnight meal ×9（含 jpkr/exotic budget 各 +1）——
+  ["kr-kimchi-ramen", "韩式泡菜拉面", "korean",  "budget", 2, "dn",  ["暖胃","解馋","续命"],   3, 2, "takeout",    "sqln"],
+  ["th-char-kway-teow", "泰式炒粿条",   "thai",    "budget", 1, "ldn", ["解馋","高热量","快手"], 3, 2, "takeout",    "sqln"],
+  ["cn-late-night-beef-rice", "夜宵牛肉盖饭", "cn-generic",  "normal", 1, "dn",  ["下饭","解馋","续命"],   4, 3, "takeout",    "sfln"],
+  ["cn-popcorn-chicken-rice", "盐酥鸡饭",     "cn-generic",  "normal", 1, "dn",  ["解馋","高热量","续命"], 3, 3, "takeout",    "sqln"],
+  ["cn-soy-fried-noodle", "豉油皇炒面",   "cn-guangdong","budget", 0, "ldn", ["快手","解馋","高热量"], 3, 2, "takeout",    "sqln"],
+  ["cn-shrimp-wonton-noodle", "鲜虾馄饨面",   "cn-guangdong","normal", 0, "ldn", ["清淡","暖胃","续命"],   3, 3, "takeout",    "sqln"],
+  ["cn-clay-pot-chicken-noodle", "砂锅鸡杂粉",   "cn-yunguigui","normal", 2, "dn",  ["暖胃","解馋","续命"],   4, 3, "restaurant", "sfln"],
+  ["cn-lurou-mixed-noodle", "卤肉拌面",     "cn-generic",  "budget", 1, "ldn", ["下饭","解馋","快手"],   3, 2, "takeout",    "sqln"],
+  ["cn-spicy-beef-noodle", "麻辣牛肉面",   "cn-chuanyu",  "normal", 3, "dn",  ["暖胃","解馋","下饭"],   4, 3, "takeout",    "sfln"],
 ];
 
 // —— 展开一行为完整候选对象 ——
@@ -397,18 +427,21 @@ const KEBAB = /^[a-z0-9]+(-[a-z0-9]+)*$/;
 const errs = [];
 const seenNames = new Set();
 const seenIds = new Set();
+const alreadyLanded = []; // 已在 foods.ts 的 id（正常：136 首批 + 后续已落库；land 脚本按 id 幂等跳过）
 const hasMojibake = (s) => typeof s === "string" && s.includes("�");
 const LAYER = new Set(["meal", "side"]);
 
 for (const d of dishes) {
   const at = `[${d.name || "??"}]`;
-  // id 契约校验：存在 / kebab-ASCII / 本批唯一 / 不撞现有 foods.ts
+  // id 契约校验：存在 / kebab-ASCII / 本批唯一。
+  // 注：草案 id 撞 foods.ts 不再是错误——首批 136 已落库，草案与 foods.ts 天然重叠；
+  //     真正的“新增 vs 已落库”幂等判定交给 land-dishes.mjs（按 id 跳过已存在项）。
   if (!d.id) errs.push(`${at} 缺 id`);
   else {
     if (!KEBAB.test(d.id)) errs.push(`${at} id 非 kebab-ASCII: ${d.id}`);
     if (seenIds.has(d.id)) errs.push(`${at} id 本批重复: ${d.id}`);
     seenIds.add(d.id);
-    if (EXISTING_IDS.has(d.id)) errs.push(`${at} id 撞现有 foods.ts: ${d.id}`);
+    if (EXISTING_IDS.has(d.id)) alreadyLanded.push(d.id);
   }
   if (!d.emoji) errs.push(`${at} 缺 emoji`);
   if (hasMojibake(d.emoji)) errs.push(`${at} emoji 含乱码`);
@@ -508,12 +541,22 @@ for (const fam of families) {
 const batchFamilies = families.filter((f) => dishes.some((d) => d._family === f));
 const totalRemaining = families.reduce((s, f) => s + familyBoard[f].remainingMeal, 0);
 
-// —— 餐段(meal-segment) 缺口看板（对齐 spec §4 餐段最低标准；tea 不设硬指标，见 §4.2）——
-// SEG_TARGET/SEG_BASELINE 来自 spec §4：目标 vs 存量现状；本批 meal 命中冲抵后得剩余缺口。
+// —— 餐段(meal-segment) 缺口看板（对齐 spec §7 lint 硬门槛；tea 不设硬指标，见 §4.2）——
+// baseline 动态从 foods.ts 真实 default-pickable 计算（排除本草案 id，避免与已落库项双算）。
+// 这样 coveredNow = 存量(非本草案) + 本草案 meal 命中 = 全库真实投影，S3 落库后不会再失真。
 // 目的：防止 family×price 达标但餐段 lint（早≥40/午≥120/晚≥140/宵≥70）失败——尤其 midnight。
 const SEG = ["breakfast", "lunch", "dinner", "midnight"]; // tea 不参与硬指标
 const SEG_TARGET = { breakfast: 40, lunch: 120, dinner: 140, midnight: 70 };
-const SEG_BASELINE = { breakfast: 29, lunch: 75, dinner: 79, midnight: 33 }; // 存量 meal 现状（spec §4）
+// 解析 foods.ts，取真实 default-pickable（kind main & dish & pickLayer meal）且 id 不在本草案
+const _foodsSrc = readFileSync(new URL("../src/config/foods.ts", import.meta.url), "utf8");
+const _draftIds = new Set(dishes.map((d) => d.id));
+const _stockPool = _foodsSrc.split(/\n  \{/).slice(1).map((b) => b.split(/\n  \},?/)[0]).map((b) => {
+  const g = (k) => (b.match(new RegExp(`\\b${k}: "([^"]+)"`)) || [])[1];
+  const meals = (b.match(/\bmeals: \[([^\]]*)\]/) || [, ""])[1];
+  return { id: g("id"), kind: g("kind"), et: g("entityType"), layer: g("pickLayer"), meals };
+}).filter((r) => r.id && !_draftIds.has(r.id) && r.kind === "main" && r.et === "dish" && r.layer === "meal");
+const SEG_BASELINE = Object.fromEntries(SEG.map((seg) =>
+  [seg, _stockPool.filter((r) => r.meals.includes(`"${seg}"`)).length]));
 const mealRemaining = {};
 for (const seg of SEG) {
   const thisBatchHit = mealLayer.filter((d) => d.meals.includes(seg)).length;

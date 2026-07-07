@@ -2,7 +2,7 @@
   "_meta": {
     "purpose": "dish 候选菜草案（脚本生成），供 user + Codex 审后落 foods.ts",
     "generated": "2026-07-07",
-    "batch": "chinese+western+jpkr+exotic（本批 meal 129 / side 7）",
+    "batch": "chinese+western+jpkr+exotic（本批 meal 147 / side 7）",
     "gapBasis": "meal-only 且按'菜数'计：缺口只统计 pickLayer=meal；side 是额外产出，不占配额（spec §4/§4.1）。收尾判据=meal 净增达标，非行数。",
     "gapTargetMeal": {
       "chinese": 49,
@@ -14,32 +14,32 @@
     "familyBoard": {
       "chinese": {
         "targetMeal": 49,
-        "achievedMealThisBatch": 49,
+        "achievedMealThisBatch": 63,
         "remainingMeal": 0,
         "mealByPrice": {
-          "budget": 18,
-          "normal": 22,
+          "budget": 27,
+          "normal": 27,
           "treat": 9
         },
         "sideExtra": 7
       },
       "western": {
         "targetMeal": 29,
-        "achievedMealThisBatch": 29,
+        "achievedMealThisBatch": 31,
         "remainingMeal": 0,
         "mealByPrice": {
-          "budget": 8,
-          "normal": 13,
+          "budget": 9,
+          "normal": 14,
           "treat": 8
         },
         "sideExtra": 0
       },
       "jpkr": {
         "targetMeal": 27,
-        "achievedMealThisBatch": 27,
+        "achievedMealThisBatch": 28,
         "remainingMeal": 0,
         "mealByPrice": {
-          "budget": 7,
+          "budget": 8,
           "normal": 13,
           "treat": 7
         },
@@ -47,10 +47,10 @@
       },
       "exotic": {
         "targetMeal": 24,
-        "achievedMealThisBatch": 24,
+        "achievedMealThisBatch": 25,
         "remainingMeal": 0,
         "mealByPrice": {
-          "budget": 4,
+          "budget": 5,
           "normal": 12,
           "treat": 8
         },
@@ -61,56 +61,56 @@
     "mealRemaining": {
       "breakfast": {
         "target": 40,
-        "baseline": 29,
-        "thisBatchMealHits": 12,
-        "coveredNow": 41,
+        "baseline": 19,
+        "thisBatchMealHits": 21,
+        "coveredNow": 40,
         "remaining": 0
       },
       "lunch": {
         "target": 120,
-        "baseline": 75,
-        "thisBatchMealHits": 83,
+        "baseline": 66,
+        "thisBatchMealHits": 92,
         "coveredNow": 158,
         "remaining": 0
       },
       "dinner": {
         "target": 140,
-        "baseline": 79,
-        "thisBatchMealHits": 118,
-        "coveredNow": 197,
+        "baseline": 65,
+        "thisBatchMealHits": 127,
+        "coveredNow": 192,
         "remaining": 0
       },
       "midnight": {
         "target": 70,
-        "baseline": 33,
-        "thisBatchMealHits": 46,
-        "coveredNow": 79,
+        "baseline": 15,
+        "thisBatchMealHits": 55,
+        "coveredNow": 70,
         "remaining": 0
       }
     },
     "segRemainingTotal": 0,
     "teaPolicy": "tea 不列入 meal-only 硬指标；下午茶走 side/drink 池，取池见 §3.1 foodsByMealForSinglePick（仅水占）。本批 tea meal=0 属预期。",
-    "thisBatchRows": 136,
+    "thisBatchRows": 154,
     "priceDistributionAll": {
-      "budget": 43,
-      "normal": 61,
+      "budget": 55,
+      "normal": 67,
       "treat": 32
     },
     "priceDistributionMealLayer": {
-      "budget": 37,
-      "normal": 60,
+      "budget": 49,
+      "normal": 66,
       "treat": 32
     },
     "layerDistribution": {
-      "meal": 129,
+      "meal": 147,
       "side": 7
     },
     "mealHitsMealLayerOnly": {
-      "breakfast": 12,
-      "lunch": 83,
+      "breakfast": 21,
+      "lunch": 92,
       "tea": 0,
-      "dinner": 118,
-      "midnight": 46
+      "dinner": 127,
+      "midnight": 55
     },
     "sideItems": [
       "白粥配小菜",
@@ -121,7 +121,7 @@
       "卤味拼盘",
       "夫妻肺片"
     ],
-    "shopKeywordCount": 46,
+    "shopKeywordCount": 49,
     "shopKeywordMap": {
       "咖喱牛肉饭": "咖喱饭",
       "金枪鱼三明治": "三明治",
@@ -168,16 +168,19 @@
       "印度烤羊排配馕": "印度菜",
       "中东烤羊肉拼盘": "中东菜",
       "摩洛哥炖羊肉": "中东菜",
-      "西班牙海鲜饭": "西班牙菜"
+      "西班牙海鲜饭": "西班牙菜",
+      "早餐三明治": "三明治",
+      "贝果早餐盘": "贝果",
+      "韩式泡菜拉面": "韩式拉面"
     },
     "reviewStatus": "DRAFT — 待审：命名/口味真实性 / spicy / priceTier 归档 / meals 合理性 / canonicalGroup / side 层归类",
     "notes": [
       "family 不写进落库对象，由 cuisine→familyOf 推导（草案里 _family 仅供统计，落库脚本须丢弃）。",
       "emoji 落库时定，草案不含。",
       "search 为嵌套对象 {gateQuery,displayQuery,fallbackQueries}；gateQuery 对齐现有 keywordOf(=shopKeyword??cuisineKeyword)，Phase 1 运行时零改动。",
-      "shopKeyword（§2.1 方案 A 变体）：仅给回退过宽/专门店型品类的菜补【店型词】，本批 46 道（见 shopKeywordMap）。中式细分菜系不补，走 cuisineKeyword。落库 lint 强制：宽泛 cuisine 或含拉面/炸鸡/牛排/寿司/烧烤等品类词的菜必须有 shopKeyword，且不得等于菜名（防 fail-closed）。",
+      "shopKeyword（§2.1 方案 A 变体）：仅给回退过宽/专门店型品类的菜补【店型词】，本批 49 道（见 shopKeywordMap）。中式细分菜系不补，走 cuisineKeyword。落库 lint 强制：宽泛 cuisine 或含拉面/炸鸡/牛排/寿司/烧烤等品类词的菜必须有 shopKeyword，且不得等于菜名（防 fail-closed）。",
       "pickLayer=side（satiety<3）不进默认单菜池，落库映射为 side 层；本批 side 7 项：白粥配小菜/茶叶蛋/咸豆浆/上海小馄饨/皮蛋豆腐/卤味拼盘/夫妻肺片。",
-      "缺口口径 = meal-only：本批 136 行中仅 129 计入 meal 缺口，side 7 不计（见 familyBoard.*.mealByPrice）。",
+      "缺口口径 = meal-only：本批 154 行中仅 147 计入 meal 缺口，side 7 不计（见 familyBoard.*.mealByPrice）。",
       "family 缺口看板见 familyBoard：chinese 剩0 / western 剩0 / jpkr 剩0 / exotic 剩0。remainingMealAllFamilies=0（>0 禁止收尾）。",
       "餐段缺口见 mealRemaining（不含 tea）：breakfast 剩0 / lunch 剩0 / dinner 剩0 / midnight 剩0。segRemainingTotal=0——下一批(jpkr/exotic)须重点覆盖 midnight/breakfast，否则餐段 lint 会红。",
       "treat 全为具体菜，无火锅/烧烤/烤肉/品牌。",
@@ -4750,6 +4753,622 @@
         "fallbackQueries": [
           "泰国菜",
           "东南亚菜"
+        ]
+      }
+    },
+    {
+      "id": "cn-breakfast-sandwich",
+      "name": "早餐三明治",
+      "emoji": "🥪",
+      "cuisine": "western-generic",
+      "priceTier": "budget",
+      "meals": [
+        "breakfast"
+      ],
+      "spicy": 0,
+      "tags": [
+        "快手",
+        "省钱",
+        "高蛋白"
+      ],
+      "satiety": 3,
+      "indulgence": 2,
+      "convenience": "convenience",
+      "occasion": [
+        "solo",
+        "quick"
+      ],
+      "pickLayer": "meal",
+      "search": {
+        "gateQuery": "三明治",
+        "displayQuery": "早餐三明治",
+        "fallbackQueries": [
+          "西餐厅",
+          "西餐"
+        ]
+      },
+      "shopKeyword": "三明治"
+    },
+    {
+      "id": "cn-egg-stuffed-pancake",
+      "name": "鸡蛋灌饼",
+      "emoji": "🥞",
+      "cuisine": "cn-beifang",
+      "priceTier": "budget",
+      "meals": [
+        "breakfast",
+        "lunch"
+      ],
+      "spicy": 0,
+      "tags": [
+        "快手",
+        "省钱",
+        "解馋"
+      ],
+      "satiety": 3,
+      "indulgence": 2,
+      "convenience": "takeout",
+      "occasion": [
+        "solo",
+        "quick"
+      ],
+      "pickLayer": "meal",
+      "search": {
+        "gateQuery": "北方菜",
+        "displayQuery": "鸡蛋灌饼",
+        "fallbackQueries": [
+          "北方菜",
+          "家常菜",
+          "中餐"
+        ]
+      }
+    },
+    {
+      "id": "cn-beef-pie",
+      "name": "牛肉馅饼",
+      "emoji": "🥞",
+      "cuisine": "cn-beifang",
+      "priceTier": "budget",
+      "meals": [
+        "breakfast",
+        "lunch"
+      ],
+      "spicy": 0,
+      "tags": [
+        "解馋",
+        "高热量",
+        "下饭"
+      ],
+      "satiety": 3,
+      "indulgence": 2,
+      "convenience": "takeout",
+      "occasion": [
+        "solo",
+        "quick"
+      ],
+      "pickLayer": "meal",
+      "search": {
+        "gateQuery": "北方菜",
+        "displayQuery": "牛肉馅饼",
+        "fallbackQueries": [
+          "北方菜",
+          "家常菜",
+          "中餐"
+        ]
+      }
+    },
+    {
+      "id": "cn-zifan-rice-roll",
+      "name": "粢饭团",
+      "emoji": "🥢",
+      "cuisine": "cn-jiangzhe",
+      "priceTier": "budget",
+      "meals": [
+        "breakfast"
+      ],
+      "spicy": 0,
+      "tags": [
+        "快手",
+        "省钱",
+        "暖胃"
+      ],
+      "satiety": 3,
+      "indulgence": 2,
+      "convenience": "takeout",
+      "occasion": [
+        "solo",
+        "quick"
+      ],
+      "pickLayer": "meal",
+      "search": {
+        "gateQuery": "江浙菜",
+        "displayQuery": "粢饭团",
+        "fallbackQueries": [
+          "江浙菜",
+          "家常菜",
+          "中餐"
+        ]
+      }
+    },
+    {
+      "id": "cn-rice-noodle-roll-set",
+      "name": "肠粉套餐",
+      "emoji": "🥢",
+      "cuisine": "cn-guangdong",
+      "priceTier": "budget",
+      "meals": [
+        "breakfast",
+        "lunch"
+      ],
+      "spicy": 0,
+      "tags": [
+        "清淡",
+        "快手",
+        "暖胃"
+      ],
+      "satiety": 3,
+      "indulgence": 2,
+      "convenience": "restaurant",
+      "occasion": [
+        "solo",
+        "quick"
+      ],
+      "pickLayer": "meal",
+      "search": {
+        "gateQuery": "粤菜",
+        "displayQuery": "肠粉套餐",
+        "fallbackQueries": [
+          "粤菜",
+          "家常菜",
+          "中餐"
+        ]
+      }
+    },
+    {
+      "id": "cn-shaomai-set",
+      "name": "烧卖套餐",
+      "emoji": "🥢",
+      "cuisine": "cn-guangdong",
+      "priceTier": "budget",
+      "meals": [
+        "breakfast",
+        "lunch"
+      ],
+      "spicy": 0,
+      "tags": [
+        "快手",
+        "解馋",
+        "暖胃"
+      ],
+      "satiety": 3,
+      "indulgence": 2,
+      "convenience": "restaurant",
+      "occasion": [
+        "solo",
+        "quick"
+      ],
+      "pickLayer": "meal",
+      "search": {
+        "gateQuery": "粤菜",
+        "displayQuery": "烧卖套餐",
+        "fallbackQueries": [
+          "粤菜",
+          "家常菜",
+          "中餐"
+        ]
+      }
+    },
+    {
+      "id": "west-bagel-breakfast-plate",
+      "name": "贝果早餐盘",
+      "emoji": "🥪",
+      "cuisine": "western-generic",
+      "priceTier": "normal",
+      "meals": [
+        "breakfast"
+      ],
+      "spicy": 0,
+      "tags": [
+        "高蛋白",
+        "健康轻食",
+        "快手"
+      ],
+      "satiety": 3,
+      "indulgence": 3,
+      "convenience": "restaurant",
+      "occasion": [
+        "solo",
+        "quick"
+      ],
+      "pickLayer": "meal",
+      "search": {
+        "gateQuery": "贝果",
+        "displayQuery": "贝果早餐盘",
+        "fallbackQueries": [
+          "西餐厅",
+          "西餐"
+        ]
+      },
+      "shopKeyword": "贝果"
+    },
+    {
+      "id": "cn-taiwan-rice-ball",
+      "name": "台式饭团",
+      "emoji": "🥢",
+      "cuisine": "cn-generic",
+      "priceTier": "budget",
+      "meals": [
+        "breakfast"
+      ],
+      "spicy": 0,
+      "tags": [
+        "快手",
+        "省钱",
+        "解馋"
+      ],
+      "satiety": 3,
+      "indulgence": 2,
+      "convenience": "takeout",
+      "occasion": [
+        "solo",
+        "quick"
+      ],
+      "pickLayer": "meal",
+      "search": {
+        "gateQuery": "家常菜",
+        "displayQuery": "台式饭团",
+        "fallbackQueries": [
+          "家常菜",
+          "中餐"
+        ]
+      }
+    },
+    {
+      "id": "cn-spicy-soup-mo",
+      "name": "胡辣汤配馍",
+      "emoji": "🥟",
+      "cuisine": "cn-beifang",
+      "priceTier": "budget",
+      "meals": [
+        "breakfast",
+        "lunch"
+      ],
+      "spicy": 1,
+      "tags": [
+        "暖胃",
+        "下饭",
+        "续命"
+      ],
+      "satiety": 3,
+      "indulgence": 2,
+      "convenience": "restaurant",
+      "occasion": [
+        "solo",
+        "quick"
+      ],
+      "pickLayer": "meal",
+      "search": {
+        "gateQuery": "北方菜",
+        "displayQuery": "胡辣汤配馍",
+        "fallbackQueries": [
+          "北方菜",
+          "家常菜",
+          "中餐"
+        ]
+      }
+    },
+    {
+      "id": "kr-kimchi-ramen",
+      "name": "韩式泡菜拉面",
+      "emoji": "🍜",
+      "cuisine": "korean",
+      "priceTier": "budget",
+      "meals": [
+        "dinner",
+        "midnight"
+      ],
+      "spicy": 2,
+      "tags": [
+        "暖胃",
+        "解馋",
+        "续命"
+      ],
+      "satiety": 3,
+      "indulgence": 2,
+      "convenience": "takeout",
+      "occasion": [
+        "solo",
+        "quick",
+        "lateNight"
+      ],
+      "pickLayer": "meal",
+      "search": {
+        "gateQuery": "韩式拉面",
+        "displayQuery": "韩式泡菜拉面",
+        "fallbackQueries": [
+          "韩国料理",
+          "韩式"
+        ]
+      },
+      "shopKeyword": "韩式拉面"
+    },
+    {
+      "id": "th-char-kway-teow",
+      "name": "泰式炒粿条",
+      "emoji": "🌍",
+      "cuisine": "thai",
+      "priceTier": "budget",
+      "meals": [
+        "lunch",
+        "dinner",
+        "midnight"
+      ],
+      "spicy": 1,
+      "tags": [
+        "解馋",
+        "高热量",
+        "快手"
+      ],
+      "satiety": 3,
+      "indulgence": 2,
+      "convenience": "takeout",
+      "occasion": [
+        "solo",
+        "quick",
+        "lateNight"
+      ],
+      "pickLayer": "meal",
+      "search": {
+        "gateQuery": "泰国菜",
+        "displayQuery": "泰式炒粿条",
+        "fallbackQueries": [
+          "泰国菜",
+          "东南亚菜"
+        ]
+      }
+    },
+    {
+      "id": "cn-late-night-beef-rice",
+      "name": "夜宵牛肉盖饭",
+      "emoji": "🍚",
+      "cuisine": "cn-generic",
+      "priceTier": "normal",
+      "meals": [
+        "dinner",
+        "midnight"
+      ],
+      "spicy": 1,
+      "tags": [
+        "下饭",
+        "解馋",
+        "续命"
+      ],
+      "satiety": 4,
+      "indulgence": 3,
+      "convenience": "takeout",
+      "occasion": [
+        "solo",
+        "friends",
+        "lateNight"
+      ],
+      "pickLayer": "meal",
+      "search": {
+        "gateQuery": "家常菜",
+        "displayQuery": "夜宵牛肉盖饭",
+        "fallbackQueries": [
+          "家常菜",
+          "中餐"
+        ]
+      }
+    },
+    {
+      "id": "cn-popcorn-chicken-rice",
+      "name": "盐酥鸡饭",
+      "emoji": "🥢",
+      "cuisine": "cn-generic",
+      "priceTier": "normal",
+      "meals": [
+        "dinner",
+        "midnight"
+      ],
+      "spicy": 1,
+      "tags": [
+        "解馋",
+        "高热量",
+        "续命"
+      ],
+      "satiety": 3,
+      "indulgence": 3,
+      "convenience": "takeout",
+      "occasion": [
+        "solo",
+        "quick",
+        "lateNight"
+      ],
+      "pickLayer": "meal",
+      "search": {
+        "gateQuery": "家常菜",
+        "displayQuery": "盐酥鸡饭",
+        "fallbackQueries": [
+          "家常菜",
+          "中餐"
+        ]
+      }
+    },
+    {
+      "id": "cn-soy-fried-noodle",
+      "name": "豉油皇炒面",
+      "emoji": "🍜",
+      "cuisine": "cn-guangdong",
+      "priceTier": "budget",
+      "meals": [
+        "lunch",
+        "dinner",
+        "midnight"
+      ],
+      "spicy": 0,
+      "tags": [
+        "快手",
+        "解馋",
+        "高热量"
+      ],
+      "satiety": 3,
+      "indulgence": 2,
+      "convenience": "takeout",
+      "occasion": [
+        "solo",
+        "quick",
+        "lateNight"
+      ],
+      "pickLayer": "meal",
+      "search": {
+        "gateQuery": "粤菜",
+        "displayQuery": "豉油皇炒面",
+        "fallbackQueries": [
+          "粤菜",
+          "家常菜",
+          "中餐"
+        ]
+      }
+    },
+    {
+      "id": "cn-shrimp-wonton-noodle",
+      "name": "鲜虾馄饨面",
+      "emoji": "🍜",
+      "cuisine": "cn-guangdong",
+      "priceTier": "normal",
+      "meals": [
+        "lunch",
+        "dinner",
+        "midnight"
+      ],
+      "spicy": 0,
+      "tags": [
+        "清淡",
+        "暖胃",
+        "续命"
+      ],
+      "satiety": 3,
+      "indulgence": 3,
+      "convenience": "takeout",
+      "occasion": [
+        "solo",
+        "quick",
+        "lateNight"
+      ],
+      "pickLayer": "meal",
+      "search": {
+        "gateQuery": "粤菜",
+        "displayQuery": "鲜虾馄饨面",
+        "fallbackQueries": [
+          "粤菜",
+          "家常菜",
+          "中餐"
+        ]
+      }
+    },
+    {
+      "id": "cn-clay-pot-chicken-noodle",
+      "name": "砂锅鸡杂粉",
+      "emoji": "🍲",
+      "cuisine": "cn-yunguigui",
+      "priceTier": "normal",
+      "meals": [
+        "dinner",
+        "midnight"
+      ],
+      "spicy": 2,
+      "tags": [
+        "暖胃",
+        "解馋",
+        "续命"
+      ],
+      "satiety": 4,
+      "indulgence": 3,
+      "convenience": "restaurant",
+      "occasion": [
+        "solo",
+        "friends",
+        "lateNight"
+      ],
+      "pickLayer": "meal",
+      "search": {
+        "gateQuery": "云南菜",
+        "displayQuery": "砂锅鸡杂粉",
+        "fallbackQueries": [
+          "云南菜",
+          "家常菜",
+          "中餐"
+        ]
+      }
+    },
+    {
+      "id": "cn-lurou-mixed-noodle",
+      "name": "卤肉拌面",
+      "emoji": "🍜",
+      "cuisine": "cn-generic",
+      "priceTier": "budget",
+      "meals": [
+        "lunch",
+        "dinner",
+        "midnight"
+      ],
+      "spicy": 1,
+      "tags": [
+        "下饭",
+        "解馋",
+        "快手"
+      ],
+      "satiety": 3,
+      "indulgence": 2,
+      "convenience": "takeout",
+      "occasion": [
+        "solo",
+        "quick",
+        "lateNight"
+      ],
+      "pickLayer": "meal",
+      "search": {
+        "gateQuery": "家常菜",
+        "displayQuery": "卤肉拌面",
+        "fallbackQueries": [
+          "家常菜",
+          "中餐"
+        ]
+      }
+    },
+    {
+      "id": "cn-spicy-beef-noodle",
+      "name": "麻辣牛肉面",
+      "emoji": "🍜",
+      "cuisine": "cn-chuanyu",
+      "priceTier": "normal",
+      "meals": [
+        "dinner",
+        "midnight"
+      ],
+      "spicy": 3,
+      "tags": [
+        "暖胃",
+        "解馋",
+        "下饭"
+      ],
+      "satiety": 4,
+      "indulgence": 3,
+      "convenience": "takeout",
+      "occasion": [
+        "solo",
+        "friends",
+        "lateNight"
+      ],
+      "pickLayer": "meal",
+      "search": {
+        "gateQuery": "川菜",
+        "displayQuery": "麻辣牛肉面",
+        "fallbackQueries": [
+          "川菜",
+          "家常菜",
+          "中餐"
         ]
       }
     }

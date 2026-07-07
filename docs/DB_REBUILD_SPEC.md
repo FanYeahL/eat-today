@@ -212,7 +212,7 @@ export function rouletteMainsByMeal(meal: MealType): Food[] {
 > `side` 层（satiety<3）**是额外产出，不占任何 meal 缺口配额**（见 §4.1）。
 > 收尾判据：**不是"总共写了 129 行"，而是"meal 层净增达到各格目标"**——写了多少 side 行都不算数。
 
-dish（meal 层）目标 ≈237（满足 240 量级）。各格 = 目标(meal 净增)。详见 `dish-candidates.draft.json`。
+dish（meal 层）目标：Phase 1 硬验收以 §7 全库 lint 为准（餐段 40/120/140/70 + family×price budget≥8/normal≥15/treat≥8）。~237/240 是早期旧 baseline 下的规划量级，现降级为**历史/长期参考**，不作为收尾判据（见 §4.0 作废说明）。各格 = 目标(meal 净增)。详见 `dish-candidates.draft.json`。
 
 | family | budget | normal | treat | 合计(meal) |
 |---|---|---|---|---|
@@ -238,27 +238,28 @@ dish（meal 层）目标 ≈237（满足 240 量级）。各格 = 目标(meal �
 
 **餐段最低标准（dish **meal 层** 主食，去重按餐段命中）与当前缺口：**
 
-> 口径 = meal 层 only（`pickLayer==="meal"`）。side 层不计入下表。
+> 口径 = 真实默认 meal 池（`kind==="main" && entityType==="dish" && pickLayer==="meal"`）。side 层不计入下表。
 > ⚠️ **下午茶(tea) 不列入 meal-only 硬指标**——见 §4.2。
-> ⚠️ **family×price 达标 ≠ 餐段达标**：补菜必须同时满足餐段最低量，否则 lint 规则 5 会红。餐段剩余由生成器 `_meta.mealRemaining` 机器追踪（存量 baseline + 本批命中 vs 目标），下表「补齐后」列与之对齐。
+> ⚠️ **family×price 达标 ≠ 餐段达标**：补菜必须同时满足餐段最低量，否则 lint 会红。
+> ⚠️ **验收口径已改为全库 lint**（`scripts/lint-foods-fulldb.mjs`，读真实 `foods.ts`），不再看 draft 单批 `_meta`。生成器 `_meta.mealRemaining` 的 baseline 现已改为**从 `foods.ts` 真实默认池动态计算**（排除本草案 id），S3 落库后不会再失真。
 
-| 餐段 | 存量(meal) | 目标(meal) | 原缺口 | 4 批补齐后 | 补齐重点 |
-|---|---|---|---|---|---|
-| 早餐 breakfast | 29 | 40 | +11 | **41 ✅** | 顶饱早点正餐（satiety≥3）；小件归 side |
-| 午饭 lunch | 75 | 120 | +45 | **158 ✅** | 各家族盖饭/面/正餐 |
-| 下午茶 tea | — | **不设 meal 硬指标** | — | — | 走 side/snack/drink 池，见 §4.2 |
-| 晚饭 dinner | 79 | 140 | +61 | **197 ✅** | 正餐主力，treat 集中在此 |
-| 宵夜 midnight | 33 | 70 | +37 | **79 ✅** | 面/拉面/炸鸡/盖饭等夜宵正餐（日韩/异国重点补此）；小件归 side |
+| 餐段 | 目标(meal, §7 硬门槛) | 全库现状 | 状态 |
+|---|---|---|---|
+| 早餐 breakfast | ≥40 | 40 | ✅ |
+| 午饭 lunch | ≥120 | 158 | ✅ |
+| 下午茶 tea | **不设 meal 硬指标** | — | 走 side/snack/drink 池，见 §4.2 |
+| 晚饭 dinner | ≥140 | 192 | ✅ |
+| 宵夜 midnight | ≥70 | 70 | ✅ |
 
-> 4 批补齐后餐段全部达标（`_meta.segRemainingTotal=0`）。midnight 曾是最大缺口（+37），由日韩/异国的拉面/炸鸡/咖喱饭/炒河粉等真实夜宵集中补齐。
+> **历史规划值（已作废，勿据此收尾）**：早期 §4 曾按迁移前旧 baseline（早 29 / 午 75 / 晚 79 / 宵 33）规划出「补齐后 41/158/197/79」「总 meal 237/240 量级」。S3 schema 迁移把大量存量早餐/宵夜小件降为 `side`（真实 old default-pickable 早=11、宵=15，非 29/33），旧结论不成立。**Phase 1 硬验收以 §7 lint 全绿为准，不追旧量级数字。** 实际执行：8 道被 migration 误降级的一餐级早餐已重分回 meal（`reclassify-breakfast.mjs`），另补 18 道（早+9/宵+9，含 jpkr-budget/exotic-budget 各 +1 修 family×price）。
 
 ### 4.1 side 层单独指标（额外产出，不并入 meal 缺口）
 
 `side`（satiety<3：凉菜/小食/配菜/汤水/早点小件）单独计量，服务于「组合推荐 / 加个菜 / 下午茶」，**不进默认单菜池**，因此**不占 §4 任何 meal 配额**。
 
 - 中式第一批 side 产出 = **7**：白粥配小菜 / 茶叶蛋 / 咸豆浆 / 上海小馄饨 / 皮蛋豆腐 / 卤味拼盘 / 夫妻肺片。
-- side 层目标暂不设硬门槛（Phase 1 先积累），落库后按 `sideFoods()` 归入 side 集合。
-- ⚠️ 审查提示：本批 side 多为早餐/宵夜小件，意味着**早餐/宵夜的 meal 层供给比行数看起来更薄**——早餐 meal 命中仅 3、宵夜仅 2（见 review 表），远低于目标，须在后续批次专门补「顶饱的早餐/宵夜正餐」。
+- side 层目标暂不设硬门槛（Phase 1 先积累），落库后按 `sideFoods()` 归入 side 集合。⚠️ `sideFoods()` 取值必须 `entityType==="dish" && pickLayer==="side"`，只按 `pickLayer` 会把火锅/品牌/dish_group（51 个非 dish）漏入 side 池——见 §7 规则 4。
+- ⚠️ 历史提示（已处理）：S3 migration 曾把一批真实一餐级早餐（煎饼果子/生煎包/淮南牛肉汤等）误降为 side（LIGHT_RE 误匹配「果」、role=snack 误伤），导致早餐/宵夜 meal 供给虚薄。已由 `reclassify-breakfast.mjs` 纠正 8 道 + 补批 18 道，全库 lint 现已达标（早 40 / 宵 70）。
 
 ### 4.2 下午茶(tea) 口径：走 side/snack/drink，不走 meal-only
 

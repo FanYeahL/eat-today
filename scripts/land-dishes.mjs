@@ -29,7 +29,12 @@ const { dishes } = JSON.parse(readFileSync(DRAFT_PATH, "utf8"));
 const existingIds = [...src.matchAll(/^\s{4}id:\s*"([^"]+)"/gm)].map((m) => m[1]);
 const existingIdSet = new Set(existingIds);
 
-// ---- 校验 ----
+// ---- 幂等分区：已落库(按 id 跳过) vs 待落库 ----
+// 草案与 foods.ts 天然重叠（首批已落）；本脚本只追加 foods.ts 尚无的 id。
+const toLand = dishes.filter((d) => !existingIdSet.has(d.id));
+const alreadyLanded = dishes.filter((d) => existingIdSet.has(d.id));
+
+// ---- 校验（全草案查结构；撞名/追加只针对 toLand）----
 const errs = [];
 const REQUIRED = ["id", "name", "emoji", "cuisine", "priceTier", "meals", "spicy", "tags",
   "satiety", "indulgence", "convenience", "occasion", "pickLayer", "search"];
@@ -43,9 +48,8 @@ for (const d of dishes) {
   if ("_family" in d) errs.push(`${at} 泄漏 _family（草案统计字段不得落库）`);
   if (d.id) {
     if (!KEBAB.test(d.id)) errs.push(`${at} id 非 kebab-ASCII: ${d.id}`);
-    if (seen.has(d.id)) errs.push(`${at} id 本批重复: ${d.id}`);
+    if (seen.has(d.id)) errs.push(`${at} id 草案内重复: ${d.id}`);
     seen.add(d.id);
-    if (existingIdSet.has(d.id)) errs.push(`${at} id 撞现有 foods.ts: ${d.id}`);
   }
   if (d.search && (!d.search.gateQuery || !d.search.displayQuery || !Array.isArray(d.search.fallbackQueries)))
     errs.push(`${at} search 结构不完整`);
@@ -55,8 +59,8 @@ for (const d of dishes) {
   if (d.pickLayer === "meal" && d.satiety < 3) errs.push(`${at} meal 层却 satiety<3`);
   if (d.pickLayer === "side" && d.satiety >= 3) errs.push(`${at} side 层却 satiety>=3`);
 }
-if (dishes.length !== 136) errs.push(`草案应 136 道，实际 ${dishes.length}`);
-if (mealN !== 129) errs.push(`meal 层应 129，实际 ${mealN}`);
+// 全草案层级计数（草案总量随补批增长；断言 draft 自身一致，不写死历史值）
+if (mealN + sideN !== dishes.length) errs.push(`meal+side(${mealN}+${sideN}) ≠ 草案 ${dishes.length}`);
 if (sideN !== 7) errs.push(`side 层应 7，实际 ${sideN}`);
 
 if (errs.length) {
@@ -96,8 +100,14 @@ function toFood(d) {
   if (d.canonicalGroup) L.push(`    canonicalGroup: ${q(d.canonicalGroup)},`);
   return `  {\n${L.join("\n")}\n  },`;
 }
-const block = "\n  // ===== S3 落库：新增 136 道（129 meal + 7 side）=====\n"
-  + dishes.map(toFood).join("\n") + "\n";
+// 幂等：无待落库项即退出（不追加空块、不改源）
+if (toLand.length === 0) {
+  console.log(`✓ 全部 ${dishes.length} 道 id 已在 foods.ts，无需追加（幂等）。`);
+  process.exit(0);
+}
+
+const block = `\n  // ===== 补批落库：新增 ${toLand.length} 道 =====\n`
+  + toLand.map(toFood).join("\n") + "\n";
 
 // ---- 追加到 foods 数组末尾（最后一个 } 与 ]; 之间）----
 const startMarker = "export const foods: Food[] = [";
@@ -109,5 +119,5 @@ if (closeIdx === -1) throw new Error("找不到 foods 数组结尾 '];'");
 const out = src.slice(0, closeIdx) + block + src.slice(closeIdx);
 
 if (WRITE) writeFileSync(FOODS_PATH, out, "utf8");
-console.log(`${WRITE ? "✅ 已追加 136 道到 foods.ts" : "🔍 干跑（未改源）"}：meal ${mealN} / side ${sideN}；现有 id ${existingIds.length} 条保留不动。`);
-if (!WRITE) console.log("预览首块:\n" + toFood(dishes[0]));
+console.log(`${WRITE ? `✅ 已追加 ${toLand.length} 道到 foods.ts` : "🔍 干跑（未改源）"}：草案 ${dishes.length}（meal ${mealN}/side ${sideN}），已落库跳过 ${alreadyLanded.length}，本次新增 ${toLand.length}；现有 id ${existingIds.length} 条保留不动。`);
+if (!WRITE) console.log("待落库 id:\n  " + toLand.map((d) => d.id).join("\n  "));
