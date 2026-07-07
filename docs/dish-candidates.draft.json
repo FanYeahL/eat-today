@@ -2,7 +2,7 @@
   "_meta": {
     "purpose": "dish 候选菜草案（脚本生成），供 user + Codex 审后落 foods.ts",
     "generated": "2026-07-07",
-    "batch": "chinese+western（本批 meal 78 / side 7）",
+    "batch": "chinese+western+jpkr+exotic（本批 meal 129 / side 7）",
     "gapBasis": "meal-only 且按'菜数'计：缺口只统计 pickLayer=meal；side 是额外产出，不占配额（spec §4/§4.1）。收尾判据=meal 净增达标，非行数。",
     "gapTargetMeal": {
       "chinese": 49,
@@ -36,50 +36,81 @@
       },
       "jpkr": {
         "targetMeal": 27,
-        "achievedMealThisBatch": 0,
-        "remainingMeal": 27,
+        "achievedMealThisBatch": 27,
+        "remainingMeal": 0,
         "mealByPrice": {
-          "budget": 0,
-          "normal": 0,
-          "treat": 0
+          "budget": 7,
+          "normal": 13,
+          "treat": 7
         },
         "sideExtra": 0
       },
       "exotic": {
         "targetMeal": 24,
-        "achievedMealThisBatch": 0,
-        "remainingMeal": 24,
+        "achievedMealThisBatch": 24,
+        "remainingMeal": 0,
         "mealByPrice": {
-          "budget": 0,
-          "normal": 0,
-          "treat": 0
+          "budget": 4,
+          "normal": 12,
+          "treat": 8
         },
         "sideExtra": 0
       }
     },
-    "remainingMealAllFamilies": 51,
+    "remainingMealAllFamilies": 0,
+    "mealRemaining": {
+      "breakfast": {
+        "target": 40,
+        "baseline": 29,
+        "thisBatchMealHits": 12,
+        "coveredNow": 41,
+        "remaining": 0
+      },
+      "lunch": {
+        "target": 120,
+        "baseline": 75,
+        "thisBatchMealHits": 83,
+        "coveredNow": 158,
+        "remaining": 0
+      },
+      "dinner": {
+        "target": 140,
+        "baseline": 79,
+        "thisBatchMealHits": 118,
+        "coveredNow": 197,
+        "remaining": 0
+      },
+      "midnight": {
+        "target": 70,
+        "baseline": 33,
+        "thisBatchMealHits": 46,
+        "coveredNow": 79,
+        "remaining": 0
+      }
+    },
+    "segRemainingTotal": 0,
     "teaPolicy": "tea 不列入 meal-only 硬指标；下午茶走 side/drink 池，取池见 §3.1 foodsByMealForSinglePick（仅水占）。本批 tea meal=0 属预期。",
-    "thisBatchRows": 85,
+    "thisBatchRows": 136,
     "priceDistributionAll": {
-      "budget": 32,
-      "normal": 36,
-      "treat": 17
+      "budget": 43,
+      "normal": 61,
+      "treat": 32
     },
     "priceDistributionMealLayer": {
-      "budget": 26,
-      "normal": 35,
-      "treat": 17
+      "budget": 37,
+      "normal": 60,
+      "treat": 32
     },
     "layerDistribution": {
-      "meal": 78,
+      "meal": 129,
       "side": 7
     },
     "mealHitsMealLayerOnly": {
-      "breakfast": 9,
-      "lunch": 51,
+      "breakfast": 12,
+      "lunch": 83,
       "tea": 0,
-      "dinner": 69,
-      "midnight": 6
+      "dinner": 118,
+      "midnight": 46
     },
     "sideItems": [
       "白粥配小菜",
@@ -96,8 +127,9 @@
       "emoji 落库时定，草案不含。",
       "search 为嵌套对象 {gateQuery,displayQuery,fallbackQueries}；gateQuery 对齐现有 cuisineKeyword，Phase 1 运行时零改动。",
       "pickLayer=side（satiety<3）不进默认单菜池，落库映射为 side 层；本批 side 7 项：白粥配小菜/茶叶蛋/咸豆浆/上海小馄饨/皮蛋豆腐/卤味拼盘/夫妻肺片。",
-      "缺口口径 = meal-only：本批 85 行中仅 78 计入 meal 缺口，side 7 不计（见 familyBoard.*.mealByPrice）。",
-      "family 缺口看板见 familyBoard：chinese 剩0 / western 剩0 / jpkr 剩27 / exotic 剩24。remainingMealAllFamilies=51（>0 禁止收尾）。",
+      "缺口口径 = meal-only：本批 136 行中仅 129 计入 meal 缺口，side 7 不计（见 familyBoard.*.mealByPrice）。",
+      "family 缺口看板见 familyBoard：chinese 剩0 / western 剩0 / jpkr 剩0 / exotic 剩0。remainingMealAllFamilies=0（>0 禁止收尾）。",
+      "餐段缺口见 mealRemaining（不含 tea）：breakfast 剩0 / lunch 剩0 / dinner 剩0 / midnight 剩0。segRemainingTotal=0——下一批(jpkr/exotic)须重点覆盖 midnight/breakfast，否则餐段 lint 会红。",
       "treat 全为具体菜，无火锅/烧烤/烤肉/品牌。",
       "treat 质量门不惩罚「清淡」，只看 indulgence / satiety / 「健康轻食」——白灼基围虾这类清爽高质量菜保留在 treat 桶（fix 5，对齐 spec §5.3）。",
       "tea meal=0 是预期（非缺陷）：下午茶不走 meal-only，由后续 side/drink 池补供给（spec §4.2 / §3.1 foodsByMealForSinglePick，仅水占）。"
@@ -2728,6 +2760,1628 @@
         "fallbackQueries": [
           "美式餐厅",
           "西餐厅"
+        ]
+      }
+    },
+    {
+      "name": "日式鲑鱼茶泡饭",
+      "cuisine": "japanese",
+      "priceTier": "budget",
+      "meals": [
+        "breakfast",
+        "lunch",
+        "midnight"
+      ],
+      "spicy": 0,
+      "tags": [
+        "清淡",
+        "快手",
+        "暖胃"
+      ],
+      "satiety": 3,
+      "indulgence": 2,
+      "convenience": "takeout",
+      "occasion": [
+        "solo",
+        "quick",
+        "lateNight"
+      ],
+      "pickLayer": "meal",
+      "search": {
+        "gateQuery": "日本料理",
+        "displayQuery": "日式鲑鱼茶泡饭",
+        "fallbackQueries": [
+          "日本料理",
+          "日料"
+        ]
+      }
+    },
+    {
+      "name": "日式滑蛋牛肉饭",
+      "cuisine": "japanese",
+      "priceTier": "budget",
+      "meals": [
+        "breakfast",
+        "lunch",
+        "dinner"
+      ],
+      "spicy": 0,
+      "tags": [
+        "快手",
+        "高蛋白",
+        "下饭"
+      ],
+      "satiety": 3,
+      "indulgence": 2,
+      "convenience": "canteen",
+      "occasion": [
+        "solo",
+        "quick"
+      ],
+      "pickLayer": "meal",
+      "search": {
+        "gateQuery": "日本料理",
+        "displayQuery": "日式滑蛋牛肉饭",
+        "fallbackQueries": [
+          "日本料理",
+          "日料"
+        ]
+      }
+    },
+    {
+      "name": "韩式泡菜炒饭",
+      "cuisine": "korean",
+      "priceTier": "budget",
+      "meals": [
+        "lunch",
+        "dinner",
+        "midnight"
+      ],
+      "spicy": 1,
+      "tags": [
+        "下饭",
+        "解馋",
+        "快手"
+      ],
+      "satiety": 3,
+      "indulgence": 2,
+      "convenience": "canteen",
+      "occasion": [
+        "solo",
+        "quick",
+        "lateNight"
+      ],
+      "pickLayer": "meal",
+      "search": {
+        "gateQuery": "韩国料理",
+        "displayQuery": "韩式泡菜炒饭",
+        "fallbackQueries": [
+          "韩国料理",
+          "韩式"
+        ]
+      }
+    },
+    {
+      "name": "韩式辣味拉面",
+      "cuisine": "korean",
+      "priceTier": "budget",
+      "meals": [
+        "lunch",
+        "dinner",
+        "midnight"
+      ],
+      "spicy": 2,
+      "tags": [
+        "暖胃",
+        "解馋",
+        "续命"
+      ],
+      "satiety": 3,
+      "indulgence": 2,
+      "convenience": "convenience",
+      "occasion": [
+        "solo",
+        "quick",
+        "lateNight"
+      ],
+      "pickLayer": "meal",
+      "search": {
+        "gateQuery": "韩国料理",
+        "displayQuery": "韩式辣味拉面",
+        "fallbackQueries": [
+          "韩国料理",
+          "韩式"
+        ]
+      }
+    },
+    {
+      "name": "日式酱油拉面",
+      "cuisine": "japanese",
+      "priceTier": "budget",
+      "meals": [
+        "lunch",
+        "dinner",
+        "midnight"
+      ],
+      "spicy": 1,
+      "tags": [
+        "暖胃",
+        "解馋"
+      ],
+      "satiety": 4,
+      "indulgence": 2,
+      "convenience": "takeout",
+      "occasion": [
+        "solo",
+        "lateNight"
+      ],
+      "pickLayer": "meal",
+      "search": {
+        "gateQuery": "日本料理",
+        "displayQuery": "日式酱油拉面",
+        "fallbackQueries": [
+          "日本料理",
+          "日料"
+        ]
+      },
+      "canonicalGroup": "ramen"
+    },
+    {
+      "name": "韩式辣炒猪肉盖饭",
+      "cuisine": "korean",
+      "priceTier": "budget",
+      "meals": [
+        "lunch",
+        "dinner",
+        "midnight"
+      ],
+      "spicy": 2,
+      "tags": [
+        "下饭",
+        "解馋",
+        "高蛋白"
+      ],
+      "satiety": 4,
+      "indulgence": 2,
+      "convenience": "canteen",
+      "occasion": [
+        "solo",
+        "quick",
+        "lateNight"
+      ],
+      "pickLayer": "meal",
+      "search": {
+        "gateQuery": "韩国料理",
+        "displayQuery": "韩式辣炒猪肉盖饭",
+        "fallbackQueries": [
+          "韩国料理",
+          "韩式"
+        ]
+      }
+    },
+    {
+      "name": "日式咖喱鸡排饭",
+      "cuisine": "japanese",
+      "priceTier": "budget",
+      "meals": [
+        "lunch",
+        "dinner",
+        "midnight"
+      ],
+      "spicy": 1,
+      "tags": [
+        "下饭",
+        "解馋",
+        "高热量"
+      ],
+      "satiety": 4,
+      "indulgence": 2,
+      "convenience": "canteen",
+      "occasion": [
+        "solo",
+        "quick",
+        "lateNight"
+      ],
+      "pickLayer": "meal",
+      "search": {
+        "gateQuery": "日本料理",
+        "displayQuery": "日式咖喱鸡排饭",
+        "fallbackQueries": [
+          "日本料理",
+          "日料"
+        ]
+      }
+    },
+    {
+      "name": "日式海鲜拉面",
+      "cuisine": "japanese",
+      "priceTier": "normal",
+      "meals": [
+        "lunch",
+        "dinner",
+        "midnight"
+      ],
+      "spicy": 1,
+      "tags": [
+        "暖胃",
+        "解馋",
+        "高蛋白"
+      ],
+      "satiety": 4,
+      "indulgence": 3,
+      "convenience": "restaurant",
+      "occasion": [
+        "solo",
+        "friends",
+        "lateNight"
+      ],
+      "pickLayer": "meal",
+      "search": {
+        "gateQuery": "日本料理",
+        "displayQuery": "日式海鲜拉面",
+        "fallbackQueries": [
+          "日本料理",
+          "日料"
+        ]
+      },
+      "canonicalGroup": "ramen"
+    },
+    {
+      "name": "日式盐味拉面",
+      "cuisine": "japanese",
+      "priceTier": "normal",
+      "meals": [
+        "lunch",
+        "dinner",
+        "midnight"
+      ],
+      "spicy": 0,
+      "tags": [
+        "暖胃",
+        "清淡"
+      ],
+      "satiety": 4,
+      "indulgence": 3,
+      "convenience": "restaurant",
+      "occasion": [
+        "solo",
+        "friends",
+        "lateNight"
+      ],
+      "pickLayer": "meal",
+      "search": {
+        "gateQuery": "日本料理",
+        "displayQuery": "日式盐味拉面",
+        "fallbackQueries": [
+          "日本料理",
+          "日料"
+        ]
+      },
+      "canonicalGroup": "ramen"
+    },
+    {
+      "name": "日式照烧鸡腿饭",
+      "cuisine": "japanese",
+      "priceTier": "normal",
+      "meals": [
+        "lunch",
+        "dinner",
+        "midnight"
+      ],
+      "spicy": 0,
+      "tags": [
+        "下饭",
+        "解馋",
+        "高蛋白"
+      ],
+      "satiety": 4,
+      "indulgence": 3,
+      "convenience": "takeout",
+      "occasion": [
+        "solo",
+        "friends",
+        "lateNight"
+      ],
+      "pickLayer": "meal",
+      "search": {
+        "gateQuery": "日本料理",
+        "displayQuery": "日式照烧鸡腿饭",
+        "fallbackQueries": [
+          "日本料理",
+          "日料"
+        ]
+      }
+    },
+    {
+      "name": "日式咖喱牛肉乌冬",
+      "cuisine": "japanese",
+      "priceTier": "normal",
+      "meals": [
+        "lunch",
+        "dinner",
+        "midnight"
+      ],
+      "spicy": 1,
+      "tags": [
+        "暖胃",
+        "解馋",
+        "下饭"
+      ],
+      "satiety": 4,
+      "indulgence": 3,
+      "convenience": "restaurant",
+      "occasion": [
+        "solo",
+        "friends",
+        "lateNight"
+      ],
+      "pickLayer": "meal",
+      "search": {
+        "gateQuery": "日本料理",
+        "displayQuery": "日式咖喱牛肉乌冬",
+        "fallbackQueries": [
+          "日本料理",
+          "日料"
+        ]
+      }
+    },
+    {
+      "name": "韩式泡菜猪肉锅",
+      "cuisine": "korean",
+      "priceTier": "normal",
+      "meals": [
+        "dinner",
+        "midnight"
+      ],
+      "spicy": 2,
+      "tags": [
+        "暖胃",
+        "下饭",
+        "解馋"
+      ],
+      "satiety": 4,
+      "indulgence": 3,
+      "convenience": "restaurant",
+      "occasion": [
+        "friends",
+        "lateNight"
+      ],
+      "pickLayer": "meal",
+      "search": {
+        "gateQuery": "韩国料理",
+        "displayQuery": "韩式泡菜猪肉锅",
+        "fallbackQueries": [
+          "韩国料理",
+          "韩式"
+        ]
+      }
+    },
+    {
+      "name": "韩式辣炒鱿鱼盖饭",
+      "cuisine": "korean",
+      "priceTier": "normal",
+      "meals": [
+        "lunch",
+        "dinner",
+        "midnight"
+      ],
+      "spicy": 2,
+      "tags": [
+        "下饭",
+        "解馋",
+        "高蛋白"
+      ],
+      "satiety": 4,
+      "indulgence": 3,
+      "convenience": "restaurant",
+      "occasion": [
+        "solo",
+        "friends",
+        "lateNight"
+      ],
+      "pickLayer": "meal",
+      "search": {
+        "gateQuery": "韩国料理",
+        "displayQuery": "韩式辣炒鱿鱼盖饭",
+        "fallbackQueries": [
+          "韩国料理",
+          "韩式"
+        ]
+      }
+    },
+    {
+      "name": "日式天妇罗盖饭",
+      "cuisine": "japanese",
+      "priceTier": "normal",
+      "meals": [
+        "lunch",
+        "dinner"
+      ],
+      "spicy": 0,
+      "tags": [
+        "解馋",
+        "高热量"
+      ],
+      "satiety": 4,
+      "indulgence": 3,
+      "convenience": "restaurant",
+      "occasion": [
+        "solo",
+        "friends"
+      ],
+      "pickLayer": "meal",
+      "search": {
+        "gateQuery": "日本料理",
+        "displayQuery": "日式天妇罗盖饭",
+        "fallbackQueries": [
+          "日本料理",
+          "日料"
+        ]
+      }
+    },
+    {
+      "name": "韩式炸鸡",
+      "cuisine": "korean",
+      "priceTier": "normal",
+      "meals": [
+        "dinner",
+        "midnight"
+      ],
+      "spicy": 1,
+      "tags": [
+        "高热量",
+        "解馋"
+      ],
+      "satiety": 4,
+      "indulgence": 4,
+      "convenience": "takeout",
+      "occasion": [
+        "friends",
+        "lateNight"
+      ],
+      "pickLayer": "meal",
+      "search": {
+        "gateQuery": "韩国料理",
+        "displayQuery": "韩式炸鸡",
+        "fallbackQueries": [
+          "韩国料理",
+          "韩式"
+        ]
+      },
+      "canonicalGroup": "koreanchicken"
+    },
+    {
+      "name": "韩式酱油炸鸡",
+      "cuisine": "korean",
+      "priceTier": "normal",
+      "meals": [
+        "dinner",
+        "midnight"
+      ],
+      "spicy": 0,
+      "tags": [
+        "高热量",
+        "解馋"
+      ],
+      "satiety": 4,
+      "indulgence": 4,
+      "convenience": "takeout",
+      "occasion": [
+        "friends",
+        "lateNight"
+      ],
+      "pickLayer": "meal",
+      "search": {
+        "gateQuery": "韩国料理",
+        "displayQuery": "韩式酱油炸鸡",
+        "fallbackQueries": [
+          "韩国料理",
+          "韩式"
+        ]
+      },
+      "canonicalGroup": "koreanchicken"
+    },
+    {
+      "name": "日式咖喱猪排饭",
+      "cuisine": "japanese",
+      "priceTier": "normal",
+      "meals": [
+        "lunch",
+        "dinner",
+        "midnight"
+      ],
+      "spicy": 1,
+      "tags": [
+        "下饭",
+        "解馋",
+        "高热量"
+      ],
+      "satiety": 4,
+      "indulgence": 3,
+      "convenience": "restaurant",
+      "occasion": [
+        "solo",
+        "friends",
+        "lateNight"
+      ],
+      "pickLayer": "meal",
+      "search": {
+        "gateQuery": "日本料理",
+        "displayQuery": "日式咖喱猪排饭",
+        "fallbackQueries": [
+          "日本料理",
+          "日料"
+        ]
+      }
+    },
+    {
+      "name": "韩式辣牛肉汤饭",
+      "cuisine": "korean",
+      "priceTier": "normal",
+      "meals": [
+        "lunch",
+        "dinner",
+        "midnight"
+      ],
+      "spicy": 2,
+      "tags": [
+        "暖胃",
+        "下饭",
+        "高蛋白"
+      ],
+      "satiety": 4,
+      "indulgence": 3,
+      "convenience": "restaurant",
+      "occasion": [
+        "solo",
+        "friends",
+        "lateNight"
+      ],
+      "pickLayer": "meal",
+      "search": {
+        "gateQuery": "韩国料理",
+        "displayQuery": "韩式辣牛肉汤饭",
+        "fallbackQueries": [
+          "韩国料理",
+          "韩式"
+        ]
+      }
+    },
+    {
+      "name": "韩式海鲜煎饼",
+      "cuisine": "korean",
+      "priceTier": "normal",
+      "meals": [
+        "dinner",
+        "midnight"
+      ],
+      "spicy": 0,
+      "tags": [
+        "解馋",
+        "高热量"
+      ],
+      "satiety": 3,
+      "indulgence": 3,
+      "convenience": "restaurant",
+      "occasion": [
+        "friends",
+        "lateNight"
+      ],
+      "pickLayer": "meal",
+      "search": {
+        "gateQuery": "韩国料理",
+        "displayQuery": "韩式海鲜煎饼",
+        "fallbackQueries": [
+          "韩国料理",
+          "韩式"
+        ]
+      }
+    },
+    {
+      "name": "日式牛肉时雨煮饭",
+      "cuisine": "japanese",
+      "priceTier": "normal",
+      "meals": [
+        "lunch",
+        "dinner"
+      ],
+      "spicy": 0,
+      "tags": [
+        "下饭",
+        "高蛋白",
+        "解馋"
+      ],
+      "satiety": 4,
+      "indulgence": 3,
+      "convenience": "takeout",
+      "occasion": [
+        "solo",
+        "friends"
+      ],
+      "pickLayer": "meal",
+      "search": {
+        "gateQuery": "日本料理",
+        "displayQuery": "日式牛肉时雨煮饭",
+        "fallbackQueries": [
+          "日本料理",
+          "日料"
+        ]
+      }
+    },
+    {
+      "name": "日式和牛烧肉",
+      "cuisine": "japanese",
+      "priceTier": "treat",
+      "meals": [
+        "dinner",
+        "midnight"
+      ],
+      "spicy": 0,
+      "tags": [
+        "高热量",
+        "解馋",
+        "高蛋白"
+      ],
+      "satiety": 4,
+      "indulgence": 5,
+      "convenience": "restaurant",
+      "occasion": [
+        "friends",
+        "lateNight"
+      ],
+      "pickLayer": "meal",
+      "search": {
+        "gateQuery": "日本料理",
+        "displayQuery": "日式和牛烧肉",
+        "fallbackQueries": [
+          "日本料理",
+          "日料"
+        ]
+      }
+    },
+    {
+      "name": "日式刺身拼盘",
+      "cuisine": "japanese",
+      "priceTier": "treat",
+      "meals": [
+        "dinner",
+        "midnight"
+      ],
+      "spicy": 0,
+      "tags": [
+        "清淡",
+        "高蛋白",
+        "解馋"
+      ],
+      "satiety": 3,
+      "indulgence": 4,
+      "convenience": "restaurant",
+      "occasion": [
+        "friends",
+        "date"
+      ],
+      "pickLayer": "meal",
+      "search": {
+        "gateQuery": "日本料理",
+        "displayQuery": "日式刺身拼盘",
+        "fallbackQueries": [
+          "日本料理",
+          "日料"
+        ]
+      }
+    },
+    {
+      "name": "日式鳗鱼三吃",
+      "cuisine": "japanese",
+      "priceTier": "treat",
+      "meals": [
+        "dinner"
+      ],
+      "spicy": 0,
+      "tags": [
+        "解馋",
+        "高蛋白"
+      ],
+      "satiety": 4,
+      "indulgence": 4,
+      "convenience": "restaurant",
+      "occasion": [
+        "friends",
+        "date"
+      ],
+      "pickLayer": "meal",
+      "search": {
+        "gateQuery": "日本料理",
+        "displayQuery": "日式鳗鱼三吃",
+        "fallbackQueries": [
+          "日本料理",
+          "日料"
+        ]
+      }
+    },
+    {
+      "name": "韩式烤五花肉套餐",
+      "cuisine": "korean",
+      "priceTier": "treat",
+      "meals": [
+        "dinner",
+        "midnight"
+      ],
+      "spicy": 1,
+      "tags": [
+        "高热量",
+        "解馋",
+        "高蛋白"
+      ],
+      "satiety": 4,
+      "indulgence": 4,
+      "convenience": "restaurant",
+      "occasion": [
+        "friends",
+        "lateNight"
+      ],
+      "pickLayer": "meal",
+      "search": {
+        "gateQuery": "韩国料理",
+        "displayQuery": "韩式烤五花肉套餐",
+        "fallbackQueries": [
+          "韩国料理",
+          "韩式"
+        ]
+      }
+    },
+    {
+      "name": "日式特上寿司",
+      "cuisine": "japanese",
+      "priceTier": "treat",
+      "meals": [
+        "dinner"
+      ],
+      "spicy": 0,
+      "tags": [
+        "清淡",
+        "高蛋白",
+        "解馋"
+      ],
+      "satiety": 3,
+      "indulgence": 5,
+      "convenience": "restaurant",
+      "occasion": [
+        "friends",
+        "date"
+      ],
+      "pickLayer": "meal",
+      "search": {
+        "gateQuery": "日本料理",
+        "displayQuery": "日式特上寿司",
+        "fallbackQueries": [
+          "日本料理",
+          "日料"
+        ]
+      }
+    },
+    {
+      "name": "韩式炭火烤牛小排",
+      "cuisine": "korean",
+      "priceTier": "treat",
+      "meals": [
+        "dinner",
+        "midnight"
+      ],
+      "spicy": 0,
+      "tags": [
+        "高热量",
+        "解馋",
+        "高蛋白"
+      ],
+      "satiety": 4,
+      "indulgence": 5,
+      "convenience": "restaurant",
+      "occasion": [
+        "friends",
+        "lateNight"
+      ],
+      "pickLayer": "meal",
+      "search": {
+        "gateQuery": "韩国料理",
+        "displayQuery": "韩式炭火烤牛小排",
+        "fallbackQueries": [
+          "韩国料理",
+          "韩式"
+        ]
+      }
+    },
+    {
+      "name": "日式蟹肉火锅",
+      "cuisine": "japanese",
+      "priceTier": "treat",
+      "meals": [
+        "dinner",
+        "midnight"
+      ],
+      "spicy": 0,
+      "tags": [
+        "暖胃",
+        "解馋",
+        "高蛋白"
+      ],
+      "satiety": 4,
+      "indulgence": 4,
+      "convenience": "restaurant",
+      "occasion": [
+        "friends",
+        "lateNight"
+      ],
+      "pickLayer": "meal",
+      "search": {
+        "gateQuery": "日本料理",
+        "displayQuery": "日式蟹肉火锅",
+        "fallbackQueries": [
+          "日本料理",
+          "日料"
+        ]
+      }
+    },
+    {
+      "name": "越南猪肉法包",
+      "cuisine": "sea",
+      "priceTier": "budget",
+      "meals": [
+        "breakfast",
+        "lunch",
+        "midnight"
+      ],
+      "spicy": 0,
+      "tags": [
+        "快手",
+        "解馋",
+        "清淡"
+      ],
+      "satiety": 3,
+      "indulgence": 2,
+      "convenience": "takeout",
+      "occasion": [
+        "solo",
+        "quick",
+        "lateNight"
+      ],
+      "pickLayer": "meal",
+      "search": {
+        "gateQuery": "东南亚菜",
+        "displayQuery": "越南猪肉法包",
+        "fallbackQueries": [
+          "东南亚菜",
+          "异国料理"
+        ]
+      }
+    },
+    {
+      "name": "泰式打抛猪饭",
+      "cuisine": "thai",
+      "priceTier": "budget",
+      "meals": [
+        "lunch",
+        "dinner",
+        "midnight"
+      ],
+      "spicy": 2,
+      "tags": [
+        "下饭",
+        "解馋",
+        "高蛋白"
+      ],
+      "satiety": 3,
+      "indulgence": 2,
+      "convenience": "takeout",
+      "occasion": [
+        "solo",
+        "quick",
+        "lateNight"
+      ],
+      "pickLayer": "meal",
+      "search": {
+        "gateQuery": "泰国菜",
+        "displayQuery": "泰式打抛猪饭",
+        "fallbackQueries": [
+          "泰国菜",
+          "东南亚菜"
+        ]
+      }
+    },
+    {
+      "name": "印尼炒饭",
+      "cuisine": "sea",
+      "priceTier": "budget",
+      "meals": [
+        "lunch",
+        "dinner",
+        "midnight"
+      ],
+      "spicy": 1,
+      "tags": [
+        "下饭",
+        "解馋",
+        "高热量"
+      ],
+      "satiety": 3,
+      "indulgence": 2,
+      "convenience": "takeout",
+      "occasion": [
+        "solo",
+        "quick",
+        "lateNight"
+      ],
+      "pickLayer": "meal",
+      "search": {
+        "gateQuery": "东南亚菜",
+        "displayQuery": "印尼炒饭",
+        "fallbackQueries": [
+          "东南亚菜",
+          "异国料理"
+        ]
+      }
+    },
+    {
+      "name": "泰式海鲜炒河粉",
+      "cuisine": "thai",
+      "priceTier": "budget",
+      "meals": [
+        "lunch",
+        "dinner",
+        "midnight"
+      ],
+      "spicy": 1,
+      "tags": [
+        "解馋",
+        "高热量",
+        "下饭"
+      ],
+      "satiety": 3,
+      "indulgence": 2,
+      "convenience": "takeout",
+      "occasion": [
+        "solo",
+        "quick",
+        "lateNight"
+      ],
+      "pickLayer": "meal",
+      "search": {
+        "gateQuery": "泰国菜",
+        "displayQuery": "泰式海鲜炒河粉",
+        "fallbackQueries": [
+          "泰国菜",
+          "东南亚菜"
+        ]
+      }
+    },
+    {
+      "name": "泰式绿咖喱鸡饭",
+      "cuisine": "thai",
+      "priceTier": "normal",
+      "meals": [
+        "lunch",
+        "dinner",
+        "midnight"
+      ],
+      "spicy": 2,
+      "tags": [
+        "下饭",
+        "解馋",
+        "暖胃"
+      ],
+      "satiety": 4,
+      "indulgence": 3,
+      "convenience": "restaurant",
+      "occasion": [
+        "solo",
+        "friends",
+        "lateNight"
+      ],
+      "pickLayer": "meal",
+      "search": {
+        "gateQuery": "泰国菜",
+        "displayQuery": "泰式绿咖喱鸡饭",
+        "fallbackQueries": [
+          "泰国菜",
+          "东南亚菜"
+        ]
+      }
+    },
+    {
+      "name": "泰式红咖喱牛肉饭",
+      "cuisine": "thai",
+      "priceTier": "normal",
+      "meals": [
+        "lunch",
+        "dinner",
+        "midnight"
+      ],
+      "spicy": 2,
+      "tags": [
+        "下饭",
+        "解馋",
+        "高蛋白"
+      ],
+      "satiety": 4,
+      "indulgence": 3,
+      "convenience": "restaurant",
+      "occasion": [
+        "solo",
+        "friends",
+        "lateNight"
+      ],
+      "pickLayer": "meal",
+      "search": {
+        "gateQuery": "泰国菜",
+        "displayQuery": "泰式红咖喱牛肉饭",
+        "fallbackQueries": [
+          "泰国菜",
+          "东南亚菜"
+        ]
+      }
+    },
+    {
+      "name": "泰式冬阴功海鲜面",
+      "cuisine": "thai",
+      "priceTier": "normal",
+      "meals": [
+        "lunch",
+        "dinner",
+        "midnight"
+      ],
+      "spicy": 2,
+      "tags": [
+        "暖胃",
+        "解馋",
+        "高蛋白"
+      ],
+      "satiety": 4,
+      "indulgence": 3,
+      "convenience": "restaurant",
+      "occasion": [
+        "solo",
+        "friends",
+        "lateNight"
+      ],
+      "pickLayer": "meal",
+      "search": {
+        "gateQuery": "泰国菜",
+        "displayQuery": "泰式冬阴功海鲜面",
+        "fallbackQueries": [
+          "泰国菜",
+          "东南亚菜"
+        ]
+      }
+    },
+    {
+      "name": "马来叻沙面",
+      "cuisine": "sea",
+      "priceTier": "normal",
+      "meals": [
+        "lunch",
+        "dinner",
+        "midnight"
+      ],
+      "spicy": 2,
+      "tags": [
+        "暖胃",
+        "解馋",
+        "高热量"
+      ],
+      "satiety": 4,
+      "indulgence": 3,
+      "convenience": "restaurant",
+      "occasion": [
+        "solo",
+        "friends",
+        "lateNight"
+      ],
+      "pickLayer": "meal",
+      "search": {
+        "gateQuery": "东南亚菜",
+        "displayQuery": "马来叻沙面",
+        "fallbackQueries": [
+          "东南亚菜",
+          "异国料理"
+        ]
+      }
+    },
+    {
+      "name": "越南香茅烤肉饭",
+      "cuisine": "sea",
+      "priceTier": "normal",
+      "meals": [
+        "lunch",
+        "dinner",
+        "midnight"
+      ],
+      "spicy": 1,
+      "tags": [
+        "下饭",
+        "解馋",
+        "高蛋白"
+      ],
+      "satiety": 4,
+      "indulgence": 3,
+      "convenience": "takeout",
+      "occasion": [
+        "solo",
+        "friends",
+        "lateNight"
+      ],
+      "pickLayer": "meal",
+      "search": {
+        "gateQuery": "东南亚菜",
+        "displayQuery": "越南香茅烤肉饭",
+        "fallbackQueries": [
+          "东南亚菜",
+          "异国料理"
+        ]
+      }
+    },
+    {
+      "name": "印度咖喱羊肉饭",
+      "cuisine": "mideast",
+      "priceTier": "normal",
+      "meals": [
+        "lunch",
+        "dinner",
+        "midnight"
+      ],
+      "spicy": 2,
+      "tags": [
+        "下饭",
+        "解馋",
+        "高蛋白"
+      ],
+      "satiety": 4,
+      "indulgence": 3,
+      "convenience": "restaurant",
+      "occasion": [
+        "solo",
+        "friends",
+        "lateNight"
+      ],
+      "pickLayer": "meal",
+      "search": {
+        "gateQuery": "中东菜",
+        "displayQuery": "印度咖喱羊肉饭",
+        "fallbackQueries": [
+          "中东菜",
+          "异国料理"
+        ]
+      }
+    },
+    {
+      "name": "印度玛萨拉咖喱鸡饭",
+      "cuisine": "mideast",
+      "priceTier": "normal",
+      "meals": [
+        "lunch",
+        "dinner",
+        "midnight"
+      ],
+      "spicy": 2,
+      "tags": [
+        "下饭",
+        "解馋",
+        "暖胃"
+      ],
+      "satiety": 4,
+      "indulgence": 3,
+      "convenience": "restaurant",
+      "occasion": [
+        "solo",
+        "friends",
+        "lateNight"
+      ],
+      "pickLayer": "meal",
+      "search": {
+        "gateQuery": "中东菜",
+        "displayQuery": "印度玛萨拉咖喱鸡饭",
+        "fallbackQueries": [
+          "中东菜",
+          "异国料理"
+        ]
+      }
+    },
+    {
+      "name": "墨西哥烤鸡肉卷饭",
+      "cuisine": "exotic-generic",
+      "priceTier": "normal",
+      "meals": [
+        "lunch",
+        "dinner",
+        "midnight"
+      ],
+      "spicy": 1,
+      "tags": [
+        "快手",
+        "解馋",
+        "高蛋白"
+      ],
+      "satiety": 3,
+      "indulgence": 3,
+      "convenience": "takeout",
+      "occasion": [
+        "solo",
+        "quick",
+        "lateNight"
+      ],
+      "pickLayer": "meal",
+      "search": {
+        "gateQuery": "异国料理",
+        "displayQuery": "墨西哥烤鸡肉卷饭",
+        "fallbackQueries": [
+          "异国料理"
+        ]
+      }
+    },
+    {
+      "name": "中东烤鸡肉饭",
+      "cuisine": "mideast",
+      "priceTier": "normal",
+      "meals": [
+        "lunch",
+        "dinner",
+        "midnight"
+      ],
+      "spicy": 1,
+      "tags": [
+        "下饭",
+        "解馋",
+        "高蛋白"
+      ],
+      "satiety": 4,
+      "indulgence": 3,
+      "convenience": "takeout",
+      "occasion": [
+        "solo",
+        "friends",
+        "lateNight"
+      ],
+      "pickLayer": "meal",
+      "search": {
+        "gateQuery": "中东菜",
+        "displayQuery": "中东烤鸡肉饭",
+        "fallbackQueries": [
+          "中东菜",
+          "异国料理"
+        ]
+      }
+    },
+    {
+      "name": "新加坡海南鸡饭",
+      "cuisine": "sea",
+      "priceTier": "normal",
+      "meals": [
+        "lunch",
+        "dinner"
+      ],
+      "spicy": 0,
+      "tags": [
+        "清淡",
+        "高蛋白",
+        "下饭"
+      ],
+      "satiety": 4,
+      "indulgence": 3,
+      "convenience": "restaurant",
+      "occasion": [
+        "solo",
+        "friends"
+      ],
+      "pickLayer": "meal",
+      "search": {
+        "gateQuery": "东南亚菜",
+        "displayQuery": "新加坡海南鸡饭",
+        "fallbackQueries": [
+          "东南亚菜",
+          "异国料理"
+        ]
+      }
+    },
+    {
+      "name": "越南春卷米线",
+      "cuisine": "sea",
+      "priceTier": "normal",
+      "meals": [
+        "lunch",
+        "dinner"
+      ],
+      "spicy": 0,
+      "tags": [
+        "清淡",
+        "快手"
+      ],
+      "satiety": 3,
+      "indulgence": 3,
+      "convenience": "takeout",
+      "occasion": [
+        "solo",
+        "quick"
+      ],
+      "pickLayer": "meal",
+      "search": {
+        "gateQuery": "东南亚菜",
+        "displayQuery": "越南春卷米线",
+        "fallbackQueries": [
+          "东南亚菜",
+          "异国料理"
+        ]
+      }
+    },
+    {
+      "name": "土耳其烤肉披萨",
+      "cuisine": "mideast",
+      "priceTier": "normal",
+      "meals": [
+        "lunch",
+        "dinner",
+        "midnight"
+      ],
+      "spicy": 0,
+      "tags": [
+        "解馋",
+        "高热量"
+      ],
+      "satiety": 4,
+      "indulgence": 3,
+      "convenience": "takeout",
+      "occasion": [
+        "solo",
+        "friends",
+        "lateNight"
+      ],
+      "pickLayer": "meal",
+      "search": {
+        "gateQuery": "中东菜",
+        "displayQuery": "土耳其烤肉披萨",
+        "fallbackQueries": [
+          "中东菜",
+          "异国料理"
+        ]
+      }
+    },
+    {
+      "name": "泰式咖喱蟹",
+      "cuisine": "thai",
+      "priceTier": "treat",
+      "meals": [
+        "dinner",
+        "midnight"
+      ],
+      "spicy": 2,
+      "tags": [
+        "解馋",
+        "高蛋白"
+      ],
+      "satiety": 4,
+      "indulgence": 4,
+      "convenience": "restaurant",
+      "occasion": [
+        "friends",
+        "lateNight"
+      ],
+      "pickLayer": "meal",
+      "search": {
+        "gateQuery": "泰国菜",
+        "displayQuery": "泰式咖喱蟹",
+        "fallbackQueries": [
+          "泰国菜",
+          "东南亚菜"
+        ]
+      }
+    },
+    {
+      "name": "新加坡黑胡椒蟹",
+      "cuisine": "sea",
+      "priceTier": "treat",
+      "meals": [
+        "dinner",
+        "midnight"
+      ],
+      "spicy": 1,
+      "tags": [
+        "解馋",
+        "高蛋白",
+        "高热量"
+      ],
+      "satiety": 4,
+      "indulgence": 5,
+      "convenience": "restaurant",
+      "occasion": [
+        "friends",
+        "lateNight"
+      ],
+      "pickLayer": "meal",
+      "search": {
+        "gateQuery": "东南亚菜",
+        "displayQuery": "新加坡黑胡椒蟹",
+        "fallbackQueries": [
+          "东南亚菜",
+          "异国料理"
+        ]
+      }
+    },
+    {
+      "name": "印度烤羊排配馕",
+      "cuisine": "mideast",
+      "priceTier": "treat",
+      "meals": [
+        "dinner"
+      ],
+      "spicy": 1,
+      "tags": [
+        "高热量",
+        "解馋",
+        "高蛋白"
+      ],
+      "satiety": 4,
+      "indulgence": 4,
+      "convenience": "restaurant",
+      "occasion": [
+        "friends",
+        "date"
+      ],
+      "pickLayer": "meal",
+      "search": {
+        "gateQuery": "中东菜",
+        "displayQuery": "印度烤羊排配馕",
+        "fallbackQueries": [
+          "中东菜",
+          "异国料理"
+        ]
+      }
+    },
+    {
+      "name": "中东烤羊肉拼盘",
+      "cuisine": "mideast",
+      "priceTier": "treat",
+      "meals": [
+        "dinner",
+        "midnight"
+      ],
+      "spicy": 1,
+      "tags": [
+        "高热量",
+        "解馋",
+        "高蛋白"
+      ],
+      "satiety": 4,
+      "indulgence": 4,
+      "convenience": "restaurant",
+      "occasion": [
+        "friends",
+        "lateNight"
+      ],
+      "pickLayer": "meal",
+      "search": {
+        "gateQuery": "中东菜",
+        "displayQuery": "中东烤羊肉拼盘",
+        "fallbackQueries": [
+          "中东菜",
+          "异国料理"
+        ]
+      }
+    },
+    {
+      "name": "泰式帝王虾",
+      "cuisine": "thai",
+      "priceTier": "treat",
+      "meals": [
+        "dinner"
+      ],
+      "spicy": 1,
+      "tags": [
+        "解馋",
+        "高蛋白",
+        "清淡"
+      ],
+      "satiety": 3,
+      "indulgence": 4,
+      "convenience": "restaurant",
+      "occasion": [
+        "friends",
+        "date"
+      ],
+      "pickLayer": "meal",
+      "search": {
+        "gateQuery": "泰国菜",
+        "displayQuery": "泰式帝王虾",
+        "fallbackQueries": [
+          "泰国菜",
+          "东南亚菜"
+        ]
+      }
+    },
+    {
+      "name": "摩洛哥炖羊肉",
+      "cuisine": "mideast",
+      "priceTier": "treat",
+      "meals": [
+        "dinner"
+      ],
+      "spicy": 1,
+      "tags": [
+        "暖胃",
+        "解馋",
+        "高蛋白"
+      ],
+      "satiety": 4,
+      "indulgence": 4,
+      "convenience": "restaurant",
+      "occasion": [
+        "friends",
+        "date"
+      ],
+      "pickLayer": "meal",
+      "search": {
+        "gateQuery": "中东菜",
+        "displayQuery": "摩洛哥炖羊肉",
+        "fallbackQueries": [
+          "中东菜",
+          "异国料理"
+        ]
+      }
+    },
+    {
+      "name": "西班牙海鲜饭",
+      "cuisine": "exotic-generic",
+      "priceTier": "treat",
+      "meals": [
+        "dinner"
+      ],
+      "spicy": 0,
+      "tags": [
+        "解馋",
+        "高蛋白",
+        "高热量"
+      ],
+      "satiety": 4,
+      "indulgence": 4,
+      "convenience": "restaurant",
+      "occasion": [
+        "friends",
+        "date"
+      ],
+      "pickLayer": "meal",
+      "search": {
+        "gateQuery": "异国料理",
+        "displayQuery": "西班牙海鲜饭",
+        "fallbackQueries": [
+          "异国料理"
+        ]
+      }
+    },
+    {
+      "name": "泰式火山排骨",
+      "cuisine": "thai",
+      "priceTier": "treat",
+      "meals": [
+        "dinner",
+        "midnight"
+      ],
+      "spicy": 3,
+      "tags": [
+        "解馋",
+        "下饭",
+        "高热量"
+      ],
+      "satiety": 4,
+      "indulgence": 4,
+      "convenience": "restaurant",
+      "occasion": [
+        "friends",
+        "lateNight"
+      ],
+      "pickLayer": "meal",
+      "search": {
+        "gateQuery": "泰国菜",
+        "displayQuery": "泰式火山排骨",
+        "fallbackQueries": [
+          "泰国菜",
+          "东南亚菜"
         ]
       }
     }

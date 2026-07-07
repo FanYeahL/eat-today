@@ -1,8 +1,9 @@
 // scripts/gen-dish-candidates.mjs
 // 生成 dish 候选菜草案 → docs/dish-candidates.draft.json + docs/dish-candidates.review.md
 // ─────────────────────────────────────────────
-// 本批：中式 +49（含补齐 +7）+ 西餐 +29 meal，供 user + Codex 审。审定后再补 jpkr/exotic。
-//   family meal 缺口由 familyBoard 机器生成（见 _meta），收尾判据=各 family meal 净增达标，非行数。
+// 本批：全 4 family meal 补齐——中式 49（含 +7）/ 西餐 29 / 日韩 27 / 异国 24 = 129 meal + 7 side，供 user + Codex 审。
+//   family meal 缺口 + 餐段缺口均由机器追踪（_meta.familyBoard / _meta.mealRemaining）。
+//   收尾判据：各 family meal 净增达标 且 各餐段(早/午/晚/宵)达标（tea 除外），非行数。
 //
 // 设计：核心属性（需人味判断的）手工列在 ROWS，紧凑表；
 // 衍生字段（search.* 查店档案、layer 层级）按规则机械推导，不手填。
@@ -166,6 +167,76 @@ const ROWS = [
   ["烤羊排",         "western-generic",  "treat", 1, "d",   ["高热量","解馋","高蛋白"],4, 4, "restaurant", "fdt"],
   ["松露蘑菇意面",   "western-italian",  "treat", 0, "d",   ["解馋","高热量"],        4, 4, "restaurant", "dtf", "yimian"],
   ["西冷牛排配薯条", "western-american", "treat", 0, "d",   ["高热量","解馋","高蛋白"],4, 4, "restaurant", "dtf"],
+
+  // ═══════════════════════════════════════════════
+  // 日韩 +27 meal（budget 7 / normal 13 / treat 7；全 satiety>=3）
+  // ★ 餐段策略：本轮须补 midnight（存量后仍缺 ~31）+ 少量 breakfast(+2)。
+  //   拉面/炸鸡/炒饭/盖饭/烧肉多为真实夜宵，故大量挂 n；早餐给 2 道日式早点。
+  //   family=jpkr（japanese/korean），已核对不与现有 29 道日韩撞名。
+  // ═══════════════════════════════════════════════
+  // ---- jpkr budget ×7（含 2 早餐、多夜宵）----
+  ["日式鲑鱼茶泡饭", "japanese", "budget", 0, "bln", ["清淡","快手","暖胃"],   3, 2, "takeout",    "sqln"],
+  ["日式滑蛋牛肉饭", "japanese", "budget", 0, "bld", ["快手","高蛋白","下饭"], 3, 2, "canteen",    "sq"],
+  ["韩式泡菜炒饭",   "korean",   "budget", 1, "ldn", ["下饭","解馋","快手"],   3, 2, "canteen",    "sqln"],
+  ["韩式辣味拉面",   "korean",   "budget", 2, "ldn", ["暖胃","解馋","续命"],   3, 2, "convenience","sqln"],
+  ["日式酱油拉面",   "japanese", "budget", 1, "ldn", ["暖胃","解馋"],          4, 2, "takeout",    "sln",  "ramen"],
+  ["韩式辣炒猪肉盖饭","korean",   "budget", 2, "ldn", ["下饭","解馋","高蛋白"], 4, 2, "canteen",    "sqln"],
+  ["日式咖喱鸡排饭", "japanese", "budget", 1, "ldn", ["下饭","解馋","高热量"], 4, 2, "canteen",    "sqln"],
+  // ---- jpkr normal ×13（夜宵主力）----
+  ["日式海鲜拉面",   "japanese", "normal", 1, "ldn", ["暖胃","解馋","高蛋白"], 4, 3, "restaurant", "sfln", "ramen"],
+  ["日式盐味拉面",   "japanese", "normal", 0, "ldn", ["暖胃","清淡"],          4, 3, "restaurant", "sfln", "ramen"],
+  ["日式照烧鸡腿饭", "japanese", "normal", 0, "ldn", ["下饭","解馋","高蛋白"], 4, 3, "takeout",    "sfln"],
+  ["日式咖喱牛肉乌冬","japanese", "normal", 1, "ldn", ["暖胃","解馋","下饭"],   4, 3, "restaurant", "sfln"],
+  ["韩式泡菜猪肉锅", "korean",   "normal", 2, "dn",  ["暖胃","下饭","解馋"],   4, 3, "restaurant", "fln"],
+  ["韩式辣炒鱿鱼盖饭","korean",   "normal", 2, "ldn", ["下饭","解馋","高蛋白"], 4, 3, "restaurant", "sfln"],
+  ["日式天妇罗盖饭", "japanese", "normal", 0, "ld",  ["解馋","高热量"],        4, 3, "restaurant", "sf"],
+  ["韩式炸鸡",       "korean",   "normal", 1, "dn",  ["高热量","解馋"],        4, 4, "takeout",    "flln",  "koreanchicken"],
+  ["韩式酱油炸鸡",   "korean",   "normal", 0, "dn",  ["高热量","解馋"],        4, 4, "takeout",    "flln",  "koreanchicken"],
+  ["日式咖喱猪排饭", "japanese", "normal", 1, "ldn", ["下饭","解馋","高热量"], 4, 3, "restaurant", "sfln"],
+  ["韩式辣牛肉汤饭", "korean",   "normal", 2, "ldn", ["暖胃","下饭","高蛋白"], 4, 3, "restaurant", "sfln"],
+  ["韩式海鲜煎饼",   "korean",   "normal", 0, "dn",  ["解馋","高热量"],        3, 3, "restaurant", "fln"],
+  ["日式牛肉时雨煮饭","japanese", "normal", 0, "ld",  ["下饭","高蛋白","解馋"], 4, 3, "takeout",    "sf"],
+  // ---- jpkr treat ×7（indulgence>=4 & satiety>=3）----
+  ["日式和牛烧肉",   "japanese", "treat", 0, "dn",  ["高热量","解馋","高蛋白"],4, 5, "restaurant", "flln"],
+  ["日式刺身拼盘",   "japanese", "treat", 0, "dn",  ["清淡","高蛋白","解馋"],  3, 4, "restaurant", "fdt"],
+  ["日式鳗鱼三吃",   "japanese", "treat", 0, "d",   ["解馋","高蛋白"],         4, 4, "restaurant", "fdt"],
+  ["韩式烤五花肉套餐","korean",  "treat", 1, "dn",  ["高热量","解馋","高蛋白"],4, 4, "restaurant", "flln"],
+  ["日式特上寿司",   "japanese", "treat", 0, "d",   ["清淡","高蛋白","解馋"],  3, 5, "restaurant", "fdt"],
+  ["韩式炭火烤牛小排","korean",  "treat", 0, "dn",  ["高热量","解馋","高蛋白"],4, 5, "restaurant", "flln"],
+  ["日式蟹肉火锅",   "japanese", "treat", 0, "dn",  ["暖胃","解馋","高蛋白"],  4, 4, "restaurant", "flln"],
+
+  // ═══════════════════════════════════════════════
+  // 异国 +24 meal（budget 4 / normal 12 / treat 8；全 satiety>=3）
+  // ★ 餐段策略：延续 midnight 重点补齐（炒河粉/法包/炒饭/咖喱多为夜宵可吃）。
+  //   family=exotic（thai/sea/mideast/exotic-generic），已核对不与现有 17 道异国撞名。
+  // ═══════════════════════════════════════════════
+  // ---- exotic budget ×4 ----
+  ["越南猪肉法包",   "sea",     "budget", 0, "bln", ["快手","解馋","清淡"],   3, 2, "takeout",    "sqln"],
+  ["泰式打抛猪饭",   "thai",    "budget", 2, "ldn", ["下饭","解馋","高蛋白"], 3, 2, "takeout",    "sqln"],
+  ["印尼炒饭",       "sea",     "budget", 1, "ldn", ["下饭","解馋","高热量"], 3, 2, "takeout",    "sqln"],
+  ["泰式海鲜炒河粉", "thai",    "budget", 1, "ldn", ["解馋","高热量","下饭"], 3, 2, "takeout",    "sqln"],
+  // ---- exotic normal ×12（夜宵主力）----
+  ["泰式绿咖喱鸡饭", "thai",    "normal", 2, "ldn", ["下饭","解馋","暖胃"],   4, 3, "restaurant", "sfln"],
+  ["泰式红咖喱牛肉饭","thai",   "normal", 2, "ldn", ["下饭","解馋","高蛋白"], 4, 3, "restaurant", "sfln"],
+  ["泰式冬阴功海鲜面","thai",   "normal", 2, "ldn", ["暖胃","解馋","高蛋白"], 4, 3, "restaurant", "sfln"],
+  ["马来叻沙面",     "sea",     "normal", 2, "ldn", ["暖胃","解馋","高热量"], 4, 3, "restaurant", "sfln"],
+  ["越南香茅烤肉饭", "sea",     "normal", 1, "ldn", ["下饭","解馋","高蛋白"], 4, 3, "takeout",    "sfln"],
+  ["印度咖喱羊肉饭", "mideast", "normal", 2, "ldn", ["下饭","解馋","高蛋白"], 4, 3, "restaurant", "sfln"],
+  ["印度玛萨拉咖喱鸡饭","mideast","normal",2, "ldn", ["下饭","解馋","暖胃"],   4, 3, "restaurant", "sfln"],
+  ["墨西哥烤鸡肉卷饭","exotic-generic","normal",1,"ldn",["快手","解馋","高蛋白"],3,3,"takeout",   "sqln"],
+  ["中东烤鸡肉饭",   "mideast", "normal", 1, "ldn", ["下饭","解馋","高蛋白"], 4, 3, "takeout",    "sfln"],
+  ["新加坡海南鸡饭", "sea",     "normal", 0, "ld",  ["清淡","高蛋白","下饭"], 4, 3, "restaurant", "sf"],
+  ["越南春卷米线",   "sea",     "normal", 0, "ld",  ["清淡","快手"],          3, 3, "takeout",    "sq"],
+  ["土耳其烤肉披萨", "mideast", "normal", 0, "ldn", ["解馋","高热量"],        4, 3, "takeout",    "sfln"],
+  // ---- exotic treat ×8（indulgence>=4 & satiety>=3）----
+  ["泰式咖喱蟹",     "thai",    "treat", 2, "dn",  ["解馋","高蛋白"],        4, 4, "restaurant", "flln"],
+  ["新加坡黑胡椒蟹", "sea",     "treat", 1, "dn",  ["解馋","高蛋白","高热量"],4, 5, "restaurant", "flln"],
+  ["印度烤羊排配馕", "mideast", "treat", 1, "d",   ["高热量","解馋","高蛋白"],4, 4, "restaurant", "fdt"],
+  ["中东烤羊肉拼盘", "mideast", "treat", 1, "dn",  ["高热量","解馋","高蛋白"],4, 4, "restaurant", "flln"],
+  ["泰式帝王虾",     "thai",    "treat", 1, "d",   ["解馋","高蛋白","清淡"], 3, 4, "restaurant", "fdt"],
+  ["摩洛哥炖羊肉",   "mideast", "treat", 1, "d",   ["暖胃","解馋","高蛋白"], 4, 4, "restaurant", "fdt"],
+  ["西班牙海鲜饭",   "exotic-generic","treat",0, "d",   ["解馋","高蛋白","高热量"],4, 4, "restaurant", "fdt"],
+  ["泰式火山排骨",   "thai",    "treat", 3, "dn",  ["解馋","下饭","高热量"], 4, 4, "restaurant", "flln"],
 ];
 
 // —— 展开一行为完整候选对象 ——
@@ -302,6 +373,26 @@ for (const fam of families) {
 const batchFamilies = families.filter((f) => dishes.some((d) => d._family === f));
 const totalRemaining = families.reduce((s, f) => s + familyBoard[f].remainingMeal, 0);
 
+// —— 餐段(meal-segment) 缺口看板（对齐 spec §4 餐段最低标准；tea 不设硬指标，见 §4.2）——
+// SEG_TARGET/SEG_BASELINE 来自 spec §4：目标 vs 存量现状；本批 meal 命中冲抵后得剩余缺口。
+// 目的：防止 family×price 达标但餐段 lint（早≥40/午≥120/晚≥140/宵≥70）失败——尤其 midnight。
+const SEG = ["breakfast", "lunch", "dinner", "midnight"]; // tea 不参与硬指标
+const SEG_TARGET = { breakfast: 40, lunch: 120, dinner: 140, midnight: 70 };
+const SEG_BASELINE = { breakfast: 29, lunch: 75, dinner: 79, midnight: 33 }; // 存量 meal 现状（spec §4）
+const mealRemaining = {};
+for (const seg of SEG) {
+  const thisBatchHit = mealLayer.filter((d) => d.meals.includes(seg)).length;
+  const covered = SEG_BASELINE[seg] + thisBatchHit;
+  mealRemaining[seg] = {
+    target: SEG_TARGET[seg],
+    baseline: SEG_BASELINE[seg],
+    thisBatchMealHits: thisBatchHit,
+    coveredNow: covered,
+    remaining: Math.max(0, SEG_TARGET[seg] - covered),
+  };
+}
+const segTotalRemaining = SEG.reduce((s, seg) => s + mealRemaining[seg].remaining, 0);
+
 const out = {
   _meta: {
     purpose: "dish 候选菜草案（脚本生成），供 user + Codex 审后落 foods.ts",
@@ -311,6 +402,8 @@ const out = {
     gapTargetMeal: { ...TARGET_MEAL, total: 129 },
     familyBoard,   // 每 family：目标/本批达成/剩余 meal 缺口/meal 价位分布/side 额外
     remainingMealAllFamilies: totalRemaining,  // >0 表示整体 meal 未补齐，禁止按行数收尾
+    mealRemaining, // 每餐段(早/午/晚/宵)：目标/存量/本批命中/已覆盖/剩余缺口（对齐 spec §4 餐段最低标准）
+    segRemainingTotal: segTotalRemaining,  // 餐段缺口总和；>0 说明还需按餐段补（尤其 midnight），否则餐段 lint 会红
     teaPolicy: "tea 不列入 meal-only 硬指标；下午茶走 side/drink 池，取池见 §3.1 foodsByMealForSinglePick（仅水占）。本批 tea meal=0 属预期。",
     thisBatchRows: dishes.length,
     priceDistributionAll: byPrice,
@@ -326,6 +419,7 @@ const out = {
       `pickLayer=side（satiety<3）不进默认单菜池，落库映射为 side 层；本批 side ${sideNames.length} 项：${sideNames.join("/")}。`,
       "缺口口径 = meal-only：本批 " + dishes.length + " 行中仅 " + mealLayer.length + " 计入 meal 缺口，side " + sideLayer.length + " 不计（见 familyBoard.*.mealByPrice）。",
       `family 缺口看板见 familyBoard：${families.map((f) => `${f} 剩${familyBoard[f].remainingMeal}`).join(" / ")}。remainingMealAllFamilies=${totalRemaining}（>0 禁止收尾）。`,
+      `餐段缺口见 mealRemaining（不含 tea）：${SEG.map((s) => `${s} 剩${mealRemaining[s].remaining}`).join(" / ")}。segRemainingTotal=${segTotalRemaining}——下一批(jpkr/exotic)须重点覆盖 midnight/breakfast，否则餐段 lint 会红。`,
       "treat 全为具体菜，无火锅/烧烤/烤肉/品牌。",
       "treat 质量门不惩罚「清淡」，只看 indulgence / satiety / 「健康轻食」——白灼基围虾这类清爽高质量菜保留在 treat 桶（fix 5，对齐 spec §5.3）。",
       "tea meal=0 是预期（非缺陷）：下午茶不走 meal-only，由后续 side/drink 池补供给（spec §4.2 / §3.1 foodsByMealForSinglePick，仅水占）。",
@@ -347,8 +441,9 @@ let md = `# 候选菜 review 表（${batchFamilies.join("+")}，共 ${dishes.len
 md += `> 审阅重点：命名真实性 / 口味(spicy) / 价位归档 / 餐段合理性 / treat 是否够犒劳 / side 层归类 / canonicalGroup 归并。\n`;
 md += `> 层级：meal ${byLayer.meal} · side ${byLayer.side}（**缺口只算 meal 层**）\n`;
 md += `> meal 层价位（计入缺口）：budget ${mealByPrice.budget} · normal ${mealByPrice.normal} · treat ${mealByPrice.treat}\n`;
-md += `> 餐段命中（仅 meal 层）：早 ${byMeal.breakfast} / 午 ${byMeal.lunch} / 茶 ${byMeal.tea} / 晚 ${byMeal.dinner} / 宵 ${byMeal.midnight}\n`;
+md += `> 餐段命中（仅 meal 层，本批）：早 ${byMeal.breakfast} / 午 ${byMeal.lunch} / 茶 ${byMeal.tea} / 晚 ${byMeal.dinner} / 宵 ${byMeal.midnight}\n`;
 md += `> family meal 缺口：${families.map((f) => `${f} 达成${familyBoard[f].achievedMealThisBatch}/${familyBoard[f].targetMeal}(剩${familyBoard[f].remainingMeal})`).join(" · ")}\n`;
+md += `> 餐段剩余缺口（存量+本批 vs 目标，不含 tea）：${SEG.map((s) => `${s} ${mealRemaining[s].coveredNow}/${mealRemaining[s].target}(剩${mealRemaining[s].remaining})`).join(" · ")} —— 合计剩 ${segTotalRemaining}\n`;
 md += `> tea meal=0 是预期：下午茶不走 meal-only，由后续 side/drink 池补供给（spec §4.2 / §3.1）。\n\n`;
 md += "| " + cols.join(" | ") + " |\n";
 md += "|" + cols.map(() => "---").join("|") + "|\n";
@@ -376,4 +471,14 @@ for (const fam of families) {
 console.log(totalRemaining > 0
   ? `  ⚠ 全 family 仍差 ${totalRemaining} 道 meal（勿按行数收尾）`
   : `  ✓ 全 family meal 达标`);
+console.log("  —— 餐段(meal-segment) 缺口看板（存量+本批 vs 目标，不含 tea）——");
+const SEG_CN = { breakfast: "早餐", lunch: "午饭", dinner: "晚饭", midnight: "宵夜" };
+for (const seg of SEG) {
+  const r = mealRemaining[seg];
+  const mark = r.remaining > 0 ? "⚠" : "✓";
+  console.log(`  ${mark} ${SEG_CN[seg]}: ${r.coveredNow}/${r.target}（存量${r.baseline}+本批${r.thisBatchMealHits}）剩${r.remaining}`);
+}
+console.log(segTotalRemaining > 0
+  ? `  ⚠ 餐段合计仍差 ${segTotalRemaining}（下一批须重点覆盖 midnight/breakfast，否则餐段 lint 会红）`
+  : `  ✓ 餐段全部达标`);
 console.log(`  → docs/dish-candidates.draft.json + docs/dish-candidates.review.md`);

@@ -1,10 +1,11 @@
-# 候选菜 review 表（chinese+western，共 85 行）
+# 候选菜 review 表（chinese+western+jpkr+exotic，共 136 行）
 
 > 审阅重点：命名真实性 / 口味(spicy) / 价位归档 / 餐段合理性 / treat 是否够犒劳 / side 层归类 / canonicalGroup 归并。
-> 层级：meal 78 · side 7（**缺口只算 meal 层**）
-> meal 层价位（计入缺口）：budget 26 · normal 35 · treat 17
-> 餐段命中（仅 meal 层）：早 9 / 午 51 / 茶 0 / 晚 69 / 宵 6
-> family meal 缺口：chinese 达成49/49(剩0) · western 达成29/29(剩0) · jpkr 达成0/27(剩27) · exotic 达成0/24(剩24)
+> 层级：meal 129 · side 7（**缺口只算 meal 层**）
+> meal 层价位（计入缺口）：budget 37 · normal 60 · treat 32
+> 餐段命中（仅 meal 层，本批）：早 12 / 午 83 / 茶 0 / 晚 118 / 宵 46
+> family meal 缺口：chinese 达成49/49(剩0) · western 达成29/29(剩0) · jpkr 达成27/27(剩0) · exotic 达成24/24(剩0)
+> 餐段剩余缺口（存量+本批 vs 目标，不含 tea）：breakfast 41/40(剩0) · lunch 158/120(剩0) · dinner 197/140(剩0) · midnight 79/70(剩0) —— 合计剩 0
 > tea meal=0 是预期：下午茶不走 meal-only，由后续 side/drink 池补供给（spec §4.2 / §3.1）。
 
 | name | _family | cuisine | priceTier | pickLayer | meals | spicy | tags | satiety | indulgence | convenience | occasion | gateQuery | displayQuery | canonicalGroup |
@@ -94,3 +95,54 @@
 | 烤羊排 | western | western-generic | treat | meal | dinner | 1 | 高热量/解馋/高蛋白 | 4 | 4 | restaurant | friends/date | 西餐厅 | 烤羊排 |  |
 | 松露蘑菇意面 | western | western-italian | treat | meal | dinner | 0 | 解馋/高热量 | 4 | 4 | restaurant | date/friends | 意大利菜 | 松露蘑菇意面 | yimian |
 | 西冷牛排配薯条 | western | western-american | treat | meal | dinner | 0 | 高热量/解馋/高蛋白 | 4 | 4 | restaurant | date/friends | 美式餐厅 | 西冷牛排配薯条 |  |
+| 日式鲑鱼茶泡饭 | jpkr | japanese | budget | meal | breakfast/lunch/midnight | 0 | 清淡/快手/暖胃 | 3 | 2 | takeout | solo/quick/lateNight | 日本料理 | 日式鲑鱼茶泡饭 |  |
+| 日式滑蛋牛肉饭 | jpkr | japanese | budget | meal | breakfast/lunch/dinner | 0 | 快手/高蛋白/下饭 | 3 | 2 | canteen | solo/quick | 日本料理 | 日式滑蛋牛肉饭 |  |
+| 韩式泡菜炒饭 | jpkr | korean | budget | meal | lunch/dinner/midnight | 1 | 下饭/解馋/快手 | 3 | 2 | canteen | solo/quick/lateNight | 韩国料理 | 韩式泡菜炒饭 |  |
+| 韩式辣味拉面 | jpkr | korean | budget | meal | lunch/dinner/midnight | 2 | 暖胃/解馋/续命 | 3 | 2 | convenience | solo/quick/lateNight | 韩国料理 | 韩式辣味拉面 |  |
+| 日式酱油拉面 | jpkr | japanese | budget | meal | lunch/dinner/midnight | 1 | 暖胃/解馋 | 4 | 2 | takeout | solo/lateNight | 日本料理 | 日式酱油拉面 | ramen |
+| 韩式辣炒猪肉盖饭 | jpkr | korean | budget | meal | lunch/dinner/midnight | 2 | 下饭/解馋/高蛋白 | 4 | 2 | canteen | solo/quick/lateNight | 韩国料理 | 韩式辣炒猪肉盖饭 |  |
+| 日式咖喱鸡排饭 | jpkr | japanese | budget | meal | lunch/dinner/midnight | 1 | 下饭/解馋/高热量 | 4 | 2 | canteen | solo/quick/lateNight | 日本料理 | 日式咖喱鸡排饭 |  |
+| 日式海鲜拉面 | jpkr | japanese | normal | meal | lunch/dinner/midnight | 1 | 暖胃/解馋/高蛋白 | 4 | 3 | restaurant | solo/friends/lateNight | 日本料理 | 日式海鲜拉面 | ramen |
+| 日式盐味拉面 | jpkr | japanese | normal | meal | lunch/dinner/midnight | 0 | 暖胃/清淡 | 4 | 3 | restaurant | solo/friends/lateNight | 日本料理 | 日式盐味拉面 | ramen |
+| 日式照烧鸡腿饭 | jpkr | japanese | normal | meal | lunch/dinner/midnight | 0 | 下饭/解馋/高蛋白 | 4 | 3 | takeout | solo/friends/lateNight | 日本料理 | 日式照烧鸡腿饭 |  |
+| 日式咖喱牛肉乌冬 | jpkr | japanese | normal | meal | lunch/dinner/midnight | 1 | 暖胃/解馋/下饭 | 4 | 3 | restaurant | solo/friends/lateNight | 日本料理 | 日式咖喱牛肉乌冬 |  |
+| 韩式泡菜猪肉锅 | jpkr | korean | normal | meal | dinner/midnight | 2 | 暖胃/下饭/解馋 | 4 | 3 | restaurant | friends/lateNight | 韩国料理 | 韩式泡菜猪肉锅 |  |
+| 韩式辣炒鱿鱼盖饭 | jpkr | korean | normal | meal | lunch/dinner/midnight | 2 | 下饭/解馋/高蛋白 | 4 | 3 | restaurant | solo/friends/lateNight | 韩国料理 | 韩式辣炒鱿鱼盖饭 |  |
+| 日式天妇罗盖饭 | jpkr | japanese | normal | meal | lunch/dinner | 0 | 解馋/高热量 | 4 | 3 | restaurant | solo/friends | 日本料理 | 日式天妇罗盖饭 |  |
+| 韩式炸鸡 | jpkr | korean | normal | meal | dinner/midnight | 1 | 高热量/解馋 | 4 | 4 | takeout | friends/lateNight | 韩国料理 | 韩式炸鸡 | koreanchicken |
+| 韩式酱油炸鸡 | jpkr | korean | normal | meal | dinner/midnight | 0 | 高热量/解馋 | 4 | 4 | takeout | friends/lateNight | 韩国料理 | 韩式酱油炸鸡 | koreanchicken |
+| 日式咖喱猪排饭 | jpkr | japanese | normal | meal | lunch/dinner/midnight | 1 | 下饭/解馋/高热量 | 4 | 3 | restaurant | solo/friends/lateNight | 日本料理 | 日式咖喱猪排饭 |  |
+| 韩式辣牛肉汤饭 | jpkr | korean | normal | meal | lunch/dinner/midnight | 2 | 暖胃/下饭/高蛋白 | 4 | 3 | restaurant | solo/friends/lateNight | 韩国料理 | 韩式辣牛肉汤饭 |  |
+| 韩式海鲜煎饼 | jpkr | korean | normal | meal | dinner/midnight | 0 | 解馋/高热量 | 3 | 3 | restaurant | friends/lateNight | 韩国料理 | 韩式海鲜煎饼 |  |
+| 日式牛肉时雨煮饭 | jpkr | japanese | normal | meal | lunch/dinner | 0 | 下饭/高蛋白/解馋 | 4 | 3 | takeout | solo/friends | 日本料理 | 日式牛肉时雨煮饭 |  |
+| 日式和牛烧肉 | jpkr | japanese | treat | meal | dinner/midnight | 0 | 高热量/解馋/高蛋白 | 4 | 5 | restaurant | friends/lateNight | 日本料理 | 日式和牛烧肉 |  |
+| 日式刺身拼盘 | jpkr | japanese | treat | meal | dinner/midnight | 0 | 清淡/高蛋白/解馋 | 3 | 4 | restaurant | friends/date | 日本料理 | 日式刺身拼盘 |  |
+| 日式鳗鱼三吃 | jpkr | japanese | treat | meal | dinner | 0 | 解馋/高蛋白 | 4 | 4 | restaurant | friends/date | 日本料理 | 日式鳗鱼三吃 |  |
+| 韩式烤五花肉套餐 | jpkr | korean | treat | meal | dinner/midnight | 1 | 高热量/解馋/高蛋白 | 4 | 4 | restaurant | friends/lateNight | 韩国料理 | 韩式烤五花肉套餐 |  |
+| 日式特上寿司 | jpkr | japanese | treat | meal | dinner | 0 | 清淡/高蛋白/解馋 | 3 | 5 | restaurant | friends/date | 日本料理 | 日式特上寿司 |  |
+| 韩式炭火烤牛小排 | jpkr | korean | treat | meal | dinner/midnight | 0 | 高热量/解馋/高蛋白 | 4 | 5 | restaurant | friends/lateNight | 韩国料理 | 韩式炭火烤牛小排 |  |
+| 日式蟹肉火锅 | jpkr | japanese | treat | meal | dinner/midnight | 0 | 暖胃/解馋/高蛋白 | 4 | 4 | restaurant | friends/lateNight | 日本料理 | 日式蟹肉火锅 |  |
+| 越南猪肉法包 | exotic | sea | budget | meal | breakfast/lunch/midnight | 0 | 快手/解馋/清淡 | 3 | 2 | takeout | solo/quick/lateNight | 东南亚菜 | 越南猪肉法包 |  |
+| 泰式打抛猪饭 | exotic | thai | budget | meal | lunch/dinner/midnight | 2 | 下饭/解馋/高蛋白 | 3 | 2 | takeout | solo/quick/lateNight | 泰国菜 | 泰式打抛猪饭 |  |
+| 印尼炒饭 | exotic | sea | budget | meal | lunch/dinner/midnight | 1 | 下饭/解馋/高热量 | 3 | 2 | takeout | solo/quick/lateNight | 东南亚菜 | 印尼炒饭 |  |
+| 泰式海鲜炒河粉 | exotic | thai | budget | meal | lunch/dinner/midnight | 1 | 解馋/高热量/下饭 | 3 | 2 | takeout | solo/quick/lateNight | 泰国菜 | 泰式海鲜炒河粉 |  |
+| 泰式绿咖喱鸡饭 | exotic | thai | normal | meal | lunch/dinner/midnight | 2 | 下饭/解馋/暖胃 | 4 | 3 | restaurant | solo/friends/lateNight | 泰国菜 | 泰式绿咖喱鸡饭 |  |
+| 泰式红咖喱牛肉饭 | exotic | thai | normal | meal | lunch/dinner/midnight | 2 | 下饭/解馋/高蛋白 | 4 | 3 | restaurant | solo/friends/lateNight | 泰国菜 | 泰式红咖喱牛肉饭 |  |
+| 泰式冬阴功海鲜面 | exotic | thai | normal | meal | lunch/dinner/midnight | 2 | 暖胃/解馋/高蛋白 | 4 | 3 | restaurant | solo/friends/lateNight | 泰国菜 | 泰式冬阴功海鲜面 |  |
+| 马来叻沙面 | exotic | sea | normal | meal | lunch/dinner/midnight | 2 | 暖胃/解馋/高热量 | 4 | 3 | restaurant | solo/friends/lateNight | 东南亚菜 | 马来叻沙面 |  |
+| 越南香茅烤肉饭 | exotic | sea | normal | meal | lunch/dinner/midnight | 1 | 下饭/解馋/高蛋白 | 4 | 3 | takeout | solo/friends/lateNight | 东南亚菜 | 越南香茅烤肉饭 |  |
+| 印度咖喱羊肉饭 | exotic | mideast | normal | meal | lunch/dinner/midnight | 2 | 下饭/解馋/高蛋白 | 4 | 3 | restaurant | solo/friends/lateNight | 中东菜 | 印度咖喱羊肉饭 |  |
+| 印度玛萨拉咖喱鸡饭 | exotic | mideast | normal | meal | lunch/dinner/midnight | 2 | 下饭/解馋/暖胃 | 4 | 3 | restaurant | solo/friends/lateNight | 中东菜 | 印度玛萨拉咖喱鸡饭 |  |
+| 墨西哥烤鸡肉卷饭 | exotic | exotic-generic | normal | meal | lunch/dinner/midnight | 1 | 快手/解馋/高蛋白 | 3 | 3 | takeout | solo/quick/lateNight | 异国料理 | 墨西哥烤鸡肉卷饭 |  |
+| 中东烤鸡肉饭 | exotic | mideast | normal | meal | lunch/dinner/midnight | 1 | 下饭/解馋/高蛋白 | 4 | 3 | takeout | solo/friends/lateNight | 中东菜 | 中东烤鸡肉饭 |  |
+| 新加坡海南鸡饭 | exotic | sea | normal | meal | lunch/dinner | 0 | 清淡/高蛋白/下饭 | 4 | 3 | restaurant | solo/friends | 东南亚菜 | 新加坡海南鸡饭 |  |
+| 越南春卷米线 | exotic | sea | normal | meal | lunch/dinner | 0 | 清淡/快手 | 3 | 3 | takeout | solo/quick | 东南亚菜 | 越南春卷米线 |  |
+| 土耳其烤肉披萨 | exotic | mideast | normal | meal | lunch/dinner/midnight | 0 | 解馋/高热量 | 4 | 3 | takeout | solo/friends/lateNight | 中东菜 | 土耳其烤肉披萨 |  |
+| 泰式咖喱蟹 | exotic | thai | treat | meal | dinner/midnight | 2 | 解馋/高蛋白 | 4 | 4 | restaurant | friends/lateNight | 泰国菜 | 泰式咖喱蟹 |  |
+| 新加坡黑胡椒蟹 | exotic | sea | treat | meal | dinner/midnight | 1 | 解馋/高蛋白/高热量 | 4 | 5 | restaurant | friends/lateNight | 东南亚菜 | 新加坡黑胡椒蟹 |  |
+| 印度烤羊排配馕 | exotic | mideast | treat | meal | dinner | 1 | 高热量/解馋/高蛋白 | 4 | 4 | restaurant | friends/date | 中东菜 | 印度烤羊排配馕 |  |
+| 中东烤羊肉拼盘 | exotic | mideast | treat | meal | dinner/midnight | 1 | 高热量/解馋/高蛋白 | 4 | 4 | restaurant | friends/lateNight | 中东菜 | 中东烤羊肉拼盘 |  |
+| 泰式帝王虾 | exotic | thai | treat | meal | dinner | 1 | 解馋/高蛋白/清淡 | 3 | 4 | restaurant | friends/date | 泰国菜 | 泰式帝王虾 |  |
+| 摩洛哥炖羊肉 | exotic | mideast | treat | meal | dinner | 1 | 暖胃/解馋/高蛋白 | 4 | 4 | restaurant | friends/date | 中东菜 | 摩洛哥炖羊肉 |  |
+| 西班牙海鲜饭 | exotic | exotic-generic | treat | meal | dinner | 0 | 解馋/高蛋白/高热量 | 4 | 4 | restaurant | friends/date | 异国料理 | 西班牙海鲜饭 |  |
+| 泰式火山排骨 | exotic | thai | treat | meal | dinner/midnight | 3 | 解馋/下饭/高热量 | 4 | 4 | restaurant | friends/lateNight | 泰国菜 | 泰式火山排骨 |  |

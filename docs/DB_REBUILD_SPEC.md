@@ -214,30 +214,33 @@ dish（meal 层）目标 ≈237（满足 240 量级）。各格 = 目标(meal �
 
 ### 4.0 各批次剩余 meal 缺口（进度看板，按实际 meal 计数滚动更新）
 
-> 更新（第二批后）：中式补 +7 已达标（budget 12→18 / normal 21→22 / treat 9），西餐 +29 一次到位（b8/n13/t8）。看板由 `familyBoard`（draft `_meta`）机器生成，此表与之对齐。
+> 更新（全 4 family 补齐后）：129 道 meal 全部到位（chinese 49 / western 29 / jpkr 27 / exotic 24），side 额外 7。看板由 `familyBoard` + `mealRemaining`（draft `_meta`）机器生成，此表与之对齐。
 
 | family | 目标(meal) | 已达成(meal) | **剩余 meal 缺口** | side 额外产出 |
 |---|---|---|---|---|
 | chinese | +49 | 49 | **0 ✅** | 7 |
 | western | +29 | 29 | **0 ✅** | 0 |
-| jpkr | +27 | 0 | **+27** | — |
-| exotic | +24 | 0 | **+24** | — |
-| **合计** | +129 | 78 | **+51 meal 待补** | 7 |
+| jpkr | +27 | 27 | **0 ✅** | 0 |
+| exotic | +24 | 24 | **0 ✅** | 0 |
+| **合计** | +129 | 129 | **0 ✅** | 7 |
 
-> 剩余批次目标 = **日韩 +27 meal、异国 +24 meal**（side/snack 另算，不冲抵）。每批"完成"的判据是它承诺的 **meal 净增**达标，不是行数。draft `_meta.remainingMealAllFamilies` >0 时禁止收尾。
+> 全部 family meal 达标；draft `_meta.remainingMealAllFamilies=0`。审定后即可进 S3 落库（先解决 §2.1 shopKeyword 取舍）。
 
 **餐段最低标准（dish **meal 层** 主食，去重按餐段命中）与当前缺口：**
 
 > 口径 = meal 层 only（`pickLayer==="meal"`）。side 层不计入下表。
 > ⚠️ **下午茶(tea) 不列入 meal-only 硬指标**——见 §4.2。
+> ⚠️ **family×price 达标 ≠ 餐段达标**：补菜必须同时满足餐段最低量，否则 lint 规则 5 会红。餐段剩余由生成器 `_meta.mealRemaining` 机器追踪（存量 baseline + 本批命中 vs 目标），下表「补齐后」列与之对齐。
 
-| 餐段 | 现状(meal) | 目标(meal) | 缺口 | 补齐重点 |
-|---|---|---|---|---|
-| 早餐 breakfast | 29 | 40 | +11 | 顶饱的早点正餐（须 satiety≥3 才算 meal）；小件早点归 side |
-| 午饭 lunch | 75 | 120 | +45 | 各家族盖饭/面/正餐 |
-| 下午茶 tea | — | **不设 meal 硬指标** | — | 走 side/snack/drink 池，见 §4.2 |
-| 晚饭 dinner | 79 | 140 | +61 | 正餐主力，treat 集中在此 |
-| 宵夜 midnight | 33 | 70 | +37 | 面/粥/顶饱夜宵正餐；小件归 side |
+| 餐段 | 存量(meal) | 目标(meal) | 原缺口 | 4 批补齐后 | 补齐重点 |
+|---|---|---|---|---|---|
+| 早餐 breakfast | 29 | 40 | +11 | **41 ✅** | 顶饱早点正餐（satiety≥3）；小件归 side |
+| 午饭 lunch | 75 | 120 | +45 | **158 ✅** | 各家族盖饭/面/正餐 |
+| 下午茶 tea | — | **不设 meal 硬指标** | — | — | 走 side/snack/drink 池，见 §4.2 |
+| 晚饭 dinner | 79 | 140 | +61 | **197 ✅** | 正餐主力，treat 集中在此 |
+| 宵夜 midnight | 33 | 70 | +37 | **79 ✅** | 面/拉面/炸鸡/盖饭等夜宵正餐（日韩/异国重点补此）；小件归 side |
+
+> 4 批补齐后餐段全部达标（`_meta.segRemainingTotal=0`）。midnight 曾是最大缺口（+37），由日韩/异国的拉面/炸鸡/咖喱饭/炒河粉等真实夜宵集中补齐。
 
 ### 4.1 side 层单独指标（额外产出，不并入 meal 缺口）
 
