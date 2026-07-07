@@ -245,7 +245,7 @@ const out = {
       "缺口口径 = meal-only：本批 " + dishes.length + " 行中仅 " + mealLayer.length + " 计入 meal 缺口，side " + sideLayer.length + " 不计（见 priceDistributionMealLayer）。",
       "treat 全为具体菜，无火锅/烧烤/烤肉/品牌。",
       "treat 质量门不惩罚「清淡」，只看 indulgence / satiety / 「健康轻食」——白灼基围虾这类清爽高质量菜保留在 treat 桶（fix 5，对齐 spec §5.3）。",
-      "tea（下午茶）本批=0，属已知缺口，记入后续【甜点/小食/饮品批次】统一补齐，不计作下午茶缺口已完成。",
+      "tea meal=0 是预期（非缺陷）：下午茶不走 meal-only，由后续 side/drink 池补供给（spec §4.2 / §3.1 foodsByMealForPick）。",
     ],
   },
   dishes,
@@ -264,7 +264,7 @@ md += `> 审阅重点：命名真实性 / 口味(spicy) / 价位归档 / 餐段�
 md += `> 层级：meal ${byLayer.meal} · side ${byLayer.side}（**缺口只算 meal 层**）\n`;
 md += `> meal 层价位（计入缺口）：budget ${mealByPrice.budget} · normal ${mealByPrice.normal} · treat ${mealByPrice.treat}\n`;
 md += `> 餐段命中（仅 meal 层）：早 ${byMeal.breakfast} / 午 ${byMeal.lunch} / 茶 ${byMeal.tea} / 晚 ${byMeal.dinner} / 宵 ${byMeal.midnight}\n`;
-md += `> tea=0：已知缺口，记入后续甜点/小食/饮品批次补齐，不计作下午茶完成。\n\n`;
+md += `> tea meal=0 是预期：下午茶不走 meal-only，由后续 side/drink 池补供给（spec §4.2 / §3.1）。\n\n`;
 md += "| " + cols.join(" | ") + " |\n";
 md += "|" + cols.map(() => "---").join("|") + "|\n";
 for (const d of dishes) {

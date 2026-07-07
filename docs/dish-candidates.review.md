@@ -4,7 +4,7 @@
 > 层级：meal 42 · side 7（**缺口只算 meal 层**）
 > meal 层价位（计入缺口）：budget 12 · normal 21 · treat 9
 > 餐段命中（仅 meal 层）：早 3 / 午 26 / 茶 0 / 晚 39 / 宵 2
-> tea=0：已知缺口，记入后续甜点/小食/饮品批次补齐，不计作下午茶完成。
+> tea meal=0 是预期：下午茶不走 meal-only，由后续 side/drink 池补供给（spec §4.2 / §3.1）。
 
 | name | cuisine | priceTier | pickLayer | meals | spicy | tags | satiety | indulgence | convenience | occasion | gateQuery | displayQuery | canonicalGroup |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|
