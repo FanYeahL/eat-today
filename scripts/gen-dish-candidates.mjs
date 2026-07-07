@@ -35,7 +35,7 @@ const FAMILY_OF = {
   "cn-xibei": "chinese", "cn-yunguigui": "chinese", "cn-beifang": "chinese",
   japanese: "jpkr", korean: "jpkr",
   "western-italian": "western", "western-american": "western", "western-generic": "western",
-  thai: "exotic", sea: "exotic", mideast: "exotic", "exotic-generic": "exotic",
+  thai: "exotic", sea: "exotic", mideast: "exotic", indian: "exotic", "exotic-generic": "exotic",
 };
 
 // cuisine → 查店档案。gateQuery 对齐现有 cuisineKeyword()（config/cuisine.ts），保证 Phase 1 运行时零改动。
@@ -57,6 +57,7 @@ const CUISINE_SEARCH = {
   thai:           { gate: "泰国菜",   fb: ["泰国菜", "东南亚菜"] },
   sea:            { gate: "东南亚菜", fb: ["东南亚菜", "异国料理"] },
   mideast:        { gate: "中东菜",   fb: ["中东菜", "异国料理"] },
+  indian:         { gate: "印度菜",   fb: ["印度菜", "异国料理"] },
   "exotic-generic": { gate: "异国料理", fb: ["异国料理"] },
 };
 
@@ -208,7 +209,7 @@ const ROWS = [
   // ═══════════════════════════════════════════════
   // 异国 +24 meal（budget 4 / normal 12 / treat 8；全 satiety>=3）
   // ★ 餐段策略：延续 midnight 重点补齐（炒河粉/法包/炒饭/咖喱多为夜宵可吃）。
-  //   family=exotic（thai/sea/mideast/exotic-generic），已核对不与现有 17 道异国撞名。
+  //   family=exotic（thai/sea/mideast/indian/exotic-generic），已核对不与现有 17 道异国撞名。
   // ═══════════════════════════════════════════════
   // ---- exotic budget ×4 ----
   ["越南猪肉法包",   "sea",     "budget", 0, "bln", ["快手","解馋","清淡"],   3, 2, "takeout",    "sqln"],
@@ -221,8 +222,8 @@ const ROWS = [
   ["泰式冬阴功海鲜面","thai",   "normal", 2, "ldn", ["暖胃","解馋","高蛋白"], 4, 3, "restaurant", "sfln"],
   ["马来叻沙面",     "sea",     "normal", 2, "ldn", ["暖胃","解馋","高热量"], 4, 3, "restaurant", "sfln"],
   ["越南香茅烤肉饭", "sea",     "normal", 1, "ldn", ["下饭","解馋","高蛋白"], 4, 3, "takeout",    "sfln"],
-  ["印度咖喱羊肉饭", "mideast", "normal", 2, "ldn", ["下饭","解馋","高蛋白"], 4, 3, "restaurant", "sfln"],
-  ["印度玛萨拉咖喱鸡饭","mideast","normal",2, "ldn", ["下饭","解馋","暖胃"],   4, 3, "restaurant", "sfln"],
+  ["印度咖喱羊肉饭", "indian",  "normal", 2, "ldn", ["下饭","解馋","高蛋白"], 4, 3, "restaurant", "sfln"],
+  ["印度玛萨拉咖喱鸡饭","indian", "normal",2, "ldn", ["下饭","解馋","暖胃"],   4, 3, "restaurant", "sfln"],
   ["墨西哥烤鸡肉卷饭","exotic-generic","normal",1,"ldn",["快手","解馋","高蛋白"],3,3,"takeout",   "sqln"],
   ["中东烤鸡肉饭",   "mideast", "normal", 1, "ldn", ["下饭","解馋","高蛋白"], 4, 3, "takeout",    "sfln"],
   ["新加坡海南鸡饭", "sea",     "normal", 0, "ld",  ["清淡","高蛋白","下饭"], 4, 3, "restaurant", "sf"],
@@ -231,7 +232,7 @@ const ROWS = [
   // ---- exotic treat ×8（indulgence>=4 & satiety>=3）----
   ["泰式咖喱蟹",     "thai",    "treat", 2, "dn",  ["解馋","高蛋白"],        4, 4, "restaurant", "flln"],
   ["新加坡黑胡椒蟹", "sea",     "treat", 1, "dn",  ["解馋","高蛋白","高热量"],4, 5, "restaurant", "flln"],
-  ["印度烤羊排配馕", "mideast", "treat", 1, "d",   ["高热量","解馋","高蛋白"],4, 4, "restaurant", "fdt"],
+  ["印度烤羊排配馕", "indian",  "treat", 1, "d",   ["高热量","解馋","高蛋白"],4, 4, "restaurant", "fdt"],
   ["中东烤羊肉拼盘", "mideast", "treat", 1, "dn",  ["高热量","解馋","高蛋白"],4, 4, "restaurant", "flln"],
   ["泰式帝王虾",     "thai",    "treat", 1, "d",   ["解馋","高蛋白","清淡"], 3, 4, "restaurant", "fdt"],
   ["摩洛哥炖羊肉",   "mideast", "treat", 1, "d",   ["暖胃","解馋","高蛋白"], 4, 4, "restaurant", "fdt"],

@@ -131,8 +131,8 @@
 | 泰式冬阴功海鲜面 | exotic | thai | normal | meal | lunch/dinner/midnight | 2 | 暖胃/解馋/高蛋白 | 4 | 3 | restaurant | solo/friends/lateNight | 泰国菜 | 泰式冬阴功海鲜面 |  |
 | 马来叻沙面 | exotic | sea | normal | meal | lunch/dinner/midnight | 2 | 暖胃/解馋/高热量 | 4 | 3 | restaurant | solo/friends/lateNight | 东南亚菜 | 马来叻沙面 |  |
 | 越南香茅烤肉饭 | exotic | sea | normal | meal | lunch/dinner/midnight | 1 | 下饭/解馋/高蛋白 | 4 | 3 | takeout | solo/friends/lateNight | 东南亚菜 | 越南香茅烤肉饭 |  |
-| 印度咖喱羊肉饭 | exotic | mideast | normal | meal | lunch/dinner/midnight | 2 | 下饭/解馋/高蛋白 | 4 | 3 | restaurant | solo/friends/lateNight | 中东菜 | 印度咖喱羊肉饭 |  |
-| 印度玛萨拉咖喱鸡饭 | exotic | mideast | normal | meal | lunch/dinner/midnight | 2 | 下饭/解馋/暖胃 | 4 | 3 | restaurant | solo/friends/lateNight | 中东菜 | 印度玛萨拉咖喱鸡饭 |  |
+| 印度咖喱羊肉饭 | exotic | indian | normal | meal | lunch/dinner/midnight | 2 | 下饭/解馋/高蛋白 | 4 | 3 | restaurant | solo/friends/lateNight | 印度菜 | 印度咖喱羊肉饭 |  |
+| 印度玛萨拉咖喱鸡饭 | exotic | indian | normal | meal | lunch/dinner/midnight | 2 | 下饭/解馋/暖胃 | 4 | 3 | restaurant | solo/friends/lateNight | 印度菜 | 印度玛萨拉咖喱鸡饭 |  |
 | 墨西哥烤鸡肉卷饭 | exotic | exotic-generic | normal | meal | lunch/dinner/midnight | 1 | 快手/解馋/高蛋白 | 3 | 3 | takeout | solo/quick/lateNight | 异国料理 | 墨西哥烤鸡肉卷饭 |  |
 | 中东烤鸡肉饭 | exotic | mideast | normal | meal | lunch/dinner/midnight | 1 | 下饭/解馋/高蛋白 | 4 | 3 | takeout | solo/friends/lateNight | 中东菜 | 中东烤鸡肉饭 |  |
 | 新加坡海南鸡饭 | exotic | sea | normal | meal | lunch/dinner | 0 | 清淡/高蛋白/下饭 | 4 | 3 | restaurant | solo/friends | 东南亚菜 | 新加坡海南鸡饭 |  |
@@ -140,7 +140,7 @@
 | 土耳其烤肉披萨 | exotic | mideast | normal | meal | lunch/dinner/midnight | 0 | 解馋/高热量 | 4 | 3 | takeout | solo/friends/lateNight | 中东菜 | 土耳其烤肉披萨 |  |
 | 泰式咖喱蟹 | exotic | thai | treat | meal | dinner/midnight | 2 | 解馋/高蛋白 | 4 | 4 | restaurant | friends/lateNight | 泰国菜 | 泰式咖喱蟹 |  |
 | 新加坡黑胡椒蟹 | exotic | sea | treat | meal | dinner/midnight | 1 | 解馋/高蛋白/高热量 | 4 | 5 | restaurant | friends/lateNight | 东南亚菜 | 新加坡黑胡椒蟹 |  |
-| 印度烤羊排配馕 | exotic | mideast | treat | meal | dinner | 1 | 高热量/解馋/高蛋白 | 4 | 4 | restaurant | friends/date | 中东菜 | 印度烤羊排配馕 |  |
+| 印度烤羊排配馕 | exotic | indian | treat | meal | dinner | 1 | 高热量/解馋/高蛋白 | 4 | 4 | restaurant | friends/date | 印度菜 | 印度烤羊排配馕 |  |
 | 中东烤羊肉拼盘 | exotic | mideast | treat | meal | dinner/midnight | 1 | 高热量/解馋/高蛋白 | 4 | 4 | restaurant | friends/lateNight | 中东菜 | 中东烤羊肉拼盘 |  |
 | 泰式帝王虾 | exotic | thai | treat | meal | dinner | 1 | 解馋/高蛋白/清淡 | 3 | 4 | restaurant | friends/date | 泰国菜 | 泰式帝王虾 |  |
 | 摩洛哥炖羊肉 | exotic | mideast | treat | meal | dinner | 1 | 暖胃/解馋/高蛋白 | 4 | 4 | restaurant | friends/date | 中东菜 | 摩洛哥炖羊肉 |  |

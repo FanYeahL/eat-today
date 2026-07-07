@@ -50,6 +50,7 @@ export const cuisineMeta: Record<CuisineKey, CuisineMeta> = {
   thai: { key: "thai", family: "exotic", label: "泰式", emoji: "🍤" },
   sea: { key: "sea", family: "exotic", label: "东南亚", emoji: "🍛" },
   mideast: { key: "mideast", family: "exotic", label: "中东", emoji: "🥙" },
+  indian: { key: "indian", family: "exotic", label: "印度", emoji: "🍛" },
   "exotic-generic": { key: "exotic-generic", family: "exotic", label: "异国", emoji: "🌍" },
 };
 
@@ -89,6 +90,7 @@ const CUISINE_KEYWORD: Record<CuisineKey, string> = {
   thai: "泰国菜",
   sea: "东南亚菜",
   mideast: "中东菜",
+  indian: "印度菜",
   "exotic-generic": "异国料理",
 };
 

@@ -43,10 +43,11 @@ export type CuisineKey =
   | "western-italian"
   | "western-american"
   | "western-generic"
-  // 异国（东南亚/中东等）
+  // 异国（东南亚/中东/南亚等）
   | "thai"
   | "sea"
   | "mideast"
+  | "indian"
   | "exotic-generic";
 
 /**

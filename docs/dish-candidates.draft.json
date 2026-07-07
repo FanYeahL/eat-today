@@ -3921,7 +3921,7 @@
     },
     {
       "name": "印度咖喱羊肉饭",
-      "cuisine": "mideast",
+      "cuisine": "indian",
       "priceTier": "normal",
       "meals": [
         "lunch",
@@ -3944,17 +3944,17 @@
       ],
       "pickLayer": "meal",
       "search": {
-        "gateQuery": "中东菜",
+        "gateQuery": "印度菜",
         "displayQuery": "印度咖喱羊肉饭",
         "fallbackQueries": [
-          "中东菜",
+          "印度菜",
           "异国料理"
         ]
       }
     },
     {
       "name": "印度玛萨拉咖喱鸡饭",
-      "cuisine": "mideast",
+      "cuisine": "indian",
       "priceTier": "normal",
       "meals": [
         "lunch",
@@ -3977,10 +3977,10 @@
       ],
       "pickLayer": "meal",
       "search": {
-        "gateQuery": "中东菜",
+        "gateQuery": "印度菜",
         "displayQuery": "印度玛萨拉咖喱鸡饭",
         "fallbackQueries": [
-          "中东菜",
+          "印度菜",
           "异国料理"
         ]
       }
@@ -4206,7 +4206,7 @@
     },
     {
       "name": "印度烤羊排配馕",
-      "cuisine": "mideast",
+      "cuisine": "indian",
       "priceTier": "treat",
       "meals": [
         "dinner"
@@ -4226,10 +4226,10 @@
       ],
       "pickLayer": "meal",
       "search": {
-        "gateQuery": "中东菜",
+        "gateQuery": "印度菜",
         "displayQuery": "印度烤羊排配馕",
         "fallbackQueries": [
-          "中东菜",
+          "印度菜",
           "异国料理"
         ]
       }
