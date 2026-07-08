@@ -11,9 +11,11 @@ type NeonButtonProps = {
 } & Omit<ComponentProps<"button">, "ref">;
 
 /**
- * 通用霓虹按钮
- * vaporwave 风格：粉紫描边 + 辉光，hover 时辉光增强。
+ * 通用主按钮
+ * 浅蓝渐变风格（与当前 ins 清新主题一致）：primary 为天空蓝→淡蓝渐变实心，
+ * ghost 为淡蓝描边 + 极轻投影，hover 时投影增强。
  * 既能当跳转链接（传 href），也能当普通按钮（传 onClick）。
+ * 注：组件名 NeonButton 为历史沿用（早期 vaporwave 主题遗留），视觉已改为浅蓝，暂不改名以免动 import 面。
  */
 export default function NeonButton({
   children,
