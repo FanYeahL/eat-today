@@ -3,9 +3,9 @@ import type { Food, MealType } from "@/types/food";
 /**
  * 种子食物数据
  * 面向中国大学生日常场景：食堂、外卖、宿舍速食。
- * 老虎机三轴：前两轴从 kind === "main" 抽，第三轴从 kind === "drink" 抽。
+ * 抽取分层：前两轴从 kind === "main" 抽，第三轴从 kind === "drink" 抽。
  * recipe 用于「附近买不到 → 自己动手」栏。
- * meals 标注适合的餐段，老虎机按当前餐段硬过滤。
+ * meals 标注适合的餐段，抽取据此按当前餐段硬过滤。
  * 后续可替换为接口数据，结构保持一致即可。
  */
 export const foods: Food[] = [
@@ -7393,10 +7393,10 @@ export const foods: Food[] = [
 
 ];
 
-/** 仅主食（老虎机前两轴用） */
+/** 仅主食（抽取前两轴用） */
 export const mainFoods: Food[] = foods.filter((f) => f.kind === "main");
 
-/** 仅饮品（老虎机第三轴用） */
+/** 仅饮品（抽取第三轴用） */
 export const drinkFoods: Food[] = foods.filter((f) => f.kind === "drink");
 
 /**
@@ -7409,7 +7409,7 @@ export function isDefaultPickable(f: Food): boolean {
   return f.kind === "main" && f.entityType === "dish" && f.pickLayer === "meal";
 }
 
-/** 取某餐段的默认主抽签池（干净、顶饱，供水占/老虎机主食轴用） */
+/** 取某餐段的默认主抽签池（干净、顶饱，供水占/抽取主食轴用） */
 export function mainFoodsByMeal(meal: MealType): Food[] {
   return foods.filter((f) => isDefaultPickable(f) && f.meals.includes(meal));
 }
@@ -7437,7 +7437,7 @@ export function drinkFoodsByMeal(meal: MealType): Food[] {
 
 /**
  * 水占单菜抽取的取池入口（useDivinationPick 用，替代直接 mainFoodsByMeal）。
- * ⚠️ 仅服务水占（单一结果）。不要用于老虎机——老虎机前两轴是「主食」，混入 drink 会语义错乱。
+ * ⚠️ 仅服务水占（单一结果）。不要用于主食轴抽取——主食轴前两轴是「主食」，混入 drink 会语义错乱。
  * - 非 tea：纯 meal 层单菜池（干净、顶饱）。
  * - tea（下午茶）：meal 层 + side + drink 并集。水占只出一个结果，抽到饮品/甜点/小食都合理。
  *   只此一处判 tea；side/drink 不会泄漏到早/午/晚/宵的默认单菜抽取。

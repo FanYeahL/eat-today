@@ -1,11 +1,11 @@
 /**
  * 食物相关的全局类型定义
- * 用于「今天吃什么」赛博老虎机的数据建模
+ * 用于「今天吃什么」抽取玩法的数据建模
  */
 
 /**
  * 口味地区
- * 用户可选自己的口味归属，老虎机据此对主食加权（不硬筛，只调概率）。
+ * 用户可选自己的口味归属，抽取据此对主食加权（不硬筛，只调概率）。
  * "all" = 不限地区，全国随机。
  */
 export type RegionKey =
@@ -59,7 +59,7 @@ export type CuisineFamily = "chinese" | "western" | "jpkr" | "exotic";
 
 /**
  * 食物在套餐里的角色
- * 老虎机轴1偏 main（撑场的正餐），轴2偏 snack（轻小吃/点心/凉菜），
+ * 抽取分层：轴1偏 main（撑场的正餐），轴2偏 snack（轻小吃/点心/凉菜），
  * 形成「正餐 + 轻小吃」的自然搭配。许多菜两者皆可，由抽取时按偏好加权。
  */
 export type FoodRole = "main" | "snack";
@@ -116,7 +116,7 @@ export type RecommendLevel = 1 | 2 | 3 | 4 | 5;
 
 /**
  * 食物种类
- * 老虎机三轴中，前两轴从 main 抽，第三轴从 drink 抽。
+ * 抽取分层：前两轴从 main 抽，第三轴从 drink 抽。
  */
 export type FoodKind = "main" | "drink";
 
@@ -168,7 +168,7 @@ export interface SearchProfile {
 
 /**
  * 餐段
- * 老虎机按当前时间硬过滤，只摇当前餐段合适的食物。
+ * 抽取据此按当前时间硬过滤，只摇当前餐段合适的食物。
  */
 export type MealType =
   | "breakfast"
@@ -178,7 +178,7 @@ export type MealType =
   | "midnight";
 
 /**
- * 老虎机滚轮的最小渲染单元
+ * 抽取滚轮的最小渲染单元
  * Reel 只需要 emoji + 名字 + 唯一 key，与具体数据来源解耦——
  * Food 和菜谱索引条目都能满足它，从而复用同一个 Reel。
  */
@@ -196,7 +196,7 @@ export interface ReelItem {
  * 继承 ReelItem（id/name/emoji），因此可直接喂给 Reel。
  */
 export interface Food extends ReelItem {
-  /** 种类：主食 or 饮品；决定它出现在老虎机的哪一轴 */
+  /** 种类：主食 or 饮品；决定它在抽取分层中归主食轴还是饮品轴 */
   kind: FoodKind;
   /** 分类标签，可多选；用于后续按场景筛选（如「只在适合宿舍的里抽」） */
   tags: FoodTag[];
@@ -241,7 +241,7 @@ export interface Food extends ReelItem {
   entityType: EntityType;
   /** 辣度 0-3，漏斗辣度筛选 + 轴3 解辣共振用 */
   spicy: SpicyLevel;
-  /** 适合的餐段，可多个；老虎机按当前餐段过滤 */
+  /** 适合的餐段，可多个；抽取据此按当前餐段过滤 */
   meals: MealType[];
 
   // ——— Phase 1 新增（dish 必填；drink 见 §1.3：satiety=1 / pickLayer=side）———

@@ -34,7 +34,7 @@ export function foodById(id: string) {
 
 /**
  * mock 广播列表（按 minutesAgo 升序，越近越靠前）。
- * 用的都是 foods 里真实存在的 id，点「我也想吃」能直接种进老虎机。
+ * 用的都是 foods 里真实存在的 id，点「我也想吃」能直接种进抽取候选。
  */
 const RAW: FriendActivity[] = [
   { id: "a1", avatar: "🍓", alias: "饭友#A7", minutesAgo: 12, shakeCount: 2, finalPickId: "japanese-beef-rice", note: "摇到了日式肥牛饭，决定就吃它啦～" },

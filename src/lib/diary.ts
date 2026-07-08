@@ -104,7 +104,7 @@ export function clearDiary(): void {
 }
 
 /**
- * 近 N 天吃过的菜 id 集合，给老虎机「看不见的避重」用。
+ * 近 N 天吃过的菜 id 集合，给抽取「看不见的避重」用。
  * now 传入便于一致性；默认回看 RECENT_DAYS 天。
  */
 export function recentFoodIds(now: number, days = RECENT_DAYS): Set<string> {

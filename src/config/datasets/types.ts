@@ -3,14 +3,14 @@
  *
  * 这些数据由 scripts/ingest-recipes.mjs 从开源数据集
  * （Anduin2017/HowToCook, MIT License）离线清洗富化而来，
- * 仅用于「附近买不到 → 自己动手」菜谱库，**不进老虎机转轮**。
+ * 仅用于「附近买不到 → 自己动手」菜谱库，**不进抽取**。
  *
  * 与运行时核心的 Food 类型刻意解耦：
  * 转轮要的 meals / recommend / tags / 文案是人工精修字段，
  * 不应由外部数据集硬造，故这里只保留能从数据集可靠提取的字段。
  */
 
-/** 富化后判定的种类；老虎机的 main/drink 拆分在这里仅作大类参考 */
+/** 富化后判定的种类；抽取分层的 main/drink 拆分在这里仅作大类参考 */
 export type GeneratedKind = "main" | "drink";
 
 /** HowToCook 的源目录分类，保留以便溯源与二次筛选 */
@@ -61,7 +61,7 @@ export interface GeneratedRecipeDataset {
 /**
  * 轻量索引条目（recipes.index.json）
  *
- * 只含老虎机滚轮 + 菜谱库列表/搜索所需的最小字段，
+ * 只含抽取滚轮 + 菜谱库列表/搜索所需的最小字段，
  * 体积小到可安全 client-import；完整食材/步骤按 id 走 /api/recipes 拉取。
  * 刻意不含 ingredients/steps，避免把 400K+ 重数据打进客户端包。
  */

@@ -4,7 +4,7 @@
  * 今日饭签（/water-concept）
  * ─────────────────────────────────────────────
  * 三屏流转：
- *  ① 筛选屏：选餐段 + 风味/心情/预算（复用老虎机的 FunnelFilter），点「开始投签」入场。
+ *  ① 筛选屏：选餐段 + 风味/心情/预算（复用抽取玩法的 FunnelFilter），点「开始投签」入场。
  *  ② 水占屏：投签入水 → 抽【一道菜】落水显影（菜名 + 签文 + 吉位）→ 再占 / 探店。
  *  ③ 探店屏：循此而去 → 真实查附近店，水底漂来三家可划看。
  *
@@ -277,7 +277,7 @@ export default function WaterConceptPage() {
     );
   };
 
-  // 定位失败时用户手输城市后重查（城市兜底，与老虎机一致）。
+  // 定位失败时用户手输城市后重查（城市兜底）。
   const onPickCity = (city: string) => {
     const target =
       confirmed.find((f) => f.id === exploringId) ?? confirmed[0] ?? div.pick;
@@ -863,7 +863,7 @@ function DriftExplore({
           </button>
         </div>
       ) : needCity ? (
-        // 定位失败：让用户手输城市兜底（与老虎机一致）
+        // 定位失败：让用户手输城市兜底
         <div className="mb-16 flex w-full max-w-xs flex-col items-center gap-3 rounded-2xl border border-brand/20 bg-white/85 px-5 py-4 backdrop-blur-md">
           <p className="text-center text-xs leading-relaxed text-ink-muted/80">
             没拿到你的位置，滚动选个城市，看看哪儿能吃到「{dishName}」：
