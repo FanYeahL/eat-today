@@ -3522,6 +3522,7 @@ export const foods: Food[] = [
     name: "珍珠奶茶",
     entityType: "dish",
     emoji: "🧋",
+    shopKeyword: "奶茶",
     kind: "drink",
     cuisine: "cn-generic",
     role: "snack",
@@ -3534,7 +3535,7 @@ export const foods: Food[] = [
     convenience: "convenience",
     occasion: ["quick", "lateNight"],
     pickLayer: "side",
-    search: { gateQuery: "家常菜", displayQuery: "珍珠奶茶", fallbackQueries: ["家常菜", "中餐"] },
+    search: { gateQuery: "奶茶", displayQuery: "珍珠奶茶", fallbackQueries: ["家常菜", "中餐"] },
     recommend: 5,
     description: "三分糖少冰，一杯喝得很满足。",
   },
@@ -3543,6 +3544,7 @@ export const foods: Food[] = [
     name: "美式咖啡",
     entityType: "dish",
     emoji: "☕",
+    shopKeyword: "咖啡",
     kind: "drink",
     cuisine: "cn-generic",
     role: "snack",
@@ -3555,7 +3557,7 @@ export const foods: Food[] = [
     convenience: "convenience",
     occasion: ["quick"],
     pickLayer: "side",
-    search: { gateQuery: "家常菜", displayQuery: "美式咖啡", fallbackQueries: ["家常菜", "中餐"] },
+    search: { gateQuery: "咖啡", displayQuery: "美式咖啡", fallbackQueries: ["家常菜", "中餐"] },
     recommend: 4,
     description: "苦中带香，提神醒脑的一杯。",
   },
@@ -3564,6 +3566,7 @@ export const foods: Food[] = [
     name: "拿铁",
     entityType: "dish",
     emoji: "🥛",
+    shopKeyword: "咖啡",
     kind: "drink",
     cuisine: "cn-generic",
     role: "snack",
@@ -3576,7 +3579,7 @@ export const foods: Food[] = [
     convenience: "convenience",
     occasion: ["quick"],
     pickLayer: "side",
-    search: { gateQuery: "家常菜", displayQuery: "拿铁", fallbackQueries: ["家常菜", "中餐"] },
+    search: { gateQuery: "咖啡", displayQuery: "拿铁", fallbackQueries: ["家常菜", "中餐"] },
     recommend: 4,
     description: "喝不惯美式的话，加奶就柔和多了。",
   },
@@ -3607,6 +3610,7 @@ export const foods: Food[] = [
     name: "豆浆",
     entityType: "dish",
     emoji: "🥛",
+    shopKeyword: "便利店",
     kind: "drink",
     cuisine: "cn-generic",
     role: "snack",
@@ -3619,7 +3623,7 @@ export const foods: Food[] = [
     convenience: "convenience",
     occasion: ["solo"],
     pickLayer: "side",
-    search: { gateQuery: "家常菜", displayQuery: "豆浆", fallbackQueries: ["家常菜", "中餐"] },
+    search: { gateQuery: "便利店", displayQuery: "豆浆", fallbackQueries: ["家常菜", "中餐"] },
     recommend: 3,
     description: "朴实又健康，配油条更香。",
   },
@@ -3628,6 +3632,7 @@ export const foods: Food[] = [
     name: "酸梅汤",
     entityType: "dish",
     emoji: "🧃",
+    shopKeyword: "便利店",
     kind: "drink",
     cuisine: "cn-generic",
     role: "snack",
@@ -3640,7 +3645,7 @@ export const foods: Food[] = [
     convenience: "convenience",
     occasion: ["lateNight"],
     pickLayer: "side",
-    search: { gateQuery: "家常菜", displayQuery: "酸梅汤", fallbackQueries: ["家常菜", "中餐"] },
+    search: { gateQuery: "便利店", displayQuery: "酸梅汤", fallbackQueries: ["家常菜", "中餐"] },
     recommend: 4,
     description: "吃完辣的来一杯，瞬间解腻。",
   },
@@ -3671,6 +3676,7 @@ export const foods: Food[] = [
     name: "柠檬茶",
     entityType: "dish",
     emoji: "🍋",
+    shopKeyword: "奶茶",
     kind: "drink",
     cuisine: "cn-generic",
     role: "snack",
@@ -3683,7 +3689,7 @@ export const foods: Food[] = [
     convenience: "convenience",
     occasion: ["quick", "lateNight"],
     pickLayer: "side",
-    search: { gateQuery: "家常菜", displayQuery: "柠檬茶", fallbackQueries: ["家常菜", "中餐"] },
+    search: { gateQuery: "奶茶", displayQuery: "柠檬茶", fallbackQueries: ["家常菜", "中餐"] },
     recommend: 4,
     description: "酸爽解腻，油腻过后来一杯很舒服。",
   },
@@ -3692,6 +3698,7 @@ export const foods: Food[] = [
     name: "酸奶",
     entityType: "dish",
     emoji: "🥛",
+    shopKeyword: "便利店",
     kind: "drink",
     cuisine: "cn-generic",
     role: "snack",
@@ -3704,7 +3711,7 @@ export const foods: Food[] = [
     convenience: "convenience",
     occasion: ["lateNight"],
     pickLayer: "side",
-    search: { gateQuery: "家常菜", displayQuery: "酸奶", fallbackQueries: ["家常菜", "中餐"] },
+    search: { gateQuery: "便利店", displayQuery: "酸奶", fallbackQueries: ["家常菜", "中餐"] },
     recommend: 3,
     description: "助消化又顶饱，嘴馋时的轻负担选择。",
   },
@@ -3735,6 +3742,7 @@ export const foods: Food[] = [
     name: "鲜榨橙汁",
     entityType: "dish",
     emoji: "🍊",
+    shopKeyword: "果汁",
     kind: "drink",
     cuisine: "cn-generic",
     role: "snack",
@@ -3747,7 +3755,7 @@ export const foods: Food[] = [
     convenience: "convenience",
     occasion: ["quick"],
     pickLayer: "side",
-    search: { gateQuery: "家常菜", displayQuery: "鲜榨橙汁", fallbackQueries: ["家常菜", "中餐"] },
+    search: { gateQuery: "果汁", displayQuery: "鲜榨橙汁", fallbackQueries: ["家常菜", "中餐"] },
     recommend: 4,
     description: "维C满满，一口酸甜唤醒早晨。",
   },
@@ -3756,6 +3764,7 @@ export const foods: Food[] = [
     name: "杨枝甘露",
     entityType: "dish",
     emoji: "🥭",
+    shopKeyword: "甜品",
     kind: "drink",
     cuisine: "cn-generic",
     role: "snack",
@@ -3768,7 +3777,7 @@ export const foods: Food[] = [
     convenience: "convenience",
     occasion: ["lateNight"],
     pickLayer: "side",
-    search: { gateQuery: "家常菜", displayQuery: "杨枝甘露", fallbackQueries: ["家常菜", "中餐"] },
+    search: { gateQuery: "甜品", displayQuery: "杨枝甘露", fallbackQueries: ["家常菜", "中餐"] },
     recommend: 4,
     description: "芒果西柚加西米，港式甜品里的人气款。",
   },
@@ -3777,6 +3786,7 @@ export const foods: Food[] = [
     name: "热可可",
     entityType: "dish",
     emoji: "☕",
+    shopKeyword: "咖啡",
     kind: "drink",
     cuisine: "cn-generic",
     role: "snack",
@@ -3789,7 +3799,7 @@ export const foods: Food[] = [
     convenience: "convenience",
     occasion: ["quick", "lateNight"],
     pickLayer: "side",
-    search: { gateQuery: "家常菜", displayQuery: "热可可", fallbackQueries: ["家常菜", "中餐"] },
+    search: { gateQuery: "咖啡", displayQuery: "热可可", fallbackQueries: ["家常菜", "中餐"] },
     recommend: 3,
     description: "冬夜捧着一杯，甜到心里。",
   },
@@ -3798,6 +3808,7 @@ export const foods: Food[] = [
     name: "茉莉花茶",
     entityType: "dish",
     emoji: "🍵",
+    shopKeyword: "便利店",
     kind: "drink",
     cuisine: "cn-generic",
     role: "snack",
@@ -3810,7 +3821,7 @@ export const foods: Food[] = [
     convenience: "convenience",
     occasion: ["lateNight"],
     pickLayer: "side",
-    search: { gateQuery: "家常菜", displayQuery: "茉莉花茶", fallbackQueries: ["家常菜", "中餐"] },
+    search: { gateQuery: "便利店", displayQuery: "茉莉花茶", fallbackQueries: ["家常菜", "中餐"] },
     recommend: 3,
     description: "清香解腻，饭后来一杯很清爽。",
   },
@@ -3841,6 +3852,7 @@ export const foods: Food[] = [
     name: "抹茶拿铁",
     entityType: "dish",
     emoji: "🍵",
+    shopKeyword: "咖啡",
     kind: "drink",
     cuisine: "cn-generic",
     role: "snack",
@@ -3853,7 +3865,7 @@ export const foods: Food[] = [
     convenience: "convenience",
     occasion: ["quick"],
     pickLayer: "side",
-    search: { gateQuery: "家常菜", displayQuery: "抹茶拿铁", fallbackQueries: ["家常菜", "中餐"] },
+    search: { gateQuery: "咖啡", displayQuery: "抹茶拿铁", fallbackQueries: ["家常菜", "中餐"] },
     recommend: 4,
     description: "微苦回甘，颜色好看味道也清新。",
   },
@@ -3862,6 +3874,7 @@ export const foods: Food[] = [
     name: "绿豆沙",
     entityType: "dish",
     emoji: "🥤",
+    shopKeyword: "甜品",
     kind: "drink",
     cuisine: "cn-generic",
     role: "snack",
@@ -3874,7 +3887,7 @@ export const foods: Food[] = [
     convenience: "convenience",
     occasion: ["lateNight"],
     pickLayer: "side",
-    search: { gateQuery: "家常菜", displayQuery: "绿豆沙", fallbackQueries: ["家常菜", "中餐"] },
+    search: { gateQuery: "甜品", displayQuery: "绿豆沙", fallbackQueries: ["家常菜", "中餐"] },
     recommend: 3,
     description: "夏天消暑，绵密一口很凉快。",
   },
@@ -3905,6 +3918,7 @@ export const foods: Food[] = [
     name: "蜂蜜柚子茶",
     entityType: "dish",
     emoji: "🍯",
+    shopKeyword: "奶茶",
     kind: "drink",
     cuisine: "cn-generic",
     role: "snack",
@@ -3917,7 +3931,7 @@ export const foods: Food[] = [
     convenience: "convenience",
     occasion: ["lateNight"],
     pickLayer: "side",
-    search: { gateQuery: "家常菜", displayQuery: "蜂蜜柚子茶", fallbackQueries: ["家常菜", "中餐"] },
+    search: { gateQuery: "奶茶", displayQuery: "蜂蜜柚子茶", fallbackQueries: ["家常菜", "中餐"] },
     recommend: 3,
     description: "酸甜温润，喉咙不舒服时来一杯。",
   },
@@ -3926,6 +3940,7 @@ export const foods: Food[] = [
     name: "燕麦拿铁",
     entityType: "dish",
     emoji: "🥛",
+    shopKeyword: "咖啡",
     kind: "drink",
     cuisine: "cn-generic",
     role: "snack",
@@ -3938,7 +3953,7 @@ export const foods: Food[] = [
     convenience: "convenience",
     occasion: ["quick"],
     pickLayer: "side",
-    search: { gateQuery: "家常菜", displayQuery: "燕麦拿铁", fallbackQueries: ["家常菜", "中餐"] },
+    search: { gateQuery: "咖啡", displayQuery: "燕麦拿铁", fallbackQueries: ["家常菜", "中餐"] },
     recommend: 3,
     description: "植物奶更清爽，乳糖不耐也能喝。",
   },
@@ -3947,6 +3962,7 @@ export const foods: Food[] = [
     name: "水果茶",
     entityType: "dish",
     emoji: "🍑",
+    shopKeyword: "奶茶",
     kind: "drink",
     cuisine: "cn-generic",
     role: "snack",
@@ -3959,7 +3975,7 @@ export const foods: Food[] = [
     convenience: "convenience",
     occasion: ["solo"],
     pickLayer: "side",
-    search: { gateQuery: "家常菜", displayQuery: "水果茶", fallbackQueries: ["家常菜", "中餐"] },
+    search: { gateQuery: "奶茶", displayQuery: "水果茶", fallbackQueries: ["家常菜", "中餐"] },
     recommend: 4,
     description: "满杯水果料，酸甜多汁。",
   },
@@ -3968,6 +3984,7 @@ export const foods: Food[] = [
     name: "莓果奶昔",
     entityType: "dish",
     emoji: "🫐",
+    shopKeyword: "甜品",
     kind: "drink",
     cuisine: "cn-generic",
     role: "snack",
@@ -3980,7 +3997,7 @@ export const foods: Food[] = [
     convenience: "convenience",
     occasion: ["solo"],
     pickLayer: "side",
-    search: { gateQuery: "家常菜", displayQuery: "莓果奶昔", fallbackQueries: ["家常菜", "中餐"] },
+    search: { gateQuery: "甜品", displayQuery: "莓果奶昔", fallbackQueries: ["家常菜", "中餐"] },
     recommend: 3,
     description: "莓果打成绵密一杯，好看又好喝。",
   },
@@ -3989,6 +4006,7 @@ export const foods: Food[] = [
     name: "红豆沙",
     entityType: "dish",
     emoji: "🍵",
+    shopKeyword: "甜品",
     kind: "drink",
     cuisine: "cn-generic",
     role: "snack",
@@ -4001,7 +4019,7 @@ export const foods: Food[] = [
     convenience: "convenience",
     occasion: ["lateNight"],
     pickLayer: "side",
-    search: { gateQuery: "家常菜", displayQuery: "红豆沙", fallbackQueries: ["家常菜", "中餐"] },
+    search: { gateQuery: "甜品", displayQuery: "红豆沙", fallbackQueries: ["家常菜", "中餐"] },
     recommend: 3,
     description: "绵软香甜，喝完整个人暖暖的。",
   },
@@ -4010,6 +4028,7 @@ export const foods: Food[] = [
     name: "巧克力奶昔",
     entityType: "dish",
     emoji: "🍫",
+    shopKeyword: "甜品",
     kind: "drink",
     cuisine: "cn-generic",
     role: "snack",
@@ -4022,7 +4041,7 @@ export const foods: Food[] = [
     convenience: "convenience",
     occasion: ["quick", "lateNight"],
     pickLayer: "side",
-    search: { gateQuery: "家常菜", displayQuery: "巧克力奶昔", fallbackQueries: ["家常菜", "中餐"] },
+    search: { gateQuery: "甜品", displayQuery: "巧克力奶昔", fallbackQueries: ["家常菜", "中餐"] },
     recommend: 3,
     description: "浓郁巧克力配冰淇淋，甜党会喜欢。",
   },
@@ -4031,6 +4050,7 @@ export const foods: Food[] = [
     name: "生椰拿铁",
     entityType: "dish",
     emoji: "🥥",
+    shopKeyword: "咖啡",
     kind: "drink",
     cuisine: "cn-generic",
     role: "snack",
@@ -4043,7 +4063,7 @@ export const foods: Food[] = [
     convenience: "convenience",
     occasion: ["quick"],
     pickLayer: "side",
-    search: { gateQuery: "家常菜", displayQuery: "生椰拿铁", fallbackQueries: ["家常菜", "中餐"] },
+    search: { gateQuery: "咖啡", displayQuery: "生椰拿铁", fallbackQueries: ["家常菜", "中餐"] },
     recommend: 5,
     description: "椰香裹着咖啡，喝着顺口又解乏。",
   },
@@ -4052,6 +4072,7 @@ export const foods: Food[] = [
     name: "鸭屎香柠檬茶",
     entityType: "dish",
     emoji: "🍋",
+    shopKeyword: "奶茶",
     kind: "drink",
     cuisine: "cn-generic",
     role: "snack",
@@ -4064,7 +4085,7 @@ export const foods: Food[] = [
     convenience: "convenience",
     occasion: ["quick"],
     pickLayer: "side",
-    search: { gateQuery: "家常菜", displayQuery: "鸭屎香柠檬茶", fallbackQueries: ["家常菜", "中餐"] },
+    search: { gateQuery: "奶茶", displayQuery: "鸭屎香柠檬茶", fallbackQueries: ["家常菜", "中餐"] },
     recommend: 5,
     description: "鸭屎香单丛打底，茶香和柠檬都很足。",
   },
@@ -4073,6 +4094,7 @@ export const foods: Food[] = [
     name: "手打柠檬茶",
     entityType: "dish",
     emoji: "🍋",
+    shopKeyword: "奶茶",
     kind: "drink",
     cuisine: "cn-generic",
     role: "snack",
@@ -4085,7 +4107,7 @@ export const foods: Food[] = [
     convenience: "convenience",
     occasion: ["quick", "lateNight"],
     pickLayer: "side",
-    search: { gateQuery: "家常菜", displayQuery: "手打柠檬茶", fallbackQueries: ["家常菜", "中餐"] },
+    search: { gateQuery: "奶茶", displayQuery: "手打柠檬茶", fallbackQueries: ["家常菜", "中餐"] },
     recommend: 4,
     description: "捶打出柠檬清香，酸爽又解腻。",
   },
@@ -4094,6 +4116,7 @@ export const foods: Food[] = [
     name: "鲜榨纯果汁",
     entityType: "dish",
     emoji: "🧃",
+    shopKeyword: "果汁",
     kind: "drink",
     cuisine: "cn-generic",
     role: "snack",
@@ -4106,7 +4129,7 @@ export const foods: Food[] = [
     convenience: "convenience",
     occasion: ["solo"],
     pickLayer: "side",
-    search: { gateQuery: "家常菜", displayQuery: "鲜榨纯果汁", fallbackQueries: ["家常菜", "中餐"] },
+    search: { gateQuery: "果汁", displayQuery: "鲜榨纯果汁", fallbackQueries: ["家常菜", "中餐"] },
     recommend: 3,
     description: "无添加现榨，维C满满一整杯。",
   },
@@ -4115,6 +4138,7 @@ export const foods: Food[] = [
     name: "精酿啤酒",
     entityType: "dish",
     emoji: "🍺",
+    shopKeyword: "便利店",
     kind: "drink",
     cuisine: "cn-generic",
     role: "snack",
@@ -4127,7 +4151,7 @@ export const foods: Food[] = [
     convenience: "convenience",
     occasion: ["quick", "lateNight"],
     pickLayer: "side",
-    search: { gateQuery: "家常菜", displayQuery: "精酿啤酒", fallbackQueries: ["家常菜", "中餐"] },
+    search: { gateQuery: "便利店", displayQuery: "精酿啤酒", fallbackQueries: ["家常菜", "中餐"] },
     recommend: 4,
     description: "花果香浓郁，配烧烤小龙虾正好。",
   },
@@ -4136,6 +4160,7 @@ export const foods: Food[] = [
     name: "果酒",
     entityType: "dish",
     emoji: "🍷",
+    shopKeyword: "便利店",
     kind: "drink",
     cuisine: "cn-generic",
     role: "snack",
@@ -4148,7 +4173,7 @@ export const foods: Food[] = [
     convenience: "convenience",
     occasion: ["lateNight"],
     pickLayer: "side",
-    search: { gateQuery: "家常菜", displayQuery: "果酒", fallbackQueries: ["家常菜", "中餐"] },
+    search: { gateQuery: "便利店", displayQuery: "果酒", fallbackQueries: ["家常菜", "中餐"] },
     recommend: 3,
     description: "果香微醺，小酌一杯不上头。",
   },
@@ -4157,6 +4182,7 @@ export const foods: Food[] = [
     name: "泰式手标奶茶",
     entityType: "dish",
     emoji: "🧡",
+    shopKeyword: "奶茶",
     kind: "drink",
     cuisine: "thai",
     role: "snack",
@@ -4169,7 +4195,7 @@ export const foods: Food[] = [
     convenience: "convenience",
     occasion: ["quick"],
     pickLayer: "side",
-    search: { gateQuery: "泰国菜", displayQuery: "泰式手标奶茶", fallbackQueries: ["泰国菜", "东南亚菜"] },
+    search: { gateQuery: "奶茶", displayQuery: "泰式手标奶茶", fallbackQueries: ["泰国菜", "东南亚菜"] },
     recommend: 4,
     description: "橙红浓奶茶甜得带劲，配辣菜解辣。",
   },
@@ -4178,6 +4204,7 @@ export const foods: Food[] = [
     name: "日式弹珠汽水",
     entityType: "dish",
     emoji: "🥤",
+    shopKeyword: "便利店",
     kind: "drink",
     cuisine: "japanese",
     role: "snack",
@@ -4190,7 +4217,7 @@ export const foods: Food[] = [
     convenience: "convenience",
     occasion: ["lateNight"],
     pickLayer: "side",
-    search: { gateQuery: "日本料理", displayQuery: "日式弹珠汽水", fallbackQueries: ["日本料理", "日料"] },
+    search: { gateQuery: "便利店", displayQuery: "日式弹珠汽水", fallbackQueries: ["日本料理", "日料"] },
     recommend: 3,
     description: "压下弹珠咕嘟冒泡，清爽带回忆杀。",
   },
@@ -4199,6 +4226,7 @@ export const foods: Food[] = [
     name: "韩式香蕉牛奶",
     entityType: "dish",
     emoji: "🍌",
+    shopKeyword: "便利店",
     kind: "drink",
     cuisine: "korean",
     role: "snack",
@@ -4211,7 +4239,7 @@ export const foods: Food[] = [
     convenience: "convenience",
     occasion: ["quick", "lateNight"],
     pickLayer: "side",
-    search: { gateQuery: "韩国料理", displayQuery: "韩式香蕉牛奶", fallbackQueries: ["韩国料理", "韩式"] },
+    search: { gateQuery: "便利店", displayQuery: "韩式香蕉牛奶", fallbackQueries: ["韩国料理", "韩式"] },
     recommend: 3,
     description: "胖胖瓶装香蕉奶，香甜顺滑很解馋。",
   },
@@ -7371,12 +7399,54 @@ export const mainFoods: Food[] = foods.filter((f) => f.kind === "main");
 /** 仅饮品（老虎机第三轴用） */
 export const drinkFoods: Food[] = foods.filter((f) => f.kind === "drink");
 
-/** 取某餐段的主食池 */
+/**
+ * 默认主抽签池判定：只有「一顿饭级别的具体菜」进池（§3/§3.1）。
+ * 三道门：kind==="main"（非饮品）、entityType==="dish"（非 brand/dining_style/dish_group）、
+ * pickLayer==="meal"（satiety>=3，非小食/配菜）。
+ * brand/dining_style/dish_group 与 side 一律不进默认单菜抽签。
+ */
+export function isDefaultPickable(f: Food): boolean {
+  return f.kind === "main" && f.entityType === "dish" && f.pickLayer === "meal";
+}
+
+/** 取某餐段的默认主抽签池（干净、顶饱，供水占/老虎机主食轴用） */
 export function mainFoodsByMeal(meal: MealType): Food[] {
-  return mainFoods.filter((f) => f.meals.includes(meal));
+  return foods.filter((f) => isDefaultPickable(f) && f.meals.includes(meal));
+}
+
+/**
+ * side 集合：小食/配菜/组合项（`kind:"main", entityType:"dish", pickLayer:"side"`），
+ * 供组合推荐/加菜/下午茶用，**不进默认单菜抽签**。
+ * ⚠️ 取值口径必须带 entityType==="dish"——只按 pickLayer 会把火锅/品牌/dish_group
+ * 等非 dish（satiety 保留真实值、政策强制 side）误纳入 side 池（§7 规则 4）。
+ */
+export function sideFoods(meal?: MealType): Food[] {
+  return foods.filter(
+    (f) =>
+      f.kind === "main" &&
+      f.entityType === "dish" &&
+      f.pickLayer === "side" &&
+      (meal ? f.meals.includes(meal) : true),
+  );
 }
 
 /** 取某餐段的饮品池 */
 export function drinkFoodsByMeal(meal: MealType): Food[] {
   return drinkFoods.filter((f) => f.meals.includes(meal));
+}
+
+/**
+ * 水占单菜抽取的取池入口（useDivinationPick 用，替代直接 mainFoodsByMeal）。
+ * ⚠️ 仅服务水占（单一结果）。不要用于老虎机——老虎机前两轴是「主食」，混入 drink 会语义错乱。
+ * - 非 tea：纯 meal 层单菜池（干净、顶饱）。
+ * - tea（下午茶）：meal 层 + side + drink 并集。水占只出一个结果，抽到饮品/甜点/小食都合理。
+ *   只此一处判 tea；side/drink 不会泄漏到早/午/晚/宵的默认单菜抽取。
+ */
+export function foodsByMealForSinglePick(meal: MealType): Food[] {
+  if (meal !== "tea") return mainFoodsByMeal(meal);
+  return [
+    ...mainFoodsByMeal("tea"),
+    ...sideFoods("tea"),
+    ...drinkFoodsByMeal("tea"),
+  ];
 }

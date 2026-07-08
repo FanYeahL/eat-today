@@ -57,6 +57,10 @@ export function regionWeight(food: Food, region: RegionKey): number {
  * 家族硬墙：按风味家族过滤。family 是用户的明确选择，一道**不可越过**的墙
  * （选了西餐绝不出中餐）。空了才退回原池。
  *
+ * ⚠ drink 是 family-neutral（§3.1）：下午茶的饮品（咖啡/奶茶/气泡水等）不归属任何菜系，
+ * family 墙**只作用于 dish（main/side）**，drink 一律放行——否则「西餐 + 下午茶」会把
+ * 咖啡/奶茶误滤掉，tea 池塌薄。
+ *
  * ⚠ 顺序契约：必须在 prefilterByAvailability / 去重（cast 内联的 unseen 过滤）**之前**作用于 base pool，
  * 保证可用性/seen 都在「家族池」内做、空了只退回家族池、绝不退回全库。
  * 否则可用性/seen 先把某家族剔光、剩别家族，family 再过滤为空→兜底吐出别家族
@@ -64,7 +68,9 @@ export function regionWeight(food: Food, region: RegionKey): number {
  */
 export function applyFamily(pool: Food[], families: CuisineFamily[]): Food[] {
   if (families.length === 0) return pool;
-  const next = pool.filter((f) => families.includes(familyOf(f.cuisine)));
+  const next = pool.filter(
+    (f) => f.kind === "drink" || families.includes(familyOf(f.cuisine)),
+  );
   return next.length > 0 ? next : pool;
 }
 
@@ -80,8 +86,9 @@ export function applyFamily(pool: Food[], families: CuisineFamily[]): Food[] {
  */
 export function applyFunnel(pool: Food[], filters: Filters): Food[] {
   if (filters.families.length > 0) {
-    const next = pool.filter((f) =>
-      filters.families.includes(familyOf(f.cuisine)),
+    // drink family-neutral（§3.1）：饮品不参与 family 墙，与 applyFamily 保持一致。
+    const next = pool.filter(
+      (f) => f.kind === "drink" || filters.families.includes(familyOf(f.cuisine)),
     );
     if (next.length > 0) return next;
   }

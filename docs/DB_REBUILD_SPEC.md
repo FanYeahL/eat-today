@@ -222,19 +222,18 @@ dish（meal 层）目标：Phase 1 硬验收以 §7 全库 lint 为准（餐段 
 | exotic | 10 (+4) | 20 (+12) | 9 (+8) | 39 |
 | **补齐合计(meal)** | +37 | +60 | +32 | **+129 meal** |
 
-### 4.0 各批次剩余 meal 缺口（进度看板，按实际 meal 计数滚动更新）
+### 4.0 各批次 meal 产出（草案/落库口径，非 §7 全库验收）
 
-> 更新（全 4 family 补齐后）：129 道 meal 全部到位（chinese 49 / western 29 / jpkr 27 / exotic 24），side 额外 7。看板由 `familyBoard` + `mealRemaining`（draft `_meta`）机器生成，此表与之对齐。
+> ⚠️ 本表是**草案/落库产出量**，不是验收标准。Phase 1 硬验收以 §7 全库 lint 为准（`scripts/lint-foods-fulldb.mjs`，读真实 foods.ts）。
+> 初版 4 family 目标 129 meal（chinese 49 / western 29 / jpkr 27 / exotic 24）。S3 落库后为满足 §7 餐段门槛（早/宵），补批新增 18 道 meal + 重分 8 道回 meal，**实际草案/落库 = 147 meal + 7 side**。真实全库默认 meal 池以 lint 输出为准（当前 223）。
 
-| family | 目标(meal) | 已达成(meal) | **剩余 meal 缺口** | side 额外产出 |
-|---|---|---|---|---|
-| chinese | +49 | 49 | **0 ✅** | 7 |
-| western | +29 | 29 | **0 ✅** | 0 |
-| jpkr | +27 | 27 | **0 ✅** | 0 |
-| exotic | +24 | 24 | **0 ✅** | 0 |
-| **合计** | +129 | 129 | **0 ✅** | 7 |
+| 口径 | meal | side | 说明 |
+|---|---|---|---|
+| 初版目标（4 family 矩阵） | 129 | — | chinese 49 / western 29 / jpkr 27 / exotic 24 |
+| 实际草案（含补批 18 + 重分回归） | 147 | 7 | 见生成器 `_meta.layerDistribution` |
+| 全库默认 meal 池（落库后真实） | 223 | — | `lint-foods-fulldb.mjs` 输出，§7 验收依据 |
 
-> 全部 family meal 达标；draft `_meta.remainingMealAllFamilies=0`。审定后即可进 S3 落库（先解决 §2.1 shopKeyword 取舍）。
+> 收尾判据 = §7 全库 lint 全绿（餐段 40/120/140/70 + family×price b8/n15/t8 + 0 默认池污染），不是「补了多少行」。
 
 **餐段最低标准（dish **meal 层** 主食，去重按餐段命中）与当前缺口：**
 
@@ -389,10 +388,10 @@ function resolveBucket(mix: Record<PriceTier, number>, nonEmpty: Set<PriceTier>)
 | 步 | 内容 | 产物 | 依赖 |
 |---|---|---|---|
 | S0 | **审候选菜单**（user+Codex 审 `dish-candidates.draft.json`） | 定稿菜单 | 本规格 |
-| S1 | 扩展 `types/food.d.ts`（§1 新字段 + 枚举） | 类型就绪 | — |
-| S2 | 给**存量 108 dish** 补新字段（satiety/indulgence/convenience/occasion/search）；标注 canonicalGroup | 存量迁移完 | S1 |
-| S3 | 把定稿新菜（**129 个 meal-layer dish** + side 额外项）写入 `foods.ts`，字段齐全；按 §4.0 看板核 meal 净增达标（非行数） | 数据达标 | S0,S1 |
-| S4 | 加 `isDefaultPickable` + 改 `mainFoodsByMeal` 内核；**新增 `foodsByMealForSinglePick(meal)`（§3.1）并只把水占 hook（`useDivinationPick.ts:149`）改调它**，落实 tea 取池路径。**老虎机 `useRoulette` 本轮不改（deprecated）** | 默认池纯净 + tea 不塌 | S1 |
+| S1 ✅ | 扩展 `types/food.d.ts`（§1 新字段 + 枚举） | 类型就绪 | — |
+| S2 ✅ | 给**存量 192 条**补新字段（satiety/indulgence/convenience/occasion/pickLayer/search），id 不动（`migrate-existing-foods.mjs`） | 存量迁移完 | S1 |
+| S3 ✅ | 落库 136 新菜 + 补批 18 + 重分 8 回 meal；全库 lint 达 §7 硬门槛（`land-dishes.mjs`/`lint-foods-fulldb.mjs`） | 数据达标 | S0,S1 |
+| S4 ✅ | 加 `isDefaultPickable` + `mainFoodsByMeal` 净化 + `sideFoods`（entityType==="dish" 口径）+ `foodsByMealForSinglePick`（§3.1）；水占 hook 改调它；`applyFamily`/`applyFunnel` 令 drink family-neutral；给 33 饮品补 store-type shopKeyword。**老虎机 `useRoulette` 未动（deprecated）** | 默认池纯净 + tea 不塌 + drink 可用性正确 | S1 |
 | S5 | `pick-core` 加桶抽样 + resolveBucket + indulgenceWeight + canonicalGroup 软避；移除旧 budget/richness 软权重（§5,6） | 抽取策略新 | S4 |
 | S6 | 写 `scripts/lint-foods.mjs`（§7）；引入 Vitest + 单测（§8） | 验证就位 | S2-S5 |
 | S7 | 跑 §8 全部验证，修红 | 绿 | S6 |

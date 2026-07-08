@@ -17,7 +17,7 @@
  */
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { mainFoodsByMeal } from "@/config/foods";
+import { foodsByMealForSinglePick } from "@/config/foods";
 import { getCurrentMeal } from "@/config/meals";
 import { resolveCoords, type Coords } from "@/lib/geo";
 import { recentFoodIds } from "@/lib/diary";
@@ -146,7 +146,8 @@ export function useDivinationPick() {
    */
   const cast = useCallback(
     async (seenIds?: Set<string>): Promise<CastResult> => {
-      const base = mainFoodsByMeal(meal);
+      // tea 走三池并集（meal+side+drink），其它餐段纯 meal 层——只此一处判 tea（§3.1）。
+      const base = foodsByMealForSinglePick(meal);
       if (base.length === 0) return { food: null, exhausted: false };
       // ★ family 硬墙最先作用：之后去重/可用性都在「家族池」内做。
       const pool = applyFamily(base, filters.families);
