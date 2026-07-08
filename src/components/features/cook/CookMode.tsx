@@ -7,11 +7,10 @@ import NeonButton from "@/components/common/NeonButton";
 import RecipeDetail from "./RecipeDetail";
 import RecipeLibrary from "./RecipeLibrary";
 import { useRecipe } from "@/hooks/useRecipe";
-import recipeIndex from "@/config/datasets/recipes.index.json";
-import type { RecipeIndex, RecipeIndexEntry } from "@/config/datasets/types";
+import { ALL_RECIPES, pickNextRecipe } from "./recipe-random";
+import type { RecipeIndexEntry } from "@/config/datasets/types";
 
-const index = recipeIndex as RecipeIndex;
-const ALL: RecipeIndexEntry[] = index.recipes;
+const ALL: RecipeIndexEntry[] = ALL_RECIPES;
 
 /** 单轴转动时长（秒） */
 const DURATION = 3;
@@ -19,22 +18,9 @@ const DURATION = 3;
 type CookStatus = "idle" | "spinning" | "done";
 type CookView = "roulette" | "library";
 
-function pickRandom<T>(arr: T[]): T {
-  return arr[Math.floor(Math.random() * arr.length)];
-}
-
-/** 取一道随机菜，尽量避开上一道（池子够大时） */
-function pickNext(avoidId: string | null): RecipeIndexEntry {
-  if (ALL.length <= 1) return ALL[0];
-  let next = pickRandom(ALL);
-  // 池有 344 道，循环重抽成本极低
-  while (next.id === avoidId) next = pickRandom(ALL);
-  return next;
-}
-
 /**
  * 「自己做」模式
- * 单轴老虎机摇一道随机菜 → 停稳后按 id 拉完整菜谱展示；
+ * 单轴滚轮摇一道随机菜 → 停稳后按 id 拉完整菜谱展示；
  * 也可切到「我自己翻」进可搜索菜谱库。
  */
 export default function CookMode() {
@@ -49,7 +35,7 @@ export default function CookMode() {
   const empty = ALL.length === 0;
 
   const handleSpin = useCallback(() => {
-    const next = pickNext(target?.id ?? null);
+    const next = pickNextRecipe(target?.id ?? null);
     setTarget(next);
     setSpinId((n) => n + 1);
     setStatus("spinning");
@@ -89,7 +75,7 @@ export default function CookMode() {
     );
   }
 
-  // ===== 老虎机视图 =====
+  // ===== 摇菜谱视图 =====
   return (
     <div className="flex flex-col items-center gap-8">
       <p className="text-sm uppercase tracking-[0.3em] text-brand-soft">
