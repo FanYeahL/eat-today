@@ -40,3 +40,6 @@ certificates
 # local tooling runtime state (oh-my-claudecode / claude code)
 .omc/
 .claude/
+
+# dev server log (local only)
+dev.log
