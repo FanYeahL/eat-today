@@ -9,7 +9,7 @@
 ## 0. 一句话概括
 
 「今天吃什么」决策工具。核心玩法 **今日饭签（水占）**：选餐段 + 口味 → 投签入水 → 抽出**一道菜**（附签文/吉位）→ 查**附近真实店铺**（高德 POI）。
-另有一套已废弃但仍在仓库里的 **老虎机（两菜一饮）** 玩法（见 §6 孤儿代码）。
+另有一套早期的 **老虎机（两菜一饮）** 玩法，已在 **S9 删除**（曾是无路由可达的孤儿代码，见 §6/§7 的 S9 注记）。
 
 ---
 
@@ -55,21 +55,22 @@ components/
   common/                     # NeonButton / ShimmerFrame / WheelPicker
   features/
     water/                    # 【在用】水占 UI：WaterAmbience/RippleLayer/DivinationSlip/
-                              #   DriftCards/WaterDiaryPanel/WaterRecipePanel
-    roulette/                 # 【大部分孤儿】老虎机 UI：SlotMachine/Reel/ShopList/
-                              #   RegularsHint/RegionSwitcher；仅 FunnelFilter/MealSwitcher/
-                              #   CityPicker 仍被水占复用
+                              #   DriftCards/WaterDiaryPanel/WaterRecipePanel；S9 起还含从
+                              #   roulette/ 迁入的 FunnelFilter/MealSwitcher/CityPicker/
+                              #   RegionSwitcher/DiaryView
+                              # 〔S9〕roulette/ 目录已删除：SlotMachine/ShopList/RegularsHint
+                              #   为死代码删掉；存活共享件迁入 water/、Reel 迁入 cook/
     cook/                     # RecipeLibrary(在用,经WaterRecipePanel) / RecipeDetail /
-                              #   CookMode(孤儿)
+                              #   Reel（S9 从 roulette/ 迁入）/ CookMode（无路由入口，未来「自己做」）
     social/                   # FriendFeed（孤儿）
 hooks/
   useWaterDivination.ts       # 水占动画状态机（idle→casting→splash→revealing→revealed→exploring）
   useDivinationPick.ts        # 水占抽菜大脑（复用 pick-core）
-  useRoulette.ts              # 【运行时孤儿】老虎机抽菜大脑（复用 pick-core）
+                              # 〔S9〕useRoulette.ts 已删除（老虎机抽菜大脑，死代码）
   useShops.ts                 # 查店 hook（防串号请求）
   useRecipe.ts                # 查菜谱详情 hook
 lib/
-  pick-core.ts                # 【核心】抽取引擎：漏斗/加权/可用性门控（两 hook 共用）
+  pick-core.ts                # 【核心】抽取引擎：漏斗/加权/可用性门控（S9 后仅水占 hook 用）
   availability.ts             # 附近可用性缓存（按关键词，非按菜）
   geo.ts                      # 定位单例缓存 + 失败归因
   diary.ts                    # 干饭日记（localStorage: foodie:diary）
@@ -121,16 +122,16 @@ mainFoodsByMeal(meal)           # 1. 按餐段取主食池
   → [无坐标] 降级：直接加权抽，不按附近过滤
 ```
 
-`pickOneMain`（`useDivinationPick.ts:61-83`）的权重乘积：
+`pickOneMain` 的权重乘积（**S5 前的历史形态**，此处保留以说明下方 §6 的 P0 病因；S5 起改为「先抽价位桶 + 桶内 `indulgenceWeight`」，`budgetWeight`/`richnessWeight` 已随 S9 删除）：
 `regionWeight × budgetWeight × richnessWeight × moodWeight × (role===main ? 1.6) × familiarFactor × seedAvoidFactor`。
 
 > 探店阶段：`useShops.fetchShops(keyword)` → `GET /api/shops`。`keyword` 来自 `keywordOf(pick)`（`availability.ts:25`），与门控同源。
 
 ---
 
-## 5. 抽取引擎 `pick-core.ts`（两套玩法共用，单一数据源）
+## 5. 抽取引擎 `pick-core.ts`（单一数据源）
 
-设计意图（`pick-core.ts:1-9`）：把「漏斗过滤 / 地区加权 / 加权抽样 / 综合加成 / 可用性预过滤/校验」这套与 UI 无关的纯逻辑抽出，老虎机与水占共用，修复不会两边漂移。
+设计意图（`pick-core.ts:1-9`）：把「漏斗过滤 / 地区加权 / 加权抽样 / 综合加成 / 可用性预过滤/校验」这套与 UI 无关的纯逻辑抽出，供水占抽取 hook 与单测共用，修复不会漂移。（S9 前老虎机也共用同一份；S9 删除老虎机后仅剩水占。）
 
 关键函数：
 
@@ -139,8 +140,8 @@ mainFoodsByMeal(meal)           # 1. 按餐段取主食池
 | `regionWeight` | 44 | 地区加权 | 招牌菜 ×5，口味 tag 累乘；`all` 恒 1 |
 | `applyFamily` | 65 | 风味家族**硬墙** | 顺序契约：必须在可用性/去重**之前**，否则会出「西餐+想吃好的→长沙臭豆腐」的 bug |
 | `applyFunnel` | 81 | 漏斗（只硬过滤 family） | budget/mood 改为软权重，避免窄家族塌成单元素 |
-| `budgetWeight` | 97 | 预算偏好乘子 | 选中档最高、相邻混入、远档压低不归零 |
-| `richnessWeight` | 126 | 丰盛度乘子 | 治「想吃好的却抽出凯撒沙拉」：treat 档对轻食 ×0.15 |
+| ~~`budgetWeight`~~ | — | 〔S5 弃用职责 / S9 删除〕预算偏好乘子 | 选中档最高、相邻混入、远档压低不归零；S5 起改由「桶抽样」承担 |
+| ~~`richnessWeight`~~ | — | 〔S5 弃用职责 / S9 删除〕丰盛度乘子 | 治「想吃好的却抽出凯撒沙拉」：treat 档对轻食 ×0.15；S5 起由 `indulgenceWeight` 承担 |
 | `moodWeight` | 136 | 心情乘子 | 匹配 ×1、不匹配 ×0.15（比预算更陡） |
 | `pickBy` | 173 | 加权抽样 | 全 0/空池退回均匀随机（永不空池第二道防线） |
 | `seedAvoidFactor` | 193 | 综合加成 | 种草 ×8 / 上轮 ×0.05 / 近 N 天 ×0.35 |
@@ -189,6 +190,8 @@ mainFoodsByMeal(meal)           # 1. 按餐段取主食池
 
 ### P0-B：筛选后权重失效——「想吃好的」却大概率抽到普通菜（**可量化的算法 bug**）
 
+> 〔已修复 — 历史诊断保留〕本节记录的是 review 时（2026-07-06）的病因分析，**S5 已修复**：改为「先抽价位桶（`budgetBucketMix`/`resolveBucket`）+ 桶内 `indulgenceWeight`」，根治了基数碾压；下文提到的 `budgetWeight`/`richnessWeight` 已在 **S9 删除**。以下分析原样保留，用于说明当初为何这么改。
+
 你的直觉「明明是普通消费水准，却出现在『吃点好的』这一档」**完全正确，而且可以用数字证明**。
 
 根因在 `budgetWeight`（`pick-core.ts:97-108`）——预算是**软权重、不硬过滤**：
@@ -227,39 +230,43 @@ mainFoodsByMeal(meal)           # 1. 按餐段取主食池
 
 ---
 
-## 7. 🔴 P1 — 孤儿代码（最近改路由的直接后果，**需先决策**）
+## 7. ~~🔴 P1 — 孤儿代码~~ →〔S9 已处置〕
+
+> 〔S9 结论〕本节的决策点已落地：采纳**方案 A**——删除吃饭老虎机整条死链路。下表为 review 时（2026-07-06）的孤儿盘点，**保留作历史**；「现状」列标注 S9 后的实际处置。
 
 把 `/` 从老虎机切成水占后，**老虎机整条链路已无任何路由可达**（`grep` 确认 0 文件 import `SlotMachine`）：
 
-| 文件 | 行数 | 引用数 | 状态 |
+| 文件 | 行数 | 引用数 | S9 处置 |
 |---|---|---|---|
-| `components/features/roulette/SlotMachine.tsx` | 387 | **0** | 完全死代码 |
-| `components/features/roulette/ShopList.tsx` | 231 | **0** | 完全死代码 |
-| `components/features/roulette/RegularsHint.tsx` | — | **0** | 完全死代码 |
-| `components/features/roulette/RegionSwitcher.tsx` | — | **0** | 完全死代码 |
-| `components/features/roulette/Reel.tsx` | 91 | 1（仅被 SlotMachine） | 随之死 |
-| `hooks/useRoulette.ts` | 360 | 运行时 0 | 仅剩 `Filters` 类型被 FunnelFilter import（`FunnelFilter.tsx:7`） |
-| `components/features/social/FriendFeed.tsx` | 157 | **0** | 完全死代码 |
-| `config/social-mock.ts` | 61 | 仅被 FriendFeed | 随之死 |
-| `components/features/cook/CookMode.tsx` | 159 | **0** | 完全死代码 |
+| `components/features/roulette/SlotMachine.tsx` | 387 | **0** | **已删除** |
+| `components/features/roulette/ShopList.tsx` | 231 | **0** | **已删除** |
+| `components/features/roulette/RegularsHint.tsx` | — | **0** | **已删除** |
+| `components/features/roulette/RegionSwitcher.tsx` | — | 1（被 FunnelFilter） | **迁入 `features/water/`**（非死代码，是 FunnelFilter 子件） |
+| `components/features/roulette/Reel.tsx` | 91 | 1（仅被 SlotMachine） | **迁入 `features/cook/`**（CookMode 仍用） |
+| `hooks/useRoulette.ts` | 360 | 运行时 0 | **已删除**（`Filters` 类型改由 FunnelFilter 直接 import `@/lib/pick-core`） |
+| `components/features/social/FriendFeed.tsx` | 157 | **0** | 未处理（S9 只删老虎机链路，social 留待后续） |
+| `config/social-mock.ts` | 61 | 仅被 FriendFeed | 未处理（同上） |
+| `components/features/cook/CookMode.tsx` | 159 | **0** | **保留**（无路由入口，标记为未来「自己做」模式） |
 
-**仍在用**（被水占复用，勿删）：`roulette/{FunnelFilter,MealSwitcher,CityPicker}`、`cook/{RecipeLibrary,RecipeDetail}`（经 WaterRecipePanel）、`common/*`、全部 `water/*`。
+**S9 后仍在用**（被水占复用）：迁入 `water/` 的 `{FunnelFilter,MealSwitcher,CityPicker,RegionSwitcher,DiaryView}`、迁入 `cook/` 的 `Reel`、`cook/{RecipeLibrary,RecipeDetail}`（经 WaterRecipePanel）、`common/*`、全部原 `water/*`。
 
-> 注意一个耦合：`FunnelFilter.tsx:7` 从 `useRoulette` import 的是 **`Filters` 类型**（`useRoulette` re-export 自 `pick-core`）。若删 `useRoulette`，需把该 import 改指向 `@/lib/pick-core`。
+> 〔历史耦合，S9 已解〕`FunnelFilter` 曾从 `useRoulette` import **`Filters` 类型**（`useRoulette` re-export 自 `pick-core`）。S9 删 `useRoulette` 时已把该 import 改指向 `@/lib/pick-core`（纯透传，零行为变更）。
 
-**决策点**：
-- 方案 A：删掉全部孤儿（约 **1300+ 行**，砍掉一半 features 代码），认知负担骤降。
-- 方案 B：给老虎机重建 `/roulette` 路由入口，作为备用玩法保留。
-- 现状（留在仓库但无入口）是最差的：既占维护成本又无人使用。
+**决策点**〔已选 A〕：
+- ✅ **方案 A（S9 采纳）**：删掉吃饭老虎机死链路（净删约 1100+ 行），认知负担骤降。
+- 方案 B（未采纳）：给老虎机重建 `/roulette` 路由入口——会把体验差、模型旧的玩法重新变成产品承诺，拖累水占。
+- 现状（留在仓库但无入口）是最差的：既占维护成本又无人使用——正是 S9 要消除的。
 
 ---
 
 ## 8. 其余问题清单
 
-### 🟡 P2 — 两套抽菜 hook 的持久化逻辑重复
-`useDivinationPick.ts:99-134` 与 `useRoulette.ts:140-172` **各自复制**了一份「从 localStorage 恢复 region/filters」的逻辑。
-- 两者共用**相同的 key**（`foodie:region`/`foodie:filters`，见 `useDivinationPick.ts:43` 与 `useRoulette.ts:30`）——所以是**代码重复，不是数据冲突**（数据其实是打通的）。
-- 若采纳 §7 方案 A 删掉 `useRoulette`，此重复自动消失。否则应抽一个共享的 `usePersistedFilters` hook。
+### 🟡 P2 — ~~两套抽菜 hook 的持久化逻辑重复~~〔S9 已消除〕
+> 〔S9〕采纳 §7 方案 A 删掉 `useRoulette` 后，此重复**自动消失**——现仅 `useDivinationPick` 一份从 localStorage 恢复 region/filters 的逻辑。以下为历史记录。
+
+`useDivinationPick.ts` 与（已删的）`useRoulette.ts` 曾**各自复制**一份「从 localStorage 恢复 region/filters」的逻辑。
+- 两者共用**相同的 key**（`foodie:region`/`foodie:filters`）——所以曾是**代码重复，不是数据冲突**（数据其实是打通的）。
+- S9 删 `useRoulette` 后此重复已消失，无需再抽 `usePersistedFilters`。
 
 ### 🟡 P3 — 931 行单文件页面
 `water-concept/page.tsx` 一个文件塞了：三屏状态机 + 多个内联子组件（文件尾部 891-931 仍有独立组件定义）。建议按屏（筛选屏 / 水占屏 / 探店屏）拆分为独立组件，主文件只做编排。

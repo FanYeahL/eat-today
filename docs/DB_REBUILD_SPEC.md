@@ -163,7 +163,7 @@ export function sideFoods(meal?: MealType): Food[] {
 - `brand` / `dining_style` / `dish_group` **一律不进默认抽签**。
 - `pickLayer === "side"`（satiety<3 的凉菜/小食/配菜）**也不进默认单菜池**——即便它是 `kind:"main", entityType:"dish"`。这是本次新增的第三道门，防止「茶叶蛋/皮蛋豆腐」这类被当成一餐主角抽出。
 - 二级集合（火锅/品牌等）通过独立 selector 暴露，不走 `mainFoodsByMeal`（Phase 1 可先不接 UI，数据留存即可）。
-- **主路径 = 水占单菜抽取（`useDivinationPick`）**。老虎机（`useRoulette`）为早期风格，本阶段视为 **deprecated / out of scope**，不改、不为其复杂化模型（见 §3.1 末）。
+- **主路径 = 水占单菜抽取（`useDivinationPick`）**。老虎机（`useRoulette`）已在 **S9 删除**（无路由可达的死代码）；后续**不要为旧 roulette 复杂化水占模型**（见 §3.1 末的历史设计说明）。
 
 ### 3.1 ⚠️ 下午茶(tea) 的取池路径（必须在 S4 落实，否则 tea 会塌池）
 
@@ -188,7 +188,7 @@ export function foodsByMealForSinglePick(meal: MealType): Food[] {
 }
 ```
 
-**老虎机（deprecated，本轮不改）**：`useRoulette.ts:179` 保持现状，**不改调上面的函数**。若未来要让老虎机也支持 tea，必须另设独立入口，且**前两轴绝不能混入 drink**：
+**老虎机（S9 已删除；下述为当时的历史说明）**：`useRoulette.ts:179` 在删除前保持现状，**未改调上面的函数**。此段记录当时的约束——若未来要重建一套两菜一饮玩法并支持 tea，仍应遵循：另设独立入口，且**前两轴绝不能混入 drink**：
 
 ```ts
 // 【未来可选，非本阶段任务】老虎机前两轴专用：tea 也只给 main+side，不含 drink；
