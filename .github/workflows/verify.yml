@@ -1,0 +1,23 @@
+name: verify
+
+# 数据库 + 水占核心抽取的回归门。等价于本地 `npm run verify`：
+#   lint:data（全库 §7 硬门槛）→ test:run（vitest）→ typecheck（tsc）→ lint（next lint）。
+# 刻意不含 next build——太慢，且 verify 已覆盖类型/数据/逻辑回归。
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run verify
