@@ -392,8 +392,8 @@ function resolveBucket(mix: Record<PriceTier, number>, nonEmpty: Set<PriceTier>)
 | S2 ✅ | 给**存量 192 条**补新字段（satiety/indulgence/convenience/occasion/pickLayer/search），id 不动（`migrate-existing-foods.mjs`） | 存量迁移完 | S1 |
 | S3 ✅ | 落库 136 新菜 + 补批 18 + 重分 8 回 meal；全库 lint 达 §7 硬门槛（`land-dishes.mjs`/`lint-foods-fulldb.mjs`） | 数据达标 | S0,S1 |
 | S4 ✅ | 加 `isDefaultPickable` + `mainFoodsByMeal` 净化 + `sideFoods`（entityType==="dish" 口径）+ `foodsByMealForSinglePick`（§3.1）；水占 hook 改调它；`applyFamily`/`applyFunnel` 令 drink family-neutral；给 33 饮品补 store-type shopKeyword。**老虎机 `useRoulette` 未动（deprecated）** | 默认池纯净 + tea 不塌 + drink 可用性正确 | S1 |
-| S5 | `pick-core` 加桶抽样 + resolveBucket + indulgenceWeight + canonicalGroup 软避；移除旧 budget/richness 软权重（§5,6） | 抽取策略新 | S4 |
-| S6 | 写 `scripts/lint-foods.mjs`（§7）；引入 Vitest + 单测（§8） | 验证就位 | S2-S5 |
+| S5 ✅ | `pick-core` 加 budgetBucketMix + resolveBucket + indulgenceWeight；`pickOneMain` 改「先抽桶、桶内加权」+ canonicalGroup 软避；水占路径移除旧 budgetWeight/richnessWeight（保留导出给 deprecated roulette）。抽样验证：lunch+treat treat 桶命中 0.749；空 treat 桶 fallback 0 越 family | 抽取策略新（P0 修复） | S4 |
+| S6 | 写 `scripts/lint-foods.mjs`（§7，已由 `lint-foods-fulldb.mjs` 覆盖大部分）；引入 Vitest + 单测（§8） | 验证就位 | S2-S5 |
 | S7 | 跑 §8 全部验证，修红 | 绿 | S6 |
 
 > **S2 与 S3 是最大工作量**（存量迁移 + 新菜落库），但都是纯数据、低风险，可并行分块。S4/S5 是核心逻辑改动，必须有 S6 的测试兜底后再 merge。

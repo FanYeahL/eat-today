@@ -96,10 +96,11 @@ export function applyFunnel(pool: Food[], filters: Filters): Food[] {
 }
 
 /**
+ * @deprecated S5 起水占改「先抽价位桶、桶内加权」（见 budgetBucketMix / resolveBucket），
+ * 不再用此 per-dish 预算软权重。仅保留给 deprecated 的老虎机 `useRoulette` 兼容，勿在水占路径使用。
+ *
  * 预算偏好 → per-dish 乘子。不再硬过滤：选中档位概率最高，相邻档自动混入，
  * 远档压低但不归零（池子小或那档没菜时仍出得来，不塌池）。
- * 用 per-dish 乘子而非"按档归一"：独苗 treat（如西餐只 1 道）会被同档人数稀释，
- * 不会重新塌回"永远那一道"。数值为温和默认，真机后再调。
  */
 export function budgetWeight(food: Food, budget: Filters["budget"]): number {
   if (budget === "any") return 1;
@@ -115,25 +116,73 @@ export function budgetWeight(food: Food, budget: Filters["budget"]): number {
 }
 
 /**
- * 丰盛度偏好 → per-dish 乘子。补「想吃好的(treat)」缺失的语义轴。
+ * @deprecated S5 起 treat 提权改由「桶内 indulgenceWeight」承担（且不再惩罚「清淡」）。
+ * 仅保留给 deprecated 的老虎机兼容，勿在水占路径使用。
  *
- * 背景：treat 原本只挂在 priceTier 上（钱多 = 好的），于是「凯撒沙拉」这种
- * 不贵但轻食的菜，靠 budgetWeight 的 normal×0.6 照样留在池里被抽中——
- * 而「想吃好的」用户脑子里是「扎实、有肉、犒劳」，轻食是它的字面反义词。
- *
- * 所以 treat 档额外对「健康轻食 / 清淡」标签施加陡惩罚（×0.15，与 moodWeight 同档），
- * 把「想吃好的」从单纯的价格信号，升级成「中高端消费 × 中高端丰盛度」双轴：
- * 一道菜要又贵又扎实才顶格，轻食（凯撒沙拉）双输被摁到底。
- *
- * 只在 treat 下生效；budget/normal 不动（平价/适中本就该容得下轻食）。
- * 软权重不硬过滤：池子全是轻食时整池 ×0.15 → 退化为均匀随机，绝不空池。
- * 注意：只罚「轻食/清淡」标签，不罚 role===snack——天妇罗/烧鸟这类「贵的小食」
- * 在「想吃好的」里出现并不冒犯，真正冒犯的只有「菜叶子/水煮」那一类。
+ * 丰盛度偏好 → per-dish 乘子。treat 档对「健康轻食 / 清淡」标签施加 ×0.15 惩罚。
  */
 export function richnessWeight(food: Food, budget: Filters["budget"]): number {
   if (budget !== "treat") return 1;
   const light = food.tags.includes("健康轻食") || food.tags.includes("清淡");
   return light ? 0.15 : 1;
+}
+
+// ─────────────────────────────────────────────
+// S5 价位桶抽样（spec §5/§6）：先按 budgetBucketMix 抽出目标价位桶，再桶内加权。
+// 取代旧的 per-dish budgetWeight/richnessWeight（上面两个已 @deprecated）。
+// ─────────────────────────────────────────────
+
+/**
+ * 价位桶混合比：按用户预算档给出「先抽哪个价位桶」的概率分布（§5.2）。
+ * 关键修复：treat 档 treat 桶占 0.75，根治「想吃好的却大概率抽到普通菜」——
+ * 旧 per-dish 软权重下 normal 基数大会淹没 treat，桶抽样把它拉回预期。
+ */
+export const budgetBucketMix: Record<Filters["budget"], Record<PriceTier, number>> = {
+  any: { budget: 0.34, normal: 0.5, treat: 0.16 }, // 不选预算时贴近数据自然构成
+  budget: { budget: 0.7, normal: 0.3, treat: 0 },
+  normal: { budget: 0.15, normal: 0.7, treat: 0.15 },
+  treat: { budget: 0, normal: 0.25, treat: 0.75 },
+};
+
+/**
+ * 抽价位桶（§6 空桶 fallback）：只在当前候选池的非空桶内按 mix 比例抽。
+ * - mix 里有权重且非空的桶：按相对比例抽。
+ * - mix 权重桶全空：放宽到「任何非空桶均匀」（仍限本池内，绝不跨 family / 回全库）。
+ * - 全空 → 返回 null（上层作 exhausted 处理，不硬抽重复）。
+ */
+export function resolveBucket(
+  mix: Record<PriceTier, number>,
+  nonEmpty: Set<PriceTier>,
+): PriceTier | null {
+  const active = (["budget", "normal", "treat"] as PriceTier[]).filter(
+    (t) => nonEmpty.has(t) && mix[t] > 0,
+  );
+  if (active.length === 0) {
+    const any = Array.from(nonEmpty);
+    return any.length ? any[Math.floor(Math.random() * any.length)] : null;
+  }
+  const total = active.reduce((s, t) => s + mix[t], 0);
+  let r = Math.random() * total;
+  for (const t of active) {
+    r -= mix[t];
+    if (r <= 0) return t;
+  }
+  return active[active.length - 1];
+}
+
+/**
+ * 桶内丰盛度乘子（§5.3）：仅 treat 桶生效，替代旧 richnessWeight。
+ * - indulgence>=4 → ×1.8（顶格犒劳菜提权）
+ * - indulgence<=2 或 satiety<3 或含「健康轻食」→ ×0.2（不够犒劳/不够顶饱/轻食降权）
+ * - 其它 → ×1
+ * ⚠️ 不惩罚「清淡」——清淡是口味非「不犒劳」信号（白灼基围虾清淡但 indulgence 4，应留）。
+ * budget/normal 桶恒 1。默认 meal 池 satiety>=3，但 tea 场景桶内含 side/drink（satiety<3），故规则要稳。
+ */
+export function indulgenceWeight(food: Food, bucket: PriceTier): number {
+  if (bucket !== "treat") return 1;
+  if (food.indulgence >= 4) return 1.8;
+  if (food.indulgence <= 2 || food.satiety < 3 || food.tags.includes("健康轻食")) return 0.2;
+  return 1;
 }
 
 /**

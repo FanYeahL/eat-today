@@ -28,15 +28,17 @@ import {
   applyFunnel,
   applyFamily,
   regionWeight,
-  budgetWeight,
-  richnessWeight,
   moodWeight,
   pickBy,
   seedAvoidFactor,
   familiarFactor,
   prefilterByAvailability,
   unavailableKeywords,
+  budgetBucketMix,
+  resolveBucket,
+  indulgenceWeight,
 } from "@/lib/pick-core";
+import type { PriceTier } from "@/types/food";
 import { keywordOf } from "@/lib/availability";
 import type { Food, MealType, RegionKey } from "@/types/food";
 
@@ -54,9 +56,17 @@ export interface CastResult {
 }
 
 /**
- * 在一个池子里按「地区加权 × 预算偏好 × 心情偏好 × 偏正餐 × 常客熟悉 × 避重」抽一道主食。
- * 与 resonate 轴1 同一套权重，保证水占和老虎机口味一致。
- * budget/mood 是偏好权重（不硬过滤），选了就向那个方向倾斜，池子不塌。
+ * 在一个池子里抽一道菜（S5：先抽价位桶，再桶内加权）。
+ *
+ * 流程（spec §5.1 第 5-6 步）：
+ * 1. 按 priceTier 把池分成三桶，记录非空桶。
+ * 2. resolveBucket(budgetBucketMix[budget], nonEmpty) 抽出目标桶——treat 档 treat 桶占 0.75，
+ *    根治「想吃好的却大概率抽普通菜」（旧 per-dish 软权重下 normal 基数会淹没 treat）。
+ *    空桶 fallback 只在本池非空桶内重分配（§6），不跨 family、不回全库。
+ * 3. 在选定桶内按 region×mood×偏正餐×常客×避重×indulgence×canonicalGroup软避 加权抽一道。
+ *
+ * budget 不再是 per-dish 软权重（budgetWeight/richnessWeight 已弃用），改为桶抽样。
+ * @param avoidGroups 已见/最近的 canonicalGroup 集合——候选命中则 ×0.15 软避（防连占刷屏同类）。
  */
 function pickOneMain(
   pool: Food[],
@@ -65,19 +75,34 @@ function pickOneMain(
   avoidIds: Set<string>,
   recentIds: Set<string>,
   affinity: ReturnType<typeof getAffinity>,
+  avoidGroups: Set<string>,
 ): Food {
   const funnel = applyFunnel(pool, filters);
+
+  // —— 1. 分桶 + 抽桶 ——
+  const byBucket: Record<PriceTier, Food[]> = { budget: [], normal: [], treat: [] };
+  for (const f of funnel) byBucket[f.priceTier].push(f);
+  const nonEmpty = new Set<PriceTier>(
+    (["budget", "normal", "treat"] as PriceTier[]).filter((t) => byBucket[t].length > 0),
+  );
+  const bucket = resolveBucket(budgetBucketMix[filters.budget], nonEmpty);
+  // 池非空时 resolveBucket 必返回非空桶（cast 已保证 unseen 非空）；兜底防御性取 funnel。
+  const inBucket = bucket ? byBucket[bucket] : funnel;
+  const activeBucket: PriceTier = bucket ?? "normal";
+
+  // —— 2. 桶内加权 ——
   const regionActive =
     region !== "all" &&
     (filters.families.length === 0 || filters.families.includes("chinese"));
   const noSeed = new Set<string>(); // 水占无种草入口
-  return pickBy(funnel, (f) => {
+  return pickBy(inBucket, (f) => {
     let w = regionActive ? regionWeight(f, region) : 1;
-    w *= budgetWeight(f, filters.budget); // 预算偏好
-    w *= richnessWeight(f, filters.budget); // 丰盛度偏好（治「想吃好的」抽出轻食）
     w *= moodWeight(f, filters.mood); // 心情偏好
     if (f.role === "main") w *= 1.6; // 偏正餐
     w *= familiarFactor(f, affinity);
+    w *= indulgenceWeight(f, activeBucket); // treat 桶：犒劳提权 / 轻食降权（§5.3）
+    // canonicalGroup 软避：与已见/最近同族 ×0.15（不硬排，防小池抽空）
+    if (f.canonicalGroup && avoidGroups.has(f.canonicalGroup)) w *= 0.15;
     return w * seedAvoidFactor(f.id, noSeed, avoidIds, recentIds);
   });
 }
@@ -166,6 +191,19 @@ export function useDivinationPick() {
       const recentIds = recentFoodIds(Date.now()); // 近几天吃过的温和降权
       const affinity = getAffinity(Date.now()); // 常客熟悉度
 
+      // canonicalGroup 软避：已见/最近/上一签 命中过的族，桶内 ×0.15（§5.4，防连占刷屏同类）。
+      // 由 id 经 base 反查 canonicalGroup（base 是本轮全池，含所有候选）。
+      const groupById = new Map<string, string>();
+      for (const f of base) if (f.canonicalGroup) groupById.set(f.id, f.canonicalGroup);
+      const avoidGroups = new Set<string>();
+      const addGroup = (id: string) => {
+        const g = groupById.get(id);
+        if (g) avoidGroups.add(g);
+      };
+      seen.forEach(addGroup);
+      recentIds.forEach(addGroup);
+      avoidIds.forEach(addGroup);
+
       const settle = (food: Food): CastResult => {
         pickRef.current = food;
         setPick(food);
@@ -185,7 +223,7 @@ export function useDivinationPick() {
         setVerifying(false);
         // 无坐标：直接在「没见过的」里加权抽，不重复。
         return settle(
-          pickOneMain(unseen, filters, region, avoidIds, recentIds, affinity),
+          pickOneMain(unseen, filters, region, avoidIds, recentIds, affinity, avoidGroups),
         );
       }
 
@@ -195,7 +233,7 @@ export function useDivinationPick() {
       for (let round = 0; round < MAX_ROUNDS; round++) {
         // 可用性预过滤作用在 unseen 上：内部空了退回 unseen（绝不退回见过的）。
         const p = prefilterByAvailability(unseen, coords);
-        const candidate = pickOneMain(p, filters, region, avoidIds, recentIds, affinity);
+        const candidate = pickOneMain(p, filters, region, avoidIds, recentIds, affinity, avoidGroups);
         const bad = await unavailableKeywords([candidate], coords);
         chosen = candidate; // 兜底留着最后一道（仍 ∈ unseen，不会重复）
         if (bad.size === 0) break; // 附近买得到，定了
