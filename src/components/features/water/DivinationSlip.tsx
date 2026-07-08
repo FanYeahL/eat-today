@@ -154,7 +154,7 @@ export default function DivinationSlip({
             <div className="my-2 text-5xl">{reveal.emoji}</div>
 
             <div
-              className="mt-5 whitespace-nowrap text-2xl font-semibold text-ink"
+              className="mt-5 max-w-full break-words text-2xl font-semibold leading-snug text-ink"
               style={{ letterSpacing: "0.08em" }}
             >
               {reveal.name}
