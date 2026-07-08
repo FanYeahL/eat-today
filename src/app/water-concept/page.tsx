@@ -93,6 +93,12 @@ export default function WaterConceptPage() {
   const [confirmed, setConfirmed] = useState<Food[]>([]);
   // 探店时当前正在看哪道菜的店（confirmed 里的某道 id）。
   const [exploringId, setExploringId] = useState<string | null>(null);
+  // 抽签并发硬锁：cast 是异步（定位 + 可用性查店可能很慢），若不锁，
+  // 快速重复点「投签/留下/换一道/重新占/就按这个」会启动多个 cast，晚返回的会
+  // 覆盖早返回的签面，且 seenRef/篮子/动画 phase 可能串线。ref 立即生效（不等重渲染），
+  // state 只用于 disable 按钮。div.verifying 只反映 hook 内部一次抽取，不足以拦住页面层连点。
+  const castingRef = useRef(false);
+  const [casting, setCasting] = useState(false);
 
   const committed = confirmed.length > 0;
   const splashing = w.phase === "splash" || w.phase === "revealing";
@@ -116,13 +122,21 @@ export default function WaterConceptPage() {
   // 投签：先抽菜（含定位+可用性门控），定下来再启动落水动画，避免签纸落下时还没菜。
   // 首签——本轮还没见过任何菜，seen 传当前累积（正常为空）。
   const onCast = async () => {
-    const { food, exhausted } = await div.cast(seenRef.current);
-    if (food) {
-      seenRef.current.add(food.id);
-      setExhausted(false);
-      w.cast();
-    } else if (exhausted) {
-      setExhausted(true);
+    if (castingRef.current) return; // 并发硬锁：一次只允许一个 cast 在途
+    castingRef.current = true;
+    setCasting(true);
+    try {
+      const { food, exhausted } = await div.cast(seenRef.current);
+      if (food) {
+        seenRef.current.add(food.id);
+        setExhausted(false);
+        w.cast();
+      } else if (exhausted) {
+        setExhausted(true);
+      }
+    } finally {
+      castingRef.current = false;
+      setCasting(false);
     }
   };
 
@@ -130,16 +144,24 @@ export default function WaterConceptPage() {
   // 不再停在「投签入水」按钮等用户二次点击。div 不 reset。
   // 关键：抽之前把「当前签面」记进 seen——无论用户留下还是跳过，它都已被看过，本轮不该再现。
   const recastNow = async () => {
-    if (div.pick) seenRef.current.add(div.pick.id);
-    w.reset(); // phase→idle，旧签面隐去（这一拍批量更新，紧接 cast 转 casting，不会真停在 idle）
-    const { food, exhausted } = await div.cast(seenRef.current);
-    if (food) {
-      seenRef.current.add(food.id);
-      setExhausted(false);
-      w.cast();
-    } else if (exhausted) {
-      // 这个口味∩餐段都翻遍了：不硬抽重复，停在水面提示用户换筛选（A 方案）。
-      setExhausted(true);
+    if (castingRef.current) return; // 并发硬锁：与 onCast 共用，杜绝多个 cast 串线
+    castingRef.current = true;
+    setCasting(true);
+    try {
+      if (div.pick) seenRef.current.add(div.pick.id);
+      w.reset(); // phase→idle，旧签面隐去（这一拍批量更新，紧接 cast 转 casting，不会真停在 idle）
+      const { food, exhausted } = await div.cast(seenRef.current);
+      if (food) {
+        seenRef.current.add(food.id);
+        setExhausted(false);
+        w.cast();
+      } else if (exhausted) {
+        // 这个口味∩餐段都翻遍了：不硬抽重复，停在水面提示用户换筛选（A 方案）。
+        setExhausted(true);
+      }
+    } finally {
+      castingRef.current = false;
+      setCasting(false);
     }
   };
 
@@ -470,7 +492,8 @@ export default function WaterConceptPage() {
                         setQuickFilter(false);
                         void recastNow();
                       }}
-                      className="water-action-primary rounded-full px-6 py-3 text-sm font-medium text-ink/80"
+                      disabled={casting}
+                      className="water-action-primary rounded-full px-6 py-3 text-sm font-medium text-ink/80 disabled:opacity-50"
                     >
                       就按这个，占一签 →
                     </button>
@@ -545,7 +568,7 @@ export default function WaterConceptPage() {
                   )}
                   <motion.button
                     onClick={onCast}
-                    disabled={div.verifying || exhausted}
+                    disabled={casting || div.verifying || exhausted}
                     whileTap={{ scale: 0.94 }}
                     className="water-action-primary rounded-full px-10 py-4 text-base font-medium tracking-[0.2em] text-ink/80 disabled:opacity-50"
                   >
@@ -590,7 +613,8 @@ export default function WaterConceptPage() {
                   <div className="flex items-center gap-4">
                     <button
                       onClick={onFreshRecast}
-                      className="text-xs tracking-[0.15em] text-brand-soft/60 transition-colors hover:text-accent"
+                      disabled={casting}
+                      className="text-xs tracking-[0.15em] text-brand-soft/60 transition-colors hover:text-accent disabled:opacity-50"
                     >
                       ↻ 重新占一桌
                     </button>
@@ -648,13 +672,15 @@ export default function WaterConceptPage() {
                   <div className="flex flex-wrap items-center justify-center gap-2.5">
                     <button
                       onClick={onAddAndRecast}
-                      className="water-glass-strong rounded-full px-5 py-3 text-sm font-medium text-ink/70"
+                      disabled={casting}
+                      className="water-glass-strong rounded-full px-5 py-3 text-sm font-medium text-ink/70 disabled:opacity-50"
                     >
                       ＋ 留下，再占
                     </button>
                     <button
                       onClick={onSkipAndRecast}
-                      className="water-glass-subtle rounded-full px-5 py-3 text-sm font-medium text-ink/65"
+                      disabled={casting}
+                      className="water-glass-subtle rounded-full px-5 py-3 text-sm font-medium text-ink/65 disabled:opacity-50"
                     >
                       ↻ 换一道
                     </button>
@@ -679,7 +705,8 @@ export default function WaterConceptPage() {
                     )}
                     <button
                       onClick={onFreshRecast}
-                      className="text-xs tracking-[0.15em] text-brand-soft/55 transition-colors hover:text-accent"
+                      disabled={casting}
+                      className="text-xs tracking-[0.15em] text-brand-soft/55 transition-colors hover:text-accent disabled:opacity-50"
                     >
                       ↻ 这套都不要，重新占
                     </button>

@@ -43,6 +43,9 @@ export function useShops() {
     setShops([]);
     setExpansion([]);
     setFetched(false);
+    // 用户已手输城市：先摘掉 needCity。否则查店失败时 needCity 仍为 true，
+    // UI 分支先判 needCity 会继续显示「选城市」，把真正的 error 藏住（Codex P0）。
+    if (city) setNeedCity(false);
 
     // 先确定坐标：走共享缓存，没有则尝试定位一次
     let coords: Coords | null = null;
