@@ -6,12 +6,14 @@
  * 「自己做」的次入口，从投签按钮下方的弱入口进入。以可搜索/分类的
  * 菜谱库（RecipeLibrary）为主体——想下厨的人主要靠「翻到一道想做的菜」。
  *
- * 库之上另给一个轻量的「摇一道菜来做」按钮，保留一点随机趣味：点一下随机
- * 抽一道菜、直接展示做法。它是辅、不是主——刻意不做成第二套随机主玩法，
+ * 库之上另给一个轻量的「随手翻一道」按钮，保留一点随机趣味：点一下随机
+ * 推荐一道菜谱、直接展示做法。它是辅、不是主——刻意不做成第二套随机主玩法，
  * 以免和水占「替你决定吃什么」的主流程抢戏（水占才是决策入口）。
+ * 用词也避开「摇/抽」这类仪式感动词：这里没有滚轮动画，只是随手翻一道，
+ * 也不和水占的「投签/抽中」抢词。
  *
  * 随机逻辑复用 cook/recipe-random（与 CookMode 同一份，不重复）；
- * 拉取走 useRecipe（内建 AbortController + 请求序号，连摇不会旧结果覆盖新结果）。
+ * 拉取走 useRecipe（内建 AbortController + 请求序号，连翻不会旧结果覆盖新结果）。
  * 数据走 /api/recipes（HowToCook 数据集）。
  */
 
@@ -29,15 +31,15 @@ type WaterRecipePanelProps = {
 };
 
 export default function WaterRecipePanel({ onClose }: WaterRecipePanelProps) {
-  // 「摇一道菜」当前选中的菜（null = 还没摇过，只显示库）
-  const [shaken, setShaken] = useState<RecipeIndexEntry | null>(null);
+  // 「随手翻一道」当前推荐的菜（null = 还没翻过，只显示库）
+  const [suggested, setSuggested] = useState<RecipeIndexEntry | null>(null);
   const { recipe, loading, error, fetchRecipe } = useRecipe();
 
-  const handleShake = useCallback(() => {
-    const next = pickNextRecipe(shaken?.id ?? null);
-    setShaken(next);
+  const handleSuggestRecipe = useCallback(() => {
+    const next = pickNextRecipe(suggested?.id ?? null);
+    setSuggested(next);
     fetchRecipe(next.id);
-  }, [shaken, fetchRecipe]);
+  }, [suggested, fetchRecipe]);
 
   return (
     <motion.div
@@ -73,17 +75,17 @@ export default function WaterRecipePanel({ onClose }: WaterRecipePanelProps) {
 
         {/* 轻量随机入口：文案按钮，不喧宾夺主（库才是主体） */}
         <button
-          onClick={handleShake}
+          onClick={handleSuggestRecipe}
           className="rounded-full border border-brand/50 bg-brand/5 px-5 py-2 text-sm text-brand-soft transition-colors hover:border-accent hover:text-accent"
         >
-          🍳 {shaken ? "再摇一道" : "摇一道菜来做"}
+          🍳 {suggested ? "再翻一道" : "随手翻一道"}
         </button>
 
-        {/* 随机结果：小区域展示在库上方，只在摇过之后出现 */}
+        {/* 随机推荐结果：小区域展示在库上方，只在翻过之后出现 */}
         <AnimatePresence mode="wait">
-          {shaken && (
+          {suggested && (
             <motion.div
-              key={shaken.id}
+              key={suggested.id}
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -12 }}
@@ -92,21 +94,21 @@ export default function WaterRecipePanel({ onClose }: WaterRecipePanelProps) {
             >
               {loading && (
                 <p className="py-3 text-center text-sm text-ink-muted/70">
-                  正在拉取「{shaken.name}」的做法…
+                  正在拉取「{suggested.name}」的做法…
                 </p>
               )}
               {!loading && error && (
                 <div className="flex flex-col items-center gap-2 py-2">
                   <p className="text-sm text-accent-pink">{error}</p>
                   <button
-                    onClick={() => fetchRecipe(shaken.id)}
+                    onClick={() => fetchRecipe(suggested.id)}
                     className="text-sm text-brand-soft underline transition-colors hover:text-accent"
                   >
                     重试
                   </button>
                 </div>
               )}
-              {!loading && !error && recipe && recipe.id === shaken.id && (
+              {!loading && !error && recipe && recipe.id === suggested.id && (
                 <RecipeDetail recipe={recipe} />
               )}
             </motion.div>
