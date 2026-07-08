@@ -13,7 +13,7 @@ type MealSwitcherProps = {
 /**
  * 餐段切换器
  * 四个餐段横向排开，点亮当前选中项。
- * 抽取据此硬过滤候选池，切换后再摇即换池。
+ * 抽取据此硬过滤候选池，切换后再抽即换池。
  */
 export default function MealSwitcher({ value, onChange }: MealSwitcherProps) {
   return (

@@ -27,7 +27,7 @@ function sleep(ms: number): Promise<void> {
 
 /**
  * 全局限流（根治 CUQPS 的关键）。
- * 高德的并发 QPS 限制是按【整个 key】算的，不是按单个用户——一个人连摇、
+ * 高德的并发 QPS 限制是按【整个 key】算的，不是按单个用户——一个人连抽、
  * 或多设备同时用，请求叠加就会冲破免费 key 那个很低的并发上限。
  * 这里把本进程内所有高德请求串成一条链、相邻两次强制间隔 MIN_GAP_MS 通过，
  * 从源头保证我们打出去的速率不超限（约 2.8 QPS < 免费 key 的 3 QPS）。
@@ -185,7 +185,7 @@ export async function GET(request: Request) {
   const lng = searchParams.get("lng");
   const lat = searchParams.get("lat");
   const city = searchParams.get("city")?.trim();
-  // count 模式：只关心「附近有没有相关的店」，回 {count}。给「摇之前按附近过滤」用。
+  // count 模式：只关心「附近有没有相关的店」，回 {count}。给「抽取之前按附近过滤」用。
   // 注意：不能再用高德裸 count——那是模糊匹配的总数，含大量噪音（搜牛肉粉混进螺蛳粉），
   // 必须取整页 + 相关性过滤后再数，才与展示一致、不假阳性。
   const countOnly = searchParams.get("count") === "1";
@@ -235,7 +235,7 @@ export async function GET(request: Request) {
       : [];
 
     // count 模式（门控）：用放宽相关性，回「附近有几家这类店」。
-    // 过滤后为 0 = 附近确实没这类店，门控据此把菜排除出转盘，从根上避免「抽到没地方吃」。
+    // 过滤后为 0 = 附近确实没这类店，门控据此把菜排除出候选池，从根上避免「抽到没地方吃」。
     // 用 isGateRelevant 而非严格 isRelevant：店类型词措辞与高德 type 字面错位时也能兜住，
     // 只减少假阴性、不会过度放宽（高德关键词搜索本身已语义过滤，详见 isGateRelevant 注释）。
     if (countOnly) {
