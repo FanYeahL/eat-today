@@ -4,7 +4,7 @@ import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { familyList } from "@/config/cuisine";
 import RegionSwitcher from "./RegionSwitcher";
-import type { Filters } from "@/hooks/useRoulette";
+import type { Filters } from "@/lib/pick-core";
 import type { CuisineFamily, RegionKey } from "@/types/food";
 
 type FunnelFilterProps = {
@@ -76,7 +76,7 @@ function Chip({
  * 三秒温和轻筛选漏斗
  * 像朋友在微信上随口问你：想吃啥风味？什么心情？预算多少？
  * 风味可多选；选了「经典中式」时，其下淡入展开中餐地区二级精修。
- * 毛玻璃气泡，低调不喧宾夺主；所有选择经 useRoulette 持久化。
+ * 毛玻璃气泡，低调不喧宾夺主；所有选择由上层 hook useDivinationPick 持久化。
  */
 /** 当前筛选的一行摘要，折叠时显示在标题里（让用户不展开也知道选了啥） */
 function filtersSummary(value: Filters): string {

@@ -14,7 +14,7 @@ import { cuisineKeyword } from "@/config/cuisine";
 
 /**
  * 一道菜查店时实际用的关键词：优先 shopKeyword，否则回落到【所属菜系的店铺类型词】。
- * 与 ShopList 保持一致。
+ * 与探店查店（DriftCards / useShops）保持一致。
  *
  * 关键：不再拿菜名硬搜。回锅肉没有 shopKeyword → 回落「川菜」（川渝店类型词），
  * 问的是「附近有没有川菜馆」，而不是「有没有店招写着回锅肉」——后者几乎必然搜不到，

@@ -29,9 +29,9 @@ import DriftCards, {
 } from "@/components/features/water/DriftCards";
 import WaterDiaryPanel from "@/components/features/water/WaterDiaryPanel";
 import WaterRecipePanel from "@/components/features/water/WaterRecipePanel";
-import FunnelFilter from "@/components/features/roulette/FunnelFilter";
-import MealSwitcher from "@/components/features/roulette/MealSwitcher";
-import CityPicker from "@/components/features/roulette/CityPicker";
+import FunnelFilter from "@/components/features/water/FunnelFilter";
+import MealSwitcher from "@/components/features/water/MealSwitcher";
+import CityPicker from "@/components/features/water/CityPicker";
 import { mealMeta } from "@/config/meals";
 import { keywordOf } from "@/lib/availability";
 import type { Shop } from "@/types/shop";
@@ -757,7 +757,7 @@ export default function WaterConceptPage() {
 
 /**
  * 探店层包装：处理 loading / 定位失败选城市 / 有店 / 真空 四态。
- * DriftCards 只管渲染卡片，其余状态在这里兜（与老虎机 ShopList 对齐，绝不留白）。
+ * DriftCards 只管渲染卡片，其余状态在这里兜（loading/需选城市/有店/真空 都不留白）。
  */
 function DriftExplore({
   loading,

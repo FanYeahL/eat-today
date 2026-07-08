@@ -2,10 +2,8 @@
  * 抽取核心（共享纯函数）
  * ─────────────────────────────────────────────
  * 把「漏斗过滤 / 地区加权 / 加权抽样 / 综合加成 / 按可用性预过滤 / 可用性校验」
- * 这套与 UI 无关的纯逻辑，从 useRoulette 抽出来，供老虎机（两菜一饮）和
- * 水占（每次一道）共用同一份实现——单一数据源，availability/避重等修复不会两边漂移。
- *
- * 这些函数从 useRoulette 机械提取而来，逻辑零改动。
+ * 这套与 UI 无关的纯逻辑收拢成纯函数，供水占（每次一道）的抽取 hook 与单测
+ * 共用同一份实现——单一数据源，availability/避重等修复不会漂移。
  */
 
 import { regionMeta, regionList } from "@/config/regions-cuisine";
@@ -138,11 +136,12 @@ export function applyFamily(pool: Food[], families: CuisineFamily[]): Food[] {
  * 漏斗过滤：只对 family 做硬过滤（风味家族是用户的明确选择，是一道墙——
  * 选了西餐就绝不出中餐）。空了就跳过该层，保证非空。
  *
- * 注意：budget / mood 不再在此硬砍——它们改为「偏好权重」（见 budgetWeight /
- * moodWeight），由调用方在加权抽样里乘进去。原因：窄家族下硬砍会把池子塌成
- * 单元素（如 西餐×treat=1 → 必中黑椒牛排；西餐×想吃辣=0 → 整层被跳过、心情形同虚设）。
- * 改成权重后池子不塌，"想吃点好的/想吃辣的"变成向那个方向倾斜，而非非此即彼。
- * meal 不在这里——两个 hook 用 mainFoodsByMeal(meal) 在入口就按餐段过滤好了。
+ * 注意：budget / mood 不再在此硬砍——budget 改为「先抽价位桶」（见 budgetBucketMix /
+ * resolveBucket），mood 改为桶内偏好权重（见 moodWeight），由调用方在抽样里生效。原因：
+ * 窄家族下硬砍会把池子塌成单元素（如 西餐×treat=1 → 必中黑椒牛排；西餐×想吃辣=0 →
+ * 整层被跳过、心情形同虚设）。改成权重后池子不塌，"想吃点好的/想吃辣的"变成向那个
+ * 方向倾斜，而非非此即彼。
+ * meal 不在这里——水占 hook 用 foodsByMealForSinglePick(meal) 在入口就按餐段过滤好了。
  */
 export function applyFunnel(pool: Food[], filters: Filters): Food[] {
   if (filters.families.length > 0) {
@@ -155,41 +154,9 @@ export function applyFunnel(pool: Food[], filters: Filters): Food[] {
   return pool;
 }
 
-/**
- * @deprecated S5 起水占改「先抽价位桶、桶内加权」（见 budgetBucketMix / resolveBucket），
- * 不再用此 per-dish 预算软权重。仅保留给 deprecated 的老虎机 `useRoulette` 兼容，勿在水占路径使用。
- *
- * 预算偏好 → per-dish 乘子。不再硬过滤：选中档位概率最高，相邻档自动混入，
- * 远档压低但不归零（池子小或那档没菜时仍出得来，不塌池）。
- */
-export function budgetWeight(food: Food, budget: Filters["budget"]): number {
-  if (budget === "any") return 1;
-  const M: Record<
-    Exclude<Filters["budget"], "any">,
-    Record<PriceTier, number>
-  > = {
-    budget: { budget: 1.0, normal: 0.5, treat: 0.1 },
-    normal: { normal: 1.0, budget: 0.4, treat: 0.5 },
-    treat: { treat: 1.0, normal: 0.6, budget: 0.1 },
-  };
-  return M[budget][food.priceTier];
-}
-
-/**
- * @deprecated S5 起 treat 提权改由「桶内 indulgenceWeight」承担（且不再惩罚「清淡」）。
- * 仅保留给 deprecated 的老虎机兼容，勿在水占路径使用。
- *
- * 丰盛度偏好 → per-dish 乘子。treat 档对「健康轻食 / 清淡」标签施加 ×0.15 惩罚。
- */
-export function richnessWeight(food: Food, budget: Filters["budget"]): number {
-  if (budget !== "treat") return 1;
-  const light = food.tags.includes("健康轻食") || food.tags.includes("清淡");
-  return light ? 0.15 : 1;
-}
-
 // ─────────────────────────────────────────────
 // S5 价位桶抽样（spec §5/§6）：先按 budgetBucketMix 抽出目标价位桶，再桶内加权。
-// 取代旧的 per-dish budgetWeight/richnessWeight（上面两个已 @deprecated）。
+// 价位/丰盛度由「先抽桶 + 桶内 indulgenceWeight」承担（取代早期的 per-dish 软权重）。
 // ─────────────────────────────────────────────
 
 /**
@@ -231,7 +198,7 @@ export function resolveBucket(
 }
 
 /**
- * 桶内丰盛度乘子（§5.3）：仅 treat 桶生效，替代旧 richnessWeight。
+ * 桶内丰盛度乘子（§5.3）：仅 treat 桶生效，承担「想吃好的」的犒劳提权。
  * - indulgence>=4 → ×1.8（顶格犒劳菜提权）
  * - indulgence<=2 或 satiety<3 或含「健康轻食」→ ×0.2（不够犒劳/不够顶饱/轻食降权）
  * - 其它 → ×1
@@ -267,7 +234,7 @@ const EMPTY_SET: Set<string> = new Set(); // 水占无种草入口，seed 集合
  * w = regionWeight × moodWeight × (role===main?1.6) × familiarFactor
  *     × indulgenceWeight(bucket) × canonicalGroup软避 × seedAvoidFactor
  * ⚠️ budget 不在这里——价位由「先抽桶」决定（budgetBucketMix/resolveBucket），
- * 桶内不再乘旧 budgetWeight/richnessWeight。
+ * 桶内只按 indulgenceWeight 调丰盛度，不再乘任何 per-dish 预算权重。
  */
 export function bucketCandidateWeight(
   food: Food,

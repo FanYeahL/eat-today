@@ -2,7 +2,7 @@
 
 import { useCallback, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import Reel, { ITEM_HEIGHT } from "@/components/features/roulette/Reel";
+import Reel, { ITEM_HEIGHT } from "@/components/features/cook/Reel";
 import NeonButton from "@/components/common/NeonButton";
 import RecipeDetail from "./RecipeDetail";
 import RecipeLibrary from "./RecipeLibrary";

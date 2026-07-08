@@ -36,7 +36,7 @@ type DriftCardsProps = {
   onHome: () => void;
 };
 
-/** 拼一个跳转到高德地图的链接（有坐标 marker 定位，否则按店名搜索）。与 ShopList 同源。 */
+/** 拼一个跳转到高德地图的链接（有坐标 marker 定位，否则按店名搜索）。 */
 function amapLink(shop: DriftShop): string {
   if (!shop.location) {
     return `https://uri.amap.com/search?keyword=${encodeURIComponent(shop.name)}`;

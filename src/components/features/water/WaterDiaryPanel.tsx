@@ -12,7 +12,7 @@
  */
 
 import { motion } from "framer-motion";
-import DiaryView from "@/components/features/roulette/DiaryView";
+import DiaryView from "@/components/features/water/DiaryView";
 
 type WaterDiaryPanelProps = {
   /** 收回面板，回到投签场景 */

@@ -12,8 +12,8 @@ type RegionSwitcherProps = {
 
 /**
  * 口味地区切换器
- * 选自己的口味归属，老虎机据此对主食加权（不硬筛，只调概率，仍保留惊喜）。
- * 选择会被记住（localStorage，在 useRoulette 里处理）。
+ * 选自己的口味归属，抽取据此对主食加权（不硬筛，只调概率，仍保留惊喜）。
+ * 选择会被记住（localStorage，由上层 hook useDivinationPick 持久化）。
  */
 export default function RegionSwitcher({ value, onChange }: RegionSwitcherProps) {
   return (

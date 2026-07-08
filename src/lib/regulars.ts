@@ -23,9 +23,8 @@ const MAX_EVENTS = 300; // 事件上限，超了丢最旧
 const KEEP_DAYS = 30; // 只保留近 30 天
 const DAY_MS = 24 * 60 * 60 * 1000;
 
-/** 常客判定窗口：近 14 天内点过同一家 ≥2 次才算「常翻」 */
+/** 近 14 天窗口：口味亲和统计的时间基准（getAffinity 用 REGULAR_DAYS*2） */
 const REGULAR_DAYS = 14;
-const REGULAR_MIN_HITS = 2;
 
 /** 一次点店事件：点进了某家店，带当时在看的那道菜的上下文 */
 export interface VisitEvent {
@@ -77,36 +76,6 @@ export function recordVisit(
   } catch {
     // 写不进就算了，不影响主流程
   }
-}
-
-/** 常翻店（展示用） */
-export interface RegularShop {
-  shopId: string;
-  shopName: string;
-  hits: number;
-}
-
-/**
- * 取「最近常翻」的店：近 REGULAR_DAYS 天内点过 ≥REGULAR_MIN_HITS 次。
- * 按次数降序，最多 limit 家。没货返回空数组（零冷启动）。
- */
-export function topRegularShops(now: number, limit = 3): RegularShop[] {
-  const cutoff = now - REGULAR_DAYS * DAY_MS;
-  const counts = new Map<string, RegularShop>();
-  for (const e of getEvents()) {
-    if (e.ts < cutoff) continue;
-    const cur = counts.get(e.shopId);
-    if (cur) {
-      cur.hits += 1;
-      cur.shopName = e.shopName; // 用最新一次的店名
-    } else {
-      counts.set(e.shopId, { shopId: e.shopId, shopName: e.shopName, hits: 1 });
-    }
-  }
-  return Array.from(counts.values())
-    .filter((s) => s.hits >= REGULAR_MIN_HITS)
-    .sort((a, b) => b.hits - a.hits)
-    .slice(0, limit);
 }
 
 /**

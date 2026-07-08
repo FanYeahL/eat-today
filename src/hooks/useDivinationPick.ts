@@ -4,12 +4,12 @@
  * 水占·单菜抽取 hook
  * ─────────────────────────────────────────────
  * 「每次抽一道菜」的大脑：复用 pick-core 的漏斗/加权/可用性门控，
- * 但只出【一道主食】（不配对、不出饮品，区别于老虎机的两菜一饮）。
+ * 但只出【一道主食】（不配对、不出饮品）。
  *
- * 与 useRoulette 共用同一份 pick-core，所以 availability 门控、避重、
- * 地区加权的修复对两边同时生效，不会漂移。
+ * 逻辑全部下沉到 pick-core 纯函数（availability 门控、避重、地区加权），
+ * 与单测共用同一份实现，修复不会漂移。
  *
- * 抽取流程（与老虎机一致的稳健性）：
+ * 抽取流程（稳健性）：
  * 1. 解析定位（共享缓存，不重复弹权限）。拿不到 → 降级：不按附近过滤，纯加权随机。
  * 2. 有坐标：拒绝采样——抽一道 → 查它附近有没有 → 没有就拉黑关键词、预过滤重抽，最多 6 轮。
  * 3. 永不空池：每轮预过滤空了退回原池；6 轮没全可用用最后一道兜底。
@@ -94,7 +94,7 @@ export function useDivinationPick() {
     setMeal(getCurrentMeal(new Date()));
   }, []);
 
-  // 口味地区 + 漏斗筛选：默认值，挂载后从 localStorage 恢复（与老虎机共用同一份持久化）
+  // 口味地区 + 漏斗筛选：默认值，挂载后从 localStorage 恢复（跨会话记住用户口味）
   const [region, setRegionState] = useState<RegionKey>("all");
   const [filters, setFiltersState] = useState<Filters>(DEFAULT_FILTERS);
   useEffect(() => {
