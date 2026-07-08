@@ -7450,3 +7450,17 @@ export function foodsByMealForSinglePick(meal: MealType): Food[] {
     ...drinkFoodsByMeal("tea"),
   ];
 }
+
+/**
+ * 全库 id → canonicalGroup 映射（module-level，全量 foods 建一次）。
+ * ⚠️ 必须全局、不能按「当前餐段池」反查：canonicalGroup 软避要覆盖**跨餐段**的最近同组
+ * （如昨晚吃过松露意面、今天午餐池里的茄汁意面同属 yimian）。若只用当前池映射，
+ * recent id 不在池内就查不到 group，跨餐段软避会静默失效。
+ */
+const CANONICAL_GROUP_BY_ID = new Map<string, string>();
+for (const f of foods) if (f.canonicalGroup) CANONICAL_GROUP_BY_ID.set(f.id, f.canonicalGroup);
+
+/** 按 food id 取其 canonicalGroup（无则 undefined）。供 canonicalGroup 软避跨餐段反查。 */
+export function canonicalGroupOfFoodId(id: string): string | undefined {
+  return CANONICAL_GROUP_BY_ID.get(id);
+}

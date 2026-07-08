@@ -180,9 +180,68 @@ export function resolveBucket(
  */
 export function indulgenceWeight(food: Food, bucket: PriceTier): number {
   if (bucket !== "treat") return 1;
-  if (food.indulgence >= 4) return 1.8;
+  // 降权条件优先于提权：不够犒劳/不够顶饱/轻食 一律 ×0.2，即便 indulgence 恰好>=4
+  // （如 satiety<3 的高 indulgence 小食，在「想吃好的」里不该顶格）。
   if (food.indulgence <= 2 || food.satiety < 3 || food.tags.includes("健康轻食")) return 0.2;
+  if (food.indulgence >= 4) return 1.8;
   return 1;
+}
+
+/** 桶内加权抽样的输入上下文（把 React hook 的状态收拢成纯数据，便于单测复用真实逻辑）。 */
+export interface BucketPickContext {
+  region: RegionKey;
+  /** region 加权是否生效：非中餐 family 或 region==="all" 时关闭（中餐二级精修专用）。 */
+  regionActive: boolean;
+  mood: Filters["mood"];
+  affinity: Affinity;
+  avoidIds: Set<string>;
+  recentIds: Set<string>;
+  /** 已见/最近/上一签的 canonicalGroup 集合——候选命中则 ×0.15 软避（§5.4）。 */
+  avoidGroups: Set<string>;
+}
+
+const EMPTY_SET: Set<string> = new Set(); // 水占无种草入口，seed 集合恒空
+
+/**
+ * 桶内单候选权重（§5.3/§5.4，纯函数，供水占抽样 + 单测复用同一实现）。
+ * w = regionWeight × moodWeight × (role===main?1.6) × familiarFactor
+ *     × indulgenceWeight(bucket) × canonicalGroup软避 × seedAvoidFactor
+ * ⚠️ budget 不在这里——价位由「先抽桶」决定（budgetBucketMix/resolveBucket），
+ * 桶内不再乘旧 budgetWeight/richnessWeight。
+ */
+export function bucketCandidateWeight(
+  food: Food,
+  bucket: PriceTier,
+  ctx: BucketPickContext,
+): number {
+  let w = ctx.regionActive ? regionWeight(food, ctx.region) : 1;
+  w *= moodWeight(food, ctx.mood);
+  if (food.role === "main") w *= 1.6; // 偏正餐
+  w *= familiarFactor(food, ctx.affinity);
+  w *= indulgenceWeight(food, bucket); // treat 桶：犒劳提权 / 轻食降权
+  if (food.canonicalGroup && ctx.avoidGroups.has(food.canonicalGroup)) w *= 0.15;
+  return w * seedAvoidFactor(food.id, EMPTY_SET, ctx.avoidIds, ctx.recentIds);
+}
+
+/**
+ * 在一个候选池里「先抽价位桶、桶内加权抽一道」（§5.1 第 5-6 步，纯函数）。
+ * 池非空即保证有返回（resolveBucket 只在整池全空时返回 null，此处 pool 非空则必命中）。
+ * 顺序契约由调用方保证：进来的 pool 必须已过 applyFamily + 去重（本函数只管桶抽样）。
+ */
+export function pickInPool(
+  pool: Food[],
+  budget: Filters["budget"],
+  ctx: BucketPickContext,
+): Food {
+  const byBucket: Record<PriceTier, Food[]> = { budget: [], normal: [], treat: [] };
+  for (const f of pool) byBucket[f.priceTier].push(f);
+  const nonEmpty = new Set<PriceTier>(
+    (["budget", "normal", "treat"] as PriceTier[]).filter((t) => byBucket[t].length > 0),
+  );
+  const bucket = resolveBucket(budgetBucketMix[budget], nonEmpty);
+  const inBucket = bucket ? byBucket[bucket] : pool; // 池非空 → bucket 必非 null；兜底取全池
+  const activeBucket: PriceTier = bucket ?? "normal";
+  return pickBy(inBucket, (f) => bucketCandidateWeight(f, activeBucket, ctx));
 }
 
 /**
