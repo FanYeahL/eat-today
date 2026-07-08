@@ -30,6 +30,8 @@ import {
   prefilterByAvailability,
   unavailableKeywords,
   pickInPool,
+  normalizeFilters,
+  normalizeRegion,
 } from "@/lib/pick-core";
 import { keywordOf } from "@/lib/availability";
 import type { Food, MealType, RegionKey } from "@/types/food";
@@ -97,17 +99,16 @@ export function useDivinationPick() {
   const [filters, setFiltersState] = useState<Filters>(DEFAULT_FILTERS);
   useEffect(() => {
     try {
-      const savedRegion = localStorage.getItem(
-        REGION_STORAGE_KEY,
-      ) as RegionKey | null;
-      if (savedRegion) setRegionState(savedRegion);
+      const savedRegion = localStorage.getItem(REGION_STORAGE_KEY);
+      // 脏值防线：只接受合法 RegionKey，否则回 "all"（详见 pick-core normalizeRegion）。
+      if (savedRegion !== null) setRegionState(normalizeRegion(savedRegion));
       const savedFilters = localStorage.getItem(FILTERS_STORAGE_KEY);
       if (savedFilters) {
-        const parsed = JSON.parse(savedFilters) as Partial<Filters>;
-        setFiltersState({ ...DEFAULT_FILTERS, ...parsed });
+        // 只接受合法 enum / 数组成员，非法字段静默回默认——绝不把脏值漏进抽取核心。
+        setFiltersState(normalizeFilters(JSON.parse(savedFilters)));
       }
     } catch {
-      // localStorage 不可用（隐私模式等）时忽略，用默认
+      // localStorage 不可用（隐私模式等）或 JSON 解析失败时忽略，用默认
     }
   }, []);
 

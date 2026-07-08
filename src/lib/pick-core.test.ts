@@ -5,6 +5,9 @@ import {
   bucketCandidateWeight,
   budgetBucketMix,
   applyFamily,
+  normalizeFilters,
+  normalizeRegion,
+  DEFAULT_FILTERS,
   type BucketPickContext,
 } from "@/lib/pick-core";
 import { EMPTY_AFFINITY } from "@/lib/regulars";
@@ -139,5 +142,63 @@ describe("applyFamily 顺序契约 + drink family-neutral", () => {
   it("family 过滤后为空 → 退回原池（不空池）", () => {
     const pool = [dish({ id: "cn1", cuisine: "cn-generic" })];
     expect(applyFamily(pool, ["western"])).toEqual(pool);
+  });
+});
+
+describe("normalizeFilters（localStorage 脏值防线 S8）", () => {
+  it("非对象输入（null / 字符串 / 数字）→ 全默认", () => {
+    expect(normalizeFilters(null)).toEqual(DEFAULT_FILTERS);
+    expect(normalizeFilters("garbage")).toEqual(DEFAULT_FILTERS);
+    expect(normalizeFilters(42)).toEqual(DEFAULT_FILTERS);
+    expect(normalizeFilters(undefined)).toEqual(DEFAULT_FILTERS);
+  });
+
+  it("非法 budget → 回默认 any（根治 budgetBucketMix[budget] === undefined 崩溃）", () => {
+    // 抽取核心会 budgetBucketMix[budget]；脏 budget 会拿到 undefined 后崩。
+    const out = normalizeFilters({ budget: "cheap", mood: "any", families: [] });
+    expect(out.budget).toBe("any");
+    // 归一化后的 budget 一定是 budgetBucketMix 的合法键
+    expect(budgetBucketMix[out.budget]).toBeDefined();
+  });
+
+  it("合法 budget（treat）→ 原样保留", () => {
+    expect(normalizeFilters({ budget: "treat" }).budget).toBe("treat");
+  });
+
+  it("非法 mood → 回默认 any；合法 mood 保留", () => {
+    expect(normalizeFilters({ mood: "hangry" }).mood).toBe("any");
+    expect(normalizeFilters({ mood: "spicy" }).mood).toBe("spicy");
+  });
+
+  it("families：滤掉非法成员、去重，保留合法家族", () => {
+    const out = normalizeFilters({
+      families: ["western", "klingon", "western", "chinese", 123],
+    });
+    expect(out.families.sort()).toEqual(["chinese", "western"]);
+  });
+
+  it("families 非数组（对象 / 字符串）→ 空数组（不限）", () => {
+    expect(normalizeFilters({ families: "western" }).families).toEqual([]);
+    expect(normalizeFilters({ families: { a: 1 } }).families).toEqual([]);
+  });
+
+  it("全非法字段的对象 → 等价默认", () => {
+    expect(
+      normalizeFilters({ budget: "x", mood: "y", families: "z" }),
+    ).toEqual(DEFAULT_FILTERS);
+  });
+});
+
+describe("normalizeRegion（localStorage 脏值防线 S8）", () => {
+  it("合法 RegionKey 原样保留", () => {
+    expect(normalizeRegion("chuanyu")).toBe("chuanyu");
+    expect(normalizeRegion("all")).toBe("all");
+  });
+
+  it("非法 / 非字符串 → 回 all", () => {
+    expect(normalizeRegion("atlantis")).toBe("all");
+    expect(normalizeRegion(null)).toBe("all");
+    expect(normalizeRegion(123)).toBe("all");
+    expect(normalizeRegion("")).toBe("all");
   });
 });

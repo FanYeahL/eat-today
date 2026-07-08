@@ -8,8 +8,8 @@
  * 这些函数从 useRoulette 机械提取而来，逻辑零改动。
  */
 
-import { regionMeta } from "@/config/regions-cuisine";
-import { familyOf } from "@/config/cuisine";
+import { regionMeta, regionList } from "@/config/regions-cuisine";
+import { familyOf, familyList } from "@/config/cuisine";
 import { keywordOf, checkKeyword, cachedAvailability } from "@/lib/availability";
 import type { Affinity } from "@/lib/regulars";
 import type { Coords } from "@/lib/geo";
@@ -34,6 +34,66 @@ export const DEFAULT_FILTERS: Filters = {
   mood: "any",
   budget: "any",
 };
+
+// —— localStorage 恢复的脏值防线（S8）——
+// 持久化的 region/filters 可能被旧版本写入、被手动改坏、或跨 app 复用同一 key 而含非法值。
+// 直接 merge 进 DEFAULT_FILTERS 会让非法 budget 一路漏到 budgetBucketMix[budget] → undefined 崩溃
+// （region/families 同理污染加权）。恢复时先过这层 normalize：只接受合法 enum / 数组成员，
+// 其余静默回退默认，保证抽取入口拿到的永远是干净值。
+
+/** 合法风味家族集合（来自 familyList 单一数据源） */
+const VALID_FAMILIES = new Set<CuisineFamily>(familyList.map((f) => f.key));
+/** 合法心情集合 */
+const VALID_MOODS = new Set<Filters["mood"]>(["any", "spicy", "mild", "meat", "light"]);
+/** 合法预算集合（"any" + 三个价��桶键，与 budgetBucketMix 对齐） */
+const VALID_BUDGETS = new Set<Filters["budget"]>(["any", "budget", "normal", "treat"]);
+/** 合法口味地区集合（来自 regionList 单一数据源，含 "all"） */
+const VALID_REGIONS = new Set<RegionKey>(regionList.map((r) => r.key));
+
+/**
+ * 把 localStorage 里 JSON.parse 出来的任意值收敛成一个合法 Filters：
+ * - 非对象 → 全默认。
+ * - families：只保留合法家族、去重；非数组 → 空数组（不限）。
+ * - mood/budget：合法 enum 才采纳，否则回默认。
+ * 永不抛错——脏缓存最多退化为「不限」，绝不把非法值漏进抽取核心。
+ */
+export function normalizeFilters(raw: unknown): Filters {
+  if (typeof raw !== "object" || raw === null) return { ...DEFAULT_FILTERS };
+  const r = raw as Record<string, unknown>;
+
+  const families = Array.isArray(r.families)
+    ? Array.from(
+        new Set(
+          r.families.filter(
+            (f): f is CuisineFamily =>
+              typeof f === "string" && VALID_FAMILIES.has(f as CuisineFamily),
+          ),
+        ),
+      )
+    : [];
+
+  const mood =
+    typeof r.mood === "string" && VALID_MOODS.has(r.mood as Filters["mood"])
+      ? (r.mood as Filters["mood"])
+      : DEFAULT_FILTERS.mood;
+
+  const budget =
+    typeof r.budget === "string" && VALID_BUDGETS.has(r.budget as Filters["budget"])
+      ? (r.budget as Filters["budget"])
+      : DEFAULT_FILTERS.budget;
+
+  return { families, mood, budget };
+}
+
+/**
+ * 把 localStorage 里的地区串收敛成合法 RegionKey：合法则采纳，否则回 "all"（不限地区）。
+ * 防止脏值漏进 regionWeight → regionMeta(region) 拿不到 tasteWeights。
+ */
+export function normalizeRegion(raw: unknown): RegionKey {
+  return typeof raw === "string" && VALID_REGIONS.has(raw as RegionKey)
+    ? (raw as RegionKey)
+    : "all";
+}
 
 /**
  * 按地区给一道主食算权重（中餐二级精修，只影响主食）。

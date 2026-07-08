@@ -9,8 +9,9 @@
  */
 
 import { AnimatePresence, motion } from "framer-motion";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { driftCardVariants } from "@/lib/water-motion";
+import { shopsSignature, clampFocus } from "./drift-cards.logic";
 
 export interface DriftShop {
   id: string;
@@ -54,6 +55,18 @@ export default function DriftCards({
   // 当前聚焦的卡 index；划走一张就 +1，到底回到 0（循环捞）
   const [focus, setFocus] = useState(0);
 
+  // 切菜（shops 换成另一道的店集）时把 focus 归零：否则 focus 停在旧高 index，
+  // 新列表更短时所有 offset=i-focus<0 会被下面的门控全过滤 → 界面空白（原 bug）。
+  // 依赖用���内容签名」而非 shops 数组引用——父层每帧重建 driftShops（新引用），
+  // 用引用会每帧 reset、划卡立刻被打回第一张。
+  const sig = shopsSignature(shops);
+  useEffect(() => {
+    setFocus(0);
+  }, [sig]);
+
+  // 渲染时再夹一层：即便 effect 还��提交，focus 也不越界，绝不产生空白帧。
+  const safeFocus = clampFocus(focus, shops.length);
+
   const strictCount = shops.filter((s) => s.tier === "strict").length;
   const hasExpansion = shops.some((s) => s.tier === "expansion");
   // 标题随两级动态：纯严格 / 严格不足靠同类店补 / 全是同类店
@@ -92,7 +105,7 @@ export default function DriftCards({
       <div className="relative h-52 w-72">
         <AnimatePresence>
           {shops.map((shop, i) => {
-            const offset = i - focus;
+            const offset = i - safeFocus;
             // 只渲染当前及其后两张，叠成一小摞
             if (offset < 0 || offset > 2) return null;
             const isTop = offset === 0;
@@ -125,7 +138,8 @@ export default function DriftCards({
                 dragElastic={0.6}
                 onDragEnd={(_, info) => {
                   if (Math.abs(info.offset.x) > 90) {
-                    setFocus((f) => (f + 1) % shops.length);
+                    // 从当前实际显示的卡（safeFocus）推进，避免 focus 若为脏值时跳错。
+                    setFocus((f) => (clampFocus(f, shops.length) + 1) % shops.length);
                   }
                 }}
               >
