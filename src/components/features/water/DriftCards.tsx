@@ -57,14 +57,14 @@ export default function DriftCards({
 
   // 切菜（shops 换成另一道的店集）时把 focus 归零：否则 focus 停在旧高 index，
   // 新列表更短时所有 offset=i-focus<0 会被下面的门控全过滤 → 界面空白（原 bug）。
-  // 依赖用���内容签名」而非 shops 数组引用——父层每帧重建 driftShops（新引用），
+  // 依赖用「内容签名」而非 shops 数组引用——父层每帧重建 driftShops（新引用），
   // 用引用会每帧 reset、划卡立刻被打回第一张。
   const sig = shopsSignature(shops);
   useEffect(() => {
     setFocus(0);
   }, [sig]);
 
-  // 渲染时再夹一层：即便 effect 还��提交，focus 也不越界，绝不产生空白帧。
+  // 渲染时再夹一层：即便 effect 还没提交，focus 也不越界，绝不产生空白帧。
   const safeFocus = clampFocus(focus, shops.length);
 
   const strictCount = shops.filter((s) => s.tier === "strict").length;

@@ -14,8 +14,9 @@
     "test": "vitest",
     "test:run": "vitest run",
     "lint:data": "node scripts/lint-foods-fulldb.mjs",
+    "lint:mojibake": "node scripts/lint-source-mojibake.mjs",
     "typecheck": "tsc --noEmit",
-    "verify": "npm run lint:data && npm run test:run && npm run typecheck && npm run lint"
+    "verify": "npm run lint:mojibake && npm run lint:data && npm run test:run && npm run typecheck && npm run lint"
   },
   "dependencies": {
     "framer-motion": "^12.40.0",

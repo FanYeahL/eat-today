@@ -45,7 +45,7 @@ export const DEFAULT_FILTERS: Filters = {
 const VALID_FAMILIES = new Set<CuisineFamily>(familyList.map((f) => f.key));
 /** 合法心情集合 */
 const VALID_MOODS = new Set<Filters["mood"]>(["any", "spicy", "mild", "meat", "light"]);
-/** 合法预算集合（"any" + 三个价��桶键，与 budgetBucketMix 对齐） */
+/** 合法预算集合（"any" + 三个价位桶键，与 budgetBucketMix 对齐） */
 const VALID_BUDGETS = new Set<Filters["budget"]>(["any", "budget", "normal", "treat"]);
 /** 合法口味地区集合（来自 regionList 单一数据源，含 "all"） */
 const VALID_REGIONS = new Set<RegionKey>(regionList.map((r) => r.key));
