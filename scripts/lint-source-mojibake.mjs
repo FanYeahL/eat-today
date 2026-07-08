@@ -9,7 +9,7 @@
  *   - 只扫 src/（真实源码与注释所在；scripts/ 下 lint-foods-fulldb 与
  *     gen-dish-candidates 故意内含该字符作检测器，扫它们会自伤，故不纳入）。
  *   - 只读文本扩展名（下方 TEXT_EXT 白名单），.woff/.ico/.png 等二进制天然排除。
- *   - 用码点 � 判定，本文件不含字面乱码字符，避免「检测器扫到自己」。
+ *   - 用码点判定（FFFD 常量走 \uFFFD 转义，非字面字符），本文件不含字面乱码，避免「检测器扫到自己」。
  */
 import { readFileSync, readdirSync } from "node:fs";
 import { fileURLToPath } from "node:url";
@@ -25,7 +25,7 @@ const TEXT_EXT = new Set([
   ".css", ".scss", ".json", ".md", ".mdx", ".html", ".svg", ".txt",
 ]);
 
-const FFFD = "�"; // replacement character，码点写法避免本文件自含字面乱码
+const FFFD = "\uFFFD"; // replacement character，用转义写法（非字面字符），避免本文件被自己的门扫到
 
 /** 递归收集 src 下所有文本文件的绝对路径 */
 function collect(dir) {
