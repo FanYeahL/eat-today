@@ -48,13 +48,7 @@ export default function WaterRecipePanel({ onClose }: WaterRecipePanelProps) {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 16 }}
       transition={{ duration: 0.4, ease: "easeOut" }}
-      className="absolute inset-0 z-50 flex flex-col items-center overflow-y-auto px-5 pb-12 pt-24"
-      style={{
-        background:
-          "linear-gradient(180deg, rgba(240,247,244,0.92) 0%, rgba(227,239,234,0.96) 100%)",
-        backdropFilter: "blur(10px)",
-        WebkitBackdropFilter: "blur(10px)",
-      }}
+      className="water-panel-overlay absolute inset-0 z-50 flex flex-col items-center overflow-y-auto px-5 pb-12 pt-24"
     >
       <div className="flex w-full max-w-md flex-col items-center gap-5">
         <button

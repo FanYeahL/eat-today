@@ -23,6 +23,13 @@
   --c-ink-muted: 108 130 150; /* #6c8296 次文字（蓝灰） */
   --c-paper: 38 60 78; /* #263c4e 中性前景 */
 
+  /* 玻璃质感通道（水占页面的玻璃层单一可信源，收敛原本散落的硬编码 rgba）。
+   * sage = 绿灰玻璃底色（事实上的第三主色，此前游离在 token 外）；
+   * edge = 玻璃高光边；depth = 玻璃投影/水底蓝影。 */
+  --c-sage: 150 179 170; /* #96b3aa 绿灰（玻璃底 / 主行动） */
+  --glass-edge: 255 255 255; /* 玻璃高光描边 */
+  --glass-depth: 63 143 208; /* 玻璃投影 + 水底渐变蓝 */
+
   /* 旧变量名沿用，指向通道，保持 body 背景/前景一致 */
   --background: rgb(var(--c-base));
   --foreground: rgb(var(--c-ink));
@@ -48,6 +55,74 @@ body {
   .hide-scrollbar {
     -ms-overflow-style: none;
     scrollbar-width: none;
+  }
+}
+
+/*
+ * 水占页面玻璃层（单一可信源）
+ * ─────────────────────────────────────────────
+ * 收敛此前散落在 page.tsx / 面板 / DriftCards 里的硬编码 rgba glass。
+ * 参数取现有众数（blur 8px、白底 0.5、白边 0.5），只统一、不加重——
+ * 不加大 blur、不加深阴影，目标是更轻更同源。透明度从 10 档收敛到 2~3 档。
+ * 全部 water- 前缀，避免污染全局 class 空间。
+ */
+@layer components {
+  /* 普通玻璃：控制条按钮 / 卡片 / tag。最轻的一档。 */
+  .water-glass-panel {
+    background: rgb(var(--glass-edge) / 0.5);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgb(var(--glass-edge) / 0.5);
+    box-shadow: 0 4px 14px rgb(var(--glass-depth) / 0.12);
+  }
+
+  /* 主行动按钮：开始投签 / 投签入水 / 定了 / 循此而去 / 就按这个。
+   * 各屏的主行动点，sage 0.34 最实一档。多个 CTA 共用此类，不再各写 inline。 */
+  .water-action-primary {
+    background: rgb(var(--c-sage) / 0.34);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgb(var(--glass-edge) / 0.55);
+    box-shadow: 0 6px 20px rgb(var(--c-sage) / 0.2);
+  }
+
+  /* 次级动作：调好了 / 留下，再占。sage 0.18 低一档、无 shadow，不抢主行动。 */
+  .water-glass-strong {
+    background: rgb(var(--c-sage) / 0.18);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgb(var(--glass-edge) / 0.5);
+  }
+
+  /* 更轻的三级动作：换一道。sage 0.12 最轻、白边更淡、无 shadow。 */
+  .water-glass-subtle {
+    background: rgb(var(--c-sage) / 0.12);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgb(var(--glass-edge) / 0.35);
+  }
+
+  /* 全屏面板底：自己做 / 干饭日记。竖向浅绿渐变 + 稍强 blur。 */
+  .water-panel-overlay {
+    background: linear-gradient(
+      180deg,
+      rgb(240 247 244 / 0.92) 0%,
+      rgb(227 239 234 / 0.96) 100%
+    );
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+
+  /* 水底深度渐变层（非玻璃：是水感光晕，不含实体边框/卡片）。 */
+  .water-depth-overlay {
+    background: linear-gradient(
+      180deg,
+      transparent 0%,
+      rgb(var(--glass-depth) / 0.08) 60%,
+      rgb(var(--glass-depth) / 0.16) 100%
+    );
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
   }
 }
 

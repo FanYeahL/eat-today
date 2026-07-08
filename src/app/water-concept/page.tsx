@@ -356,14 +356,7 @@ export default function WaterConceptPage() {
             </div>
             <button
               onClick={() => setEntered(true)}
-              className="pointer-events-auto rounded-full px-10 py-4 text-base font-medium tracking-[0.2em] text-ink/80"
-              style={{
-                background: "rgba(150, 179, 170, 0.34)",
-                backdropFilter: "blur(8px)",
-                WebkitBackdropFilter: "blur(8px)",
-                border: "1px solid rgba(255,255,255,0.55)",
-                boxShadow: "0 6px 20px rgba(150,179,170,0.2)",
-              }}
+              className="water-action-primary pointer-events-auto rounded-full px-10 py-4 text-base font-medium tracking-[0.2em] text-ink/80"
             >
               开 始 投 签
             </button>
@@ -406,25 +399,13 @@ export default function WaterConceptPage() {
             <div className="pointer-events-none absolute inset-x-0 top-8 z-40 flex items-center justify-between px-5">
               <button
                 onClick={onHome}
-                className="pointer-events-auto rounded-full px-3.5 py-2 text-xs tracking-[0.15em] text-ink/70 transition-colors hover:text-accent"
-                style={{
-                  background: "rgba(255,255,255,0.5)",
-                  backdropFilter: "blur(8px)",
-                  WebkitBackdropFilter: "blur(8px)",
-                  border: "1px solid rgba(255,255,255,0.6)",
-                }}
+                className="water-glass-panel pointer-events-auto rounded-full px-3.5 py-2 text-xs tracking-[0.15em] text-ink/70 transition-colors hover:text-accent"
               >
                 🏠 首页
               </button>
               <button
                 onClick={() => setQuickFilter(true)}
-                className="pointer-events-auto rounded-full px-3.5 py-2 text-xs tracking-[0.15em] text-ink/70 transition-colors hover:text-accent"
-                style={{
-                  background: "rgba(255,255,255,0.5)",
-                  backdropFilter: "blur(8px)",
-                  WebkitBackdropFilter: "blur(8px)",
-                  border: "1px solid rgba(255,255,255,0.6)",
-                }}
+                className="water-glass-panel pointer-events-auto rounded-full px-3.5 py-2 text-xs tracking-[0.15em] text-ink/70 transition-colors hover:text-accent"
               >
                 🎚 口味
               </button>
@@ -480,11 +461,7 @@ export default function WaterConceptPage() {
                   <div className="flex gap-3">
                     <button
                       onClick={() => setQuickFilter(false)}
-                      className="rounded-full px-6 py-3 text-sm font-medium text-ink/70"
-                      style={{
-                        background: "rgba(150, 179, 170, 0.18)",
-                        border: "1px solid rgba(255,255,255,0.5)",
-                      }}
+                      className="water-glass-strong rounded-full px-6 py-3 text-sm font-medium text-ink/70"
                     >
                       调好了
                     </button>
@@ -493,12 +470,7 @@ export default function WaterConceptPage() {
                         setQuickFilter(false);
                         void recastNow();
                       }}
-                      className="rounded-full px-6 py-3 text-sm font-medium text-ink/80"
-                      style={{
-                        background: "rgba(150, 179, 170, 0.34)",
-                        border: "1px solid rgba(255,255,255,0.55)",
-                        boxShadow: "0 6px 18px rgba(150,179,170,0.2)",
-                      }}
+                      className="water-action-primary rounded-full px-6 py-3 text-sm font-medium text-ink/80"
                     >
                       就按这个，占一签 →
                     </button>
@@ -575,14 +547,7 @@ export default function WaterConceptPage() {
                     onClick={onCast}
                     disabled={div.verifying || exhausted}
                     whileTap={{ scale: 0.94 }}
-                    className="rounded-full px-10 py-4 text-base font-medium tracking-[0.2em] text-ink/80 disabled:opacity-50"
-                    style={{
-                      background: "rgba(150, 179, 170, 0.3)",
-                      backdropFilter: "blur(8px)",
-                      WebkitBackdropFilter: "blur(8px)",
-                      border: "1px solid rgba(255,255,255,0.5)",
-                      boxShadow: "0 6px 20px rgba(150,179,170,0.18)",
-                    }}
+                    className="water-action-primary rounded-full px-10 py-4 text-base font-medium tracking-[0.2em] text-ink/80 disabled:opacity-50"
                   >
                     {div.verifying
                       ? "🛰️ 问 签 中…"
@@ -617,14 +582,7 @@ export default function WaterConceptPage() {
                   <div className="flex gap-3">
                     <button
                       onClick={onReExplore}
-                      className="rounded-full px-6 py-3 text-sm font-medium text-ink/80"
-                      style={{
-                        background: "rgba(150, 179, 170, 0.34)",
-                        backdropFilter: "blur(8px)",
-                        WebkitBackdropFilter: "blur(8px)",
-                        border: "1px solid rgba(255,255,255,0.55)",
-                        boxShadow: "0 6px 18px rgba(150,179,170,0.2)",
-                      }}
+                      className="water-action-primary rounded-full px-6 py-3 text-sm font-medium text-ink/80"
                     >
                       循此而去 →
                     </button>
@@ -690,38 +648,19 @@ export default function WaterConceptPage() {
                   <div className="flex flex-wrap items-center justify-center gap-2.5">
                     <button
                       onClick={onAddAndRecast}
-                      className="rounded-full px-5 py-3 text-sm font-medium text-ink/70"
-                      style={{
-                        background: "rgba(150, 179, 170, 0.18)",
-                        backdropFilter: "blur(8px)",
-                        WebkitBackdropFilter: "blur(8px)",
-                        border: "1px solid rgba(255,255,255,0.4)",
-                      }}
+                      className="water-glass-strong rounded-full px-5 py-3 text-sm font-medium text-ink/70"
                     >
                       ＋ 留下，再占
                     </button>
                     <button
                       onClick={onSkipAndRecast}
-                      className="rounded-full px-5 py-3 text-sm font-medium text-ink/65"
-                      style={{
-                        background: "rgba(150, 179, 170, 0.12)",
-                        backdropFilter: "blur(8px)",
-                        WebkitBackdropFilter: "blur(8px)",
-                        border: "1px solid rgba(255,255,255,0.35)",
-                      }}
+                      className="water-glass-subtle rounded-full px-5 py-3 text-sm font-medium text-ink/65"
                     >
                       ↻ 换一道
                     </button>
                     <button
                       onClick={onConfirm}
-                      className="rounded-full px-6 py-3 text-sm font-medium text-ink/80"
-                      style={{
-                        background: "rgba(150, 179, 170, 0.34)",
-                        backdropFilter: "blur(8px)",
-                        WebkitBackdropFilter: "blur(8px)",
-                        border: "1px solid rgba(255,255,255,0.55)",
-                        boxShadow: "0 6px 18px rgba(150,179,170,0.2)",
-                      }}
+                      className="water-action-primary rounded-full px-6 py-3 text-sm font-medium text-ink/80"
                     >
                       定了 · 共 {basket.length + (div.pick ? 1 : 0)} 道 →
                     </button>
@@ -839,12 +778,7 @@ function DriftExplore({
 
   return (
     <motion.div
-      className="absolute inset-0 z-30 flex flex-col items-center justify-end pb-16"
-      style={{
-        background:
-          "linear-gradient(180deg, transparent 0%, rgba(63,143,208,0.08) 60%, rgba(63,143,208,0.16) 100%)",
-        backdropFilter: "blur(2px)",
-      }}
+      className="water-depth-overlay absolute inset-0 z-30 flex flex-col items-center justify-end pb-16"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}

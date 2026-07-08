@@ -79,25 +79,13 @@ export default function DriftCards({
 
   return (
     <motion.div
-      className="absolute inset-0 z-30 flex flex-col items-center justify-end pb-10"
-      style={{
-        background:
-          "linear-gradient(180deg, transparent 0%, rgba(63,143,208,0.08) 60%, rgba(63,143,208,0.16) 100%)",
-        backdropFilter: "blur(2px)",
-      }}
+      className="water-depth-overlay absolute inset-0 z-30 flex flex-col items-center justify-end pb-10"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
     >
       <div
-        className="mb-5 rounded-full px-4 py-1.5 text-xs tracking-[0.2em] text-ink/70"
-        style={{
-          background: "rgba(255,255,255,0.55)",
-          backdropFilter: "blur(8px)",
-          WebkitBackdropFilter: "blur(8px)",
-          border: "1px solid rgba(255,255,255,0.6)",
-          boxShadow: "0 4px 14px rgba(63,143,208,0.12)",
-        }}
+        className="water-glass-panel mb-5 rounded-full px-4 py-1.5 text-xs tracking-[0.2em] text-ink/70"
       >
         {heading}
       </div>
