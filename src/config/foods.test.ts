@@ -80,6 +80,67 @@ describe("tea 取池 (§3.1)", () => {
       expect(pool.every((f) => isDefaultPickable(f))).toBe(true);
     }
   });
+
+  it("tea 池必须含 priceTier==='treat' 候选（守卫「想吃好的」不再 fallback 到普通菜）", () => {
+    // 回归防线：曾经 tea 池 treat=0，导致「tea+想吃好的」75% treat 混合比塌到 normal 桶，
+    // 抽出波奇饭/鸡胸肉沙拉这类不犒劳的项。此处钉死 treat 候选存在且成规模。
+    const treat = tea.filter((f) => f.priceTier === "treat");
+    expect(treat.length).toBeGreaterThanOrEqual(8);
+    // 且都是「想吃好的」该出的：indulgence>=4、非健康轻食
+    expect(treat.every((f) => f.indulgence >= 4)).toBe(true);
+    expect(treat.some((f) => f.tags.includes("健康轻食"))).toBe(false);
+    // 甜品/饮品顶不饱是常态：treat 里应有 satiety<3 的项（正是本次特判要救的对象）
+    expect(treat.some((f) => f.satiety < 3)).toBe(true);
+  });
+});
+
+describe("meal×family×price 分布快照 + treat 桶空洞守卫 (§5/§6)", () => {
+  // 每个「用户能选的核心组合」= 餐段 × 风味家族。treat 桶为 0 时，budgetBucketMix.treat 的
+  // 0.75 权重会整体塌到 normal 桶 → 「想吃好的」100% 抽到普通菜（就是 tea 那个 bug 的通式）。
+  // drink 是 family-neutral（applyFamily 放行），所以某 family 的 treat 可用性 =
+  //   该 family 的 treat dish + 全部 treat drink。此处按 applyFamily 后的真实池计数，钉死不为 0。
+  const ALL_MEALS: MealType[] = ["breakfast", "lunch", "tea", "dinner", "midnight"];
+
+  /** 复刻运行时：某餐段池经 applyFamily(family) 后，某价位桶的候选数（drink family-neutral 已含）。 */
+  function bucketCount(meal: MealType, fam: CuisineFamily, price: string): number {
+    const pool = applyFamily(foodsByMealForSinglePick(meal), [fam]);
+    return pool.filter((f) => f.priceTier === price).length;
+  }
+
+  it("每个 餐段×家族 的 treat 桶都可达（非 0，杜绝 100% fallback）", () => {
+    const holes: string[] = [];
+    for (const meal of ALL_MEALS) {
+      for (const fam of FAMILIES) {
+        if (bucketCount(meal, fam, "treat") === 0) holes.push(`${meal}×${fam}`);
+      }
+    }
+    expect(holes).toEqual([]);
+  });
+
+  it("每个 餐段×家族 至少还有 normal 或 budget 兜底（池非空）", () => {
+    for (const meal of ALL_MEALS) {
+      for (const fam of FAMILIES) {
+        const pool = applyFamily(foodsByMealForSinglePick(meal), [fam]);
+        expect(pool.length).toBeGreaterThan(0);
+      }
+    }
+  });
+
+  // 早餐 / 下午茶是「特殊餐段」，不套午晚餐的 family×price 规模门槛（那是 lint-foods-fulldb 的事），
+  // 这里只对它们要求「treat 可达」——本组第一个用例已覆盖，这里补一个显式回归锚点。
+  it("早餐每个家族 treat 可达（曾全 t=0）", () => {
+    for (const fam of FAMILIES) {
+      expect(bucketCount("breakfast", fam, "treat")).toBeGreaterThan(0);
+    }
+  });
+
+  it("午餐 western treat 可达（曾 t=0）", () => {
+    expect(bucketCount("lunch", "western", "treat")).toBeGreaterThan(0);
+  });
+
+  it("宵夜 western treat 可达（曾 t=0）", () => {
+    expect(bucketCount("midnight", "western", "treat")).toBeGreaterThan(0);
+  });
 });
 
 describe("canonicalGroupOfFoodId 全局映射 (P2：跨餐段软避)", () => {

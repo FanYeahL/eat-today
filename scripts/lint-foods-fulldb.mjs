@@ -105,6 +105,38 @@ for (const f of sidePoolCorrect) {
     errs.push(`[${f.name}] dish/side 却 satiety>=3（应 meal 或降 satiety）`);
 }
 
+// 8. treat 桶空洞守卫：每个「餐段×家族」的 treat 桶必须可达（含 family-neutral 的 treat drink），
+//    否则「想吃好的」会 100% fallback 到普通菜（tea bug 的通式）。
+//    单菜池口径 = mainFoodsByMeal(meal)（meal 层）+ side + drink（仅 tea 并入 side/drink）。
+//    drink family-neutral：任意家族都能抽到 → treat drink 记入每个家族的可达数。
+const MEALS = ["breakfast", "lunch", "tea", "dinner", "midnight"];
+const treatHoles = [];
+for (const meal of MEALS) {
+  // 该餐段的「单菜池」候选（对齐 foodsByMealForSinglePick）
+  let poolForMeal;
+  if (meal === "tea") {
+    poolForMeal = foods.filter(
+      (f) =>
+        f.meals.includes("tea") &&
+        f.entityType === "dish" &&
+        (f.kind === "drink" || f.pickLayer === "meal" || f.pickLayer === "side"),
+    );
+  } else {
+    // 非 tea：仅 meal 层（kind main / dish / pickLayer meal）
+    poolForMeal = foods.filter(
+      (f) => f.meals.includes(meal) && f.kind === "main" && f.entityType === "dish" && f.pickLayer === "meal",
+    );
+  }
+  const treatDrinks = poolForMeal.filter((f) => f.kind === "drink" && f.priceTier === "treat").length;
+  for (const fam of ["chinese", "western", "jpkr", "exotic"]) {
+    const treatDish = poolForMeal.filter(
+      (f) => f.kind !== "drink" && FAM[f.cuisine] === fam && f.priceTier === "treat",
+    ).length;
+    if (treatDish + treatDrinks === 0) treatHoles.push(`${meal}×${fam}`);
+  }
+}
+if (treatHoles.length) errs.push(`treat 桶空洞（想吃好的会 100% fallback）: ${treatHoles.join(", ")}`);
+
 // ---- 报告 ----
 console.log(`全库 ${foods.length} 条 | 默认 meal 池 ${pool.length}`);
 console.log(`餐段: ${Object.entries(segCount).map(([s, c]) => `${s} ${c}/${SEG_FLOOR[s]}`).join(" · ")}`);

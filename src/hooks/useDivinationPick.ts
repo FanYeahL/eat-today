@@ -64,6 +64,7 @@ function pickOneMain(
   recentIds: Set<string>,
   affinity: ReturnType<typeof getAffinity>,
   avoidGroups: Set<string>,
+  meal: MealType,
 ): Food {
   const funnel = applyFunnel(pool, filters);
   const regionActive =
@@ -77,6 +78,7 @@ function pickOneMain(
     avoidIds,
     recentIds,
     avoidGroups,
+    meal, // 下午茶特判：treat 免 satiety 惩罚 + 关闭 role main 偏向（见 bucketCandidateWeight）
   });
 }
 
@@ -194,7 +196,7 @@ export function useDivinationPick() {
         setVerifying(false);
         // 无坐标：直接在「没见过的」里加权抽，不重复。
         return settle(
-          pickOneMain(unseen, filters, region, avoidIds, recentIds, affinity, avoidGroups),
+          pickOneMain(unseen, filters, region, avoidIds, recentIds, affinity, avoidGroups, meal),
         );
       }
 
@@ -204,7 +206,7 @@ export function useDivinationPick() {
       for (let round = 0; round < MAX_ROUNDS; round++) {
         // 可用性预过滤作用在 unseen 上：内部空了退回 unseen（绝不退回见过的）。
         const p = prefilterByAvailability(unseen, coords);
-        const candidate = pickOneMain(p, filters, region, avoidIds, recentIds, affinity, avoidGroups);
+        const candidate = pickOneMain(p, filters, region, avoidIds, recentIds, affinity, avoidGroups, meal);
         const bad = await unavailableKeywords([candidate], coords);
         chosen = candidate; // 兜底留着最后一道（仍 ∈ unseen，不会重复）
         if (bad.size === 0) break; // 附近买得到，定了

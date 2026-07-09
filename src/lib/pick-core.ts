@@ -11,7 +11,7 @@ import { familyOf, familyList } from "@/config/cuisine";
 import { keywordOf, checkKeyword, cachedAvailability } from "@/lib/availability";
 import type { Affinity } from "@/lib/regulars";
 import type { Coords } from "@/lib/geo";
-import type { Food, RegionKey, CuisineFamily, PriceTier } from "@/types/food";
+import type { Food, RegionKey, CuisineFamily, PriceTier, MealType } from "@/types/food";
 
 /** 漏斗筛选：风味家族（多选）/ 心情 / 预算 */
 export interface Filters {
@@ -200,16 +200,28 @@ export function resolveBucket(
 /**
  * 桶内丰盛度乘子（§5.3）：仅 treat 桶生效，承担「想吃好的」的犒劳提权。
  * - indulgence>=4 → ×1.8（顶格犒劳菜提权）
- * - indulgence<=2 或 satiety<3 或含「健康轻食」→ ×0.2（不够犒劳/不够顶饱/轻食降权）
+ * - indulgence<=2 或含「健康轻食」→ ×0.2（不够犒劳 / 轻食降权）
+ * - satiety<3 → ×0.2，但**仅正餐餐段**：正餐「想吃好的」该顶饱又丰盛（一道小食不算犒劳一顿）。
  * - 其它 → ×1
+ *
+ * ⚠️ meal 感知（下午茶特判）：下午茶的 treat 本就是「小而贵 / 精致 / 犒劳」——
+ * 巴斯克芝士、提拉米苏、精品手冲天然 satiety 低，不该因为「不顶饱」被降权，否则
+ * 「tea + 想吃好的」永远抽不到真正的甜品犒劳项。故 meal==="tea" 时跳过 satiety<3 惩罚，
+ * 但仍照常降权 indulgence<=2 / 健康轻食（沙拉、无糖美式这类不符合「想吃好的」）。
+ * 正餐餐段（早/午/晚/宵）口径完全不变。
  * ⚠️ 不惩罚「清淡」——清淡是口味非「不犒劳」信号（白灼基围虾清淡但 indulgence 4，应留）。
- * budget/normal 桶恒 1。默认 meal 池 satiety>=3，但 tea 场景桶内含 side/drink（satiety<3），故规则要稳。
+ * budget/normal 桶恒 1。
  */
-export function indulgenceWeight(food: Food, bucket: PriceTier): number {
+export function indulgenceWeight(
+  food: Food,
+  bucket: PriceTier,
+  meal?: MealType,
+): number {
   if (bucket !== "treat") return 1;
-  // 降权条件优先于提权：不够犒劳/不够顶饱/轻食 一律 ×0.2，即便 indulgence 恰好>=4
-  // （如 satiety<3 的高 indulgence 小食，在「想吃好的」里不该顶格）。
-  if (food.indulgence <= 2 || food.satiety < 3 || food.tags.includes("健康轻食")) return 0.2;
+  // 不够犒劳 / 轻食：一律 ×0.2（所有餐段通用，即便 indulgence 恰好>=4）
+  if (food.indulgence <= 2 || food.tags.includes("健康轻食")) return 0.2;
+  // 不顶饱降权：仅正餐；下午茶的甜品/饮品顶不饱是常态，不在此降权（meal 感知特判）。
+  if (meal !== "tea" && food.satiety < 3) return 0.2;
   if (food.indulgence >= 4) return 1.8;
   return 1;
 }
@@ -225,16 +237,25 @@ export interface BucketPickContext {
   recentIds: Set<string>;
   /** 已见/最近/上一签的 canonicalGroup 集合——候选命中则 ×0.15 软避（§5.4）。 */
   avoidGroups: Set<string>;
+  /**
+   * 当前餐段。treat 桶的丰盛度乘子据此做 tea 特判（下午茶甜品不因 satiety<3 降权）；
+   * 且 tea 场景关闭「role===main ×1.6」正餐偏向——否则波奇饭/沙拉这类正餐项会盖过甜品。
+   * 缺省（正餐默认路径不显式传）时按正餐口径处理，行为与改动前一致。
+   */
+  meal?: MealType;
 }
 
 const EMPTY_SET: Set<string> = new Set(); // 水占无种草入口，seed 集合恒空
 
 /**
  * 桶内单候选权重（§5.3/§5.4，纯函数，供水占抽样 + 单测复用同一实现）。
- * w = regionWeight × moodWeight × (role===main?1.6) × familiarFactor
- *     × indulgenceWeight(bucket) × canonicalGroup软避 × seedAvoidFactor
+ * w = regionWeight × moodWeight × (role===main?1.6，tea 场景关闭) × familiarFactor
+ *     × indulgenceWeight(bucket, meal) × canonicalGroup软避 × seedAvoidFactor
  * ⚠️ budget 不在这里——价位由「先抽桶」决定（budgetBucketMix/resolveBucket），
  * 桶内只按 indulgenceWeight 调丰盛度，不再乘任何 per-dish 预算权重。
+ * ⚠️ role===main ×1.6 的「偏正餐」在下午茶不成立：tea 池里 role=main 的多是波奇饭/沙拉
+ * 这类正餐轻食，加权会把它们顶到甜品前面。故 meal==="tea" 时关闭该加权，只让甜品/饮品
+ * 凭 indulgence 竞争；正餐餐段一切照旧。
  */
 export function bucketCandidateWeight(
   food: Food,
@@ -243,9 +264,9 @@ export function bucketCandidateWeight(
 ): number {
   let w = ctx.regionActive ? regionWeight(food, ctx.region) : 1;
   w *= moodWeight(food, ctx.mood);
-  if (food.role === "main") w *= 1.6; // 偏正餐
+  if (food.role === "main" && ctx.meal !== "tea") w *= 1.6; // 偏正餐（下午茶不偏）
   w *= familiarFactor(food, ctx.affinity);
-  w *= indulgenceWeight(food, bucket); // treat 桶：犒劳提权 / 轻食降权
+  w *= indulgenceWeight(food, bucket, ctx.meal); // treat 桶：犒劳提权 / 轻食降权（tea 免 satiety 惩罚）
   if (food.canonicalGroup && ctx.avoidGroups.has(food.canonicalGroup)) w *= 0.15;
   return w * seedAvoidFactor(food.id, EMPTY_SET, ctx.avoidIds, ctx.recentIds);
 }
