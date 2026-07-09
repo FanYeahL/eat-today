@@ -1,6 +1,6 @@
 // @ts-nocheck
 /**
- * land-dishes.mjs —— 把 docs/dish-candidates.draft.json 的 136 道机械落进 foods.ts。
+ * land-dishes.mjs —— 把 docs/archive/dish-candidates.draft.json 的候选菜机械落进 foods.ts。
  *   纯消费：id/emoji/字段直通，绝不重新生成 id。
  *
  * 用法：
@@ -19,7 +19,7 @@ import { dirname, join } from "node:path";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const FOODS_PATH = join(__dirname, "..", "src", "config", "foods.ts");
-const DRAFT_PATH = join(__dirname, "..", "docs", "dish-candidates.draft.json");
+const DRAFT_PATH = join(__dirname, "..", "docs", "archive", "dish-candidates.draft.json");
 const WRITE = process.argv.includes("--write");
 
 const src = readFileSync(FOODS_PATH, "utf8");

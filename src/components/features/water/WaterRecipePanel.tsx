@@ -12,7 +12,7 @@
  * 用词也避开「摇/抽」这类仪式感动词：这里没有滚轮动画，只是随手翻一道，
  * 也不和水占的「投签/抽中」抢词。
  *
- * 随机逻辑复用 cook/recipe-random（与 CookMode 同一份，不重复）；
+ * 随机逻辑复用 cook/recipe-random（抽成共享纯函数，不在面板里重写）；
  * 拉取走 useRecipe（内建 AbortController + 请求序号，连翻不会旧结果覆盖新结果）。
  * 数据走 /api/recipes（HowToCook 数据集）。
  */

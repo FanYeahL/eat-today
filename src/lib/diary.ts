@@ -25,6 +25,25 @@ const STORAGE_KEY = "foodie:diary";
 /** 历史避重默认回看天数 */
 export const RECENT_DAYS = 3;
 const DAY_MS = 24 * 60 * 60 * 1000;
+/**
+ * 日记最多保留多少条。防 localStorage 无上限膨胀（长期天天用可能撑到几千条，
+ * 拖慢每次 JSON.parse / 序列化，甚至触配额）。够覆盖看板统计（陪伴天数用首条 ts）
+ * 与近 N 天避重，超出的最老记录裁掉——只增不减的口径针对「不删单条」，
+ * 总量兜底裁剪是工程护栏、不改产品语义。
+ */
+export const MAX_ENTRIES = 1000;
+
+/**
+ * 裁到最多 max 条，保留最近的（数组按时间升序，从头部裁最老）。纯函数，便于测试。
+ * max<=0 视作不裁（防误配把日记清空）。
+ */
+export function trimEntries(
+  entries: DiaryEntry[],
+  max = MAX_ENTRIES,
+): DiaryEntry[] {
+  if (max <= 0 || entries.length <= max) return entries;
+  return entries.slice(entries.length - max);
+}
 
 /** 日记里一道菜的精简快照（够算统计 + 够展示，不存整个 Food） */
 export interface DiaryFood {
@@ -87,7 +106,7 @@ export function addEntry(foods: Food[], meal: MealType, now: number): void {
   try {
     const entries = getEntries();
     entries.push({ ts: now, meal, items: foods.map(toDiaryFood) });
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(trimEntries(entries)));
   } catch {
     // 写不进去（满了 / 隐私模式）就算了，不影响主流程
   }

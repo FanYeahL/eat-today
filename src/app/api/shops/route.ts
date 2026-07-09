@@ -1,5 +1,10 @@
 import { NextResponse } from "next/server";
 import type { Shop, ShopsResponse } from "@/types/shop";
+import {
+  parseShopQuery,
+  isQueryError,
+  fetchWithTimeout,
+} from "@/lib/shop-query";
 
 /**
  * 店铺搜索代理
@@ -69,7 +74,7 @@ async function fetchAmap(
       await sleep(Math.round(bases[i] * jitter));
     }
     await passThrottle(); // 过全局限流闸再打高德
-    const res = await fetch(`${endpoint}?${qs}`, {
+    const res = await fetchWithTimeout(`${endpoint}?${qs}`, {
       // 高德数据有时效性，但同条件短时间内可缓存，降低额度消耗
       next: { revalidate: 60 },
     });
@@ -181,21 +186,17 @@ export async function GET(request: Request) {
   }
 
   const { searchParams } = new URL(request.url);
-  const keyword = searchParams.get("keyword")?.trim();
-  const lng = searchParams.get("lng");
-  const lat = searchParams.get("lat");
-  const city = searchParams.get("city")?.trim();
+  // 解析 + 校验交给纯函数（长度上限、经纬度合法性与成对性），脏输入早拒不透传高德。
   // count 模式：只关心「附近有没有相关的店」，回 {count}。给「抽取之前按附近过滤」用。
   // 注意：不能再用高德裸 count——那是模糊匹配的总数，含大量噪音（搜牛肉粉混进螺蛳粉），
   // 必须取整页 + 相关性过滤后再数，才与展示一致、不假阳性。
-  const countOnly = searchParams.get("count") === "1";
-
-  if (!keyword) {
-    return NextResponse.json({ error: "缺少 keyword 参数。" }, { status: 400 });
+  const parsed = parseShopQuery(searchParams);
+  if (isQueryError(parsed)) {
+    return NextResponse.json({ error: parsed.error }, { status: parsed.status });
   }
+  const { keyword, city, lng, lat, useAround, countOnly } = parsed;
 
   // 有经纬度走周边搜索（按距离排序），否则走城市关键字搜索
-  const useAround = Boolean(lng && lat);
   const via: ShopsResponse["via"] = useAround ? "location" : "city";
 
   // 两种模式都取整页 + extensions=all：相关性过滤要读 keytag/type，

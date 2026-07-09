@@ -212,7 +212,7 @@ export function rouletteMainsByMeal(meal: MealType): Food[] {
 > `side` 层（satiety<3）**是额外产出，不占任何 meal 缺口配额**（见 §4.1）。
 > 收尾判据：**不是"总共写了 129 行"，而是"meal 层净增达到各格目标"**——写了多少 side 行都不算数。
 
-dish（meal 层）目标：Phase 1 硬验收以 §7 全库 lint 为准（餐段 40/120/140/70 + family×price budget≥8/normal≥15/treat≥8）。~237/240 是早期旧 baseline 下的规划量级，现降级为**历史/长期参考**，不作为收尾判据（见 §4.0 作废说明）。各格 = 目标(meal 净增)。详见 `dish-candidates.draft.json`。
+dish（meal 层）目标：Phase 1 硬验收以 §7 全库 lint 为准（餐段 40/120/140/70 + family×price budget≥8/normal≥15/treat≥8）。~237/240 是早期旧 baseline 下的规划量级，现降级为**历史/长期参考**，不作为收尾判据（见 §4.0 作废说明）。各格 = 目标(meal 净增)。详见 `docs/archive/dish-candidates.draft.json`（已落库归档）。
 
 | family | budget | normal | treat | 合计(meal) |
 |---|---|---|---|---|
@@ -387,7 +387,7 @@ function resolveBucket(mix: Record<PriceTier, number>, nonEmpty: Set<PriceTier>)
 
 | 步 | 内容 | 产物 | 依赖 |
 |---|---|---|---|
-| S0 | **审候选菜单**（user+Codex 审 `dish-candidates.draft.json`） | 定稿菜单 | 本规格 |
+| S0 | **审候选菜单**（user+Codex 审 `docs/archive/dish-candidates.draft.json`） | 定稿菜单 | 本规格 |
 | S1 ✅ | 扩展 `types/food.d.ts`（§1 新字段 + 枚举） | 类型就绪 | — |
 | S2 ✅ | 给**存量 192 条**补新字段（satiety/indulgence/convenience/occasion/pickLayer/search），id 不动（`migrate-existing-foods.mjs`） | 存量迁移完 | S1 |
 | S3 ✅ | 落库 136 新菜 + 补批 18 + 重分 8 回 meal；全库 lint 达 §7 硬门槛（`land-dishes.mjs`/`lint-foods-fulldb.mjs`） | 数据达标 | S0,S1 |

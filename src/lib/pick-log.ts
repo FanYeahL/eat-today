@@ -17,6 +17,24 @@
 import type { EntityType, PriceTier } from "@/types/food";
 
 const STORAGE_KEY = "foodie:picklog";
+/**
+ * 埋点最多保留多少条。抽签比「定了」频繁得多（每次 reroll 都记一条），
+ * 长期累积更容易撑爆 localStorage，故上限比 diary 略大。接受率是比例统计，
+ * 裁掉最老样本不影响近期信号的可读性；这是工程护栏、不改埋点语义。
+ */
+export const MAX_PICKLOG_ENTRIES = 2000;
+
+/**
+ * 裁到最多 max 条，保留最近的（数组时间升序，从头部裁最老）。纯函数，便于测试。
+ * max<=0 视作不裁。
+ */
+export function trimPickLog(
+  log: PickLogEntry[],
+  max = MAX_PICKLOG_ENTRIES,
+): PickLogEntry[] {
+  if (max <= 0 || log.length <= max) return log;
+  return log.slice(log.length - max);
+}
 
 /** 用户对一次抽中的处置 */
 export type PickAction = "accept" | "reroll";
@@ -82,7 +100,7 @@ export function logPick(
       budget,
       action,
     });
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(log));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(trimPickLog(log)));
   } catch {
     // 忽略写入失败
   }
