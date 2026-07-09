@@ -5814,7 +5814,7 @@ export const foods: Food[] = [
     priceTier: "treat",
     spicy: 0,
     tags: ["高热量", "解馋", "高蛋白"],
-    meals: ["dinner"],
+    meals: ["lunch", "dinner"],
     recommend: 5,
     satiety: 4,
     indulgence: 5,
@@ -5855,7 +5855,7 @@ export const foods: Food[] = [
     priceTier: "treat",
     spicy: 1,
     tags: ["解馋", "高蛋白"],
-    meals: ["dinner"],
+    meals: ["lunch", "dinner"],
     recommend: 5,
     satiety: 4,
     indulgence: 4,
@@ -7485,7 +7485,7 @@ export const foods: Food[] = [
     pickLayer: "side",
     search: { gateQuery: "甜品", displayQuery: "马卡龙", fallbackQueries: ["蛋糕", "咖啡"] },
     recommend: 4,
-    description: "少女的酥皮小圆饼，颜值即正义。",
+    description: "酥皮小圆饼五颜六色，颜值即正义。",
   },
   {
     id: "canele",
@@ -7661,7 +7661,7 @@ export const foods: Food[] = [
     pickLayer: "side",
     search: { gateQuery: "奶茶", displayQuery: "黑糖珍珠奶茶", fallbackQueries: ["奶茶", "甜品"] },
     recommend: 4,
-    description: "黑糖挂壁、珍珠 Q 弹，甜妹快乐水。",
+    description: "黑糖挂壁、珍珠 Q 弹，一杯甜到位。",
   },
 
   // ─────────────────────────────────────────────
@@ -7737,7 +7737,7 @@ export const foods: Food[] = [
     description: "松饼配培根牛油果，一盘全都要。",
   },
   {
-    id: "beef-congee-deluxe",
+    id: "seafood-congee-deluxe",
     name: "现熬海鲜粥配油条",
     entityType: "dish",
     emoji: "🥣",
@@ -7893,7 +7893,8 @@ export const foods: Food[] = [
     description: "满满大虾配浓椰浆汤，丰盛的南洋早午餐。",
   },
   // ─────────────────────────────────────────────
-  // 午餐·western treat（原 lunch western treat=0）——牛排/意面/惠灵顿等，meals 含 lunch。
+  // 午餐·western treat（原 lunch western treat=0）——只为 lunch 补洞，不进 dinner。
+  // 另有既有 it-seafood-pasta / west-beef-wellington 已补加 lunch（不再重复新增）。
   // 正餐口径 treat：satiety>=3 / pickLayer="meal"。
   // ─────────────────────────────────────────────
   {
@@ -7908,7 +7909,7 @@ export const foods: Food[] = [
     priceTier: "treat",
     spicy: 0,
     tags: ["高蛋白", "解馋"],
-    meals: ["lunch", "dinner"],
+    meals: ["lunch"],
     satiety: 4,
     indulgence: 4,
     convenience: "restaurant",
@@ -7930,7 +7931,7 @@ export const foods: Food[] = [
     priceTier: "treat",
     spicy: 0,
     tags: ["高热量", "解馋"],
-    meals: ["lunch", "dinner"],
+    meals: ["lunch"],
     satiety: 3,
     indulgence: 4,
     convenience: "restaurant",
@@ -7941,53 +7942,8 @@ export const foods: Food[] = [
     canonicalGroup: "yimian",
     description: "黑松露的香气裹着奶油面，奢侈的一口。",
   },
-  {
-    id: "seafood-linguine",
-    name: "海鲜扁意面",
-    entityType: "dish",
-    emoji: "🍝",
-    shopKeyword: "意大利菜",
-    kind: "main",
-    cuisine: "western-italian",
-    role: "main",
-    priceTier: "treat",
-    spicy: 0,
-    tags: ["高蛋白", "解馋"],
-    meals: ["lunch", "dinner"],
-    satiety: 4,
-    indulgence: 4,
-    convenience: "restaurant",
-    occasion: ["date", "friends"],
-    pickLayer: "meal",
-    search: { gateQuery: "意大利菜", displayQuery: "海鲜意面", fallbackQueries: ["意大利菜", "西餐厅"] },
-    recommend: 4,
-    canonicalGroup: "yimian",
-    description: "蛤蜊大虾配白酒蒜香，海味十足。",
-  },
-  {
-    id: "beef-wellington",
-    name: "惠灵顿牛排",
-    entityType: "dish",
-    emoji: "🥩",
-    shopKeyword: "西餐厅",
-    kind: "main",
-    cuisine: "western-generic",
-    role: "main",
-    priceTier: "treat",
-    spicy: 0,
-    tags: ["高蛋白", "解馋", "高热量"],
-    meals: ["lunch", "dinner"],
-    satiety: 4,
-    indulgence: 5,
-    convenience: "restaurant",
-    occasion: ["date"],
-    pickLayer: "meal",
-    search: { gateQuery: "西餐厅", displayQuery: "惠灵顿牛排", fallbackQueries: ["西餐厅", "牛排"] },
-    recommend: 4,
-    description: "酥皮裹菲力，切开粉嫩，仪式感顶配。",
-  },
   // ─────────────────────────────────────────────
-  // 宵夜·western treat（原 midnight western treat=0，低优先级补足）。
+  // 宵夜·western treat（原 midnight western treat=0，低优先级补足）——只进 midnight。
   // ─────────────────────────────────────────────
   {
     id: "midnight-steak",
@@ -8001,7 +7957,7 @@ export const foods: Food[] = [
     priceTier: "treat",
     spicy: 0,
     tags: ["高蛋白", "解馋", "高热量"],
-    meals: ["dinner", "midnight"],
+    meals: ["midnight"],
     satiety: 4,
     indulgence: 5,
     convenience: "restaurant",

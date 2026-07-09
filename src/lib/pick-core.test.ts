@@ -173,10 +173,9 @@ describe("pickInPool — tea + treat 抽样不塌到普通菜（端到端）", (
     expect(treatHits / N).toBeGreaterThan(0.70);
   });
 
-  it("正餐 lunch + treat：satiety<3 的甜品被降权，正餐轻食反而更可能（对照，证明没动正餐）", () => {
-    // 同一池按 lunch 口径：treat 桶里 cake/tira/dirty 都 satiety<3 → ×0.2；
-    // 但 normal 桶的波奇饭 satiety3/indulgence2 在 normal 桶恒权重 1，且 role main ×1.6。
-    // 这里只断言「lunch 下甜品不再被特判豁免」——treat 桶内甜品权重回到 0.2。
+  it("正餐 lunch + treat：satiety<3 仍降权（对照，证明没动正餐）", () => {
+    // 同一池按 lunch 口径：treat 桶里 cake/tira/dirty 都 satiety<3 → ×0.2（不像 tea 免罚）。
+    // 断言「lunch 下 satiety<3 的高 indulgence 项不再被特判豁免」——treat 桶内权重回到 0.2。
     const lunchCtx: BucketPickContext = { ...baseCtx(), meal: "lunch" };
     expect(bucketCandidateWeight(cake, "treat", lunchCtx)).toBeCloseTo(0.2, 6);
     expect(bucketCandidateWeight(dirty, "treat", lunchCtx)).toBeCloseTo(0.2, 6);

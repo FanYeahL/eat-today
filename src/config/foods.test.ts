@@ -117,11 +117,12 @@ describe("meal×family×price 分布快照 + treat 桶空洞守卫 (§5/§6)", (
     expect(holes).toEqual([]);
   });
 
-  it("每个 餐段×家族 至少还有 normal 或 budget 兜底（池非空）", () => {
+  it("每个 餐段×家族 至少还有 normal 或 budget 兜底（treat 外仍可抽）", () => {
     for (const meal of ALL_MEALS) {
       for (const fam of FAMILIES) {
-        const pool = applyFamily(foodsByMealForSinglePick(meal), [fam]);
-        expect(pool.length).toBeGreaterThan(0);
+        const nonTreat =
+          bucketCount(meal, fam, "normal") + bucketCount(meal, fam, "budget");
+        expect(nonTreat).toBeGreaterThan(0);
       }
     }
   });
