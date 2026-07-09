@@ -1,6 +1,6 @@
 // @ts-nocheck
 /**
- * land-dishes.mjs —— 把 docs/dish-candidates.draft.json 的 136 道机械落进 foods.ts。
+ * land-dishes.mjs —— 把 docs/archive/dish-candidates.draft.json 的 136 道机械落进 foods.ts。
  *   纯消费：id/emoji/字段直通，绝不重新生成 id。
  *
  * 用法：

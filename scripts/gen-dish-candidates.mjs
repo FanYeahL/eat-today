@@ -1,5 +1,6 @@
 // scripts/gen-dish-candidates.mjs
-// 生成 dish 候选菜草案 → docs/dish-candidates.draft.json + docs/dish-candidates.review.md
+// 生成 dish 候选菜草案 → docs/archive/dish-candidates.draft.json + docs/archive/dish-candidates.review.md
+//   （产物已归档到 docs/archive/：本批 dish 早已落库进 foods.ts，草案仅留作溯源）
 // ─────────────────────────────────────────────
 // 本批：全 4 family meal 补齐——中式 49（含 +7）/ 西餐 29 / 日韩 27 / 异国 24 = 129 meal + 7 side，供 user + Codex 审。
 //   family meal 缺口 + 餐段缺口均由机器追踪（_meta.familyBoard / _meta.mealRemaining）。
@@ -662,4 +663,4 @@ for (const seg of SEG) {
 console.log(segTotalRemaining > 0
   ? `  ⚠ 餐段合计仍差 ${segTotalRemaining}（下一批须重点覆盖 midnight/breakfast，否则餐段 lint 会红）`
   : `  ✓ 餐段全部达标`);
-console.log(`  → docs/dish-candidates.draft.json + docs/dish-candidates.review.md`);
+console.log(`  → docs/archive/dish-candidates.draft.json + docs/archive/dish-candidates.review.md`);

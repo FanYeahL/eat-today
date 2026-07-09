@@ -15,13 +15,13 @@
  *     须 scope 到 entityType==="dish"（已在报告标注，供 S6 lint）。
  *   - 绝不改动任何现有 id。幂等：已含 satiety 的对象跳过。
  */
-import { readFileSync, writeFileSync } from "node:fs";
+import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const FOODS_PATH = join(__dirname, "..", "src", "config", "foods.ts");
-const REPORT_PATH = join(__dirname, "migrate-existing-report.txt");
+const REPORT_PATH = join(__dirname, "..", "docs", "archive", "migrate-existing-report.txt");
 const WRITE = process.argv.includes("--write");
 const src = readFileSync(FOODS_PATH, "utf8");
 
@@ -177,5 +177,6 @@ report += rows.map((r) =>
   `${r.flag ? "⚠ " : "  "}${pad(r.name, 16)} ${pad(r.entityType + "/" + r.kind, 18)} sat${r.satiety} ind${r.indulgence} ${pad(r.pickLayer, 5)} ${pad(r.convenience, 12)} [${r.occasion}] gate=${r.gateQuery}`
 ).join("\n");
 if (todos.length) report += `\n\n—— TODO ——\n` + todos.map((t) => `  ${pad(t.name, 16)} ${t.why}`).join("\n");
+mkdirSync(dirname(REPORT_PATH), { recursive: true }); // 报告归档到 docs/archive/，确保目录存在
 writeFileSync(REPORT_PATH, report, "utf8");
 console.log(`${WRITE ? "✅ 已写回 foods.ts" : "🔍 干跑（未改源）"}：迁移 ${rows.length} 条，TODO ${todos.length}；报告 → ${REPORT_PATH}`);
