@@ -19,7 +19,7 @@ import { dirname, join } from "node:path";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const FOODS_PATH = join(__dirname, "..", "src", "config", "foods.ts");
-const DRAFT_PATH = join(__dirname, "..", "docs", "dish-candidates.draft.json");
+const DRAFT_PATH = join(__dirname, "..", "docs", "archive", "dish-candidates.draft.json");
 const WRITE = process.argv.includes("--write");
 
 const src = readFileSync(FOODS_PATH, "utf8");

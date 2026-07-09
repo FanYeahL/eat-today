@@ -611,7 +611,7 @@ const out = {
 };
 
 fs.writeFileSync(
-  path.join(process.cwd(), "docs", "dish-candidates.draft.json"),
+  path.join(process.cwd(), "docs", "archive", "dish-candidates.draft.json"),
   JSON.stringify(out, null, 2) + "\n",
 );
 
@@ -636,7 +636,7 @@ for (const d of dishes) {
     return esc(v ?? "");
   }).join(" | ") + " |\n";
 }
-fs.writeFileSync(path.join(process.cwd(), "docs", "dish-candidates.review.md"), md);
+fs.writeFileSync(path.join(process.cwd(), "docs", "archive", "dish-candidates.review.md"), md);
 
 console.log(`✓ 生成 ${dishes.length} 行候选（${batchFamilies.join("+")}）`);
 console.log(`  价位(全): budget ${byPrice.budget} / normal ${byPrice.normal} / treat ${byPrice.treat}`);
