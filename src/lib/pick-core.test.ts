@@ -7,6 +7,7 @@ import {
   applyFamily,
   normalizeFilters,
   normalizeRegion,
+  pickInPool,
   DEFAULT_FILTERS,
   type BucketPickContext,
 } from "@/lib/pick-core";
@@ -85,20 +86,99 @@ describe("indulgenceWeight (§5.3)", () => {
     expect(indulgenceWeight(f, "treat")).toBe(1.8);
   });
 
-  it("treat 桶惩罚「健康轻食」→ ×0.2", () => {
+  it("treat 桶惩罚「健康轻食」→ ×0.2（所有餐段，含 tea）", () => {
     const f = dish({ id: "b", cuisine: "cn-generic", tags: ["健康轻食"], indulgence: 4, satiety: 3 });
     expect(indulgenceWeight(f, "treat")).toBe(0.2);
+    expect(indulgenceWeight(f, "treat", "tea")).toBe(0.2); // tea 也照常降轻食
   });
 
-  it("treat 桶惩罚 satiety<3 与 indulgence<=2 → ×0.2", () => {
-    expect(indulgenceWeight(dish({ id: "c", cuisine: "cn-generic", satiety: 2, indulgence: 4 }), "treat")).toBe(0.2);
+  it("treat 桶惩罚 indulgence<=2 → ×0.2（所有餐段）", () => {
     expect(indulgenceWeight(dish({ id: "d", cuisine: "cn-generic", satiety: 3, indulgence: 2 }), "treat")).toBe(0.2);
+    expect(indulgenceWeight(dish({ id: "d2", cuisine: "cn-generic", satiety: 1, indulgence: 2 }), "treat", "tea")).toBe(0.2);
   });
 
-  it("budget/normal 桶恒 1（即便轻食）", () => {
+  it("正餐 treat 仍惩罚 satiety<3（口径不变）→ ×0.2", () => {
+    const snack = dish({ id: "c", cuisine: "cn-generic", satiety: 2, indulgence: 4 });
+    expect(indulgenceWeight(snack, "treat")).toBe(0.2); // meal 缺省=正餐口径
+    expect(indulgenceWeight(snack, "treat", "lunch")).toBe(0.2);
+    expect(indulgenceWeight(snack, "treat", "dinner")).toBe(0.2);
+  });
+
+  it("tea treat 不因 satiety<3 惩罚高 indulgence 甜品/饮品 → ×1.8", () => {
+    // 巴斯克芝士（satiety 2、indulgence 5）这类：下午茶该抽到，不该被顶饱门降权
+    const cake = dish({ id: "cake", cuisine: "western-generic", satiety: 2, indulgence: 5, role: "snack" });
+    expect(indulgenceWeight(cake, "treat", "tea")).toBe(1.8);
+    // 对照：同一道在正餐口径会被 satiety<3 降到 0.2
+    expect(indulgenceWeight(cake, "treat", "lunch")).toBe(0.2);
+    // 饮品（satiety 1、indulgence 4）同理
+    const drink = dish({ id: "dirty", cuisine: "cn-generic", kind: "drink", satiety: 1, indulgence: 4, role: "snack" });
+    expect(indulgenceWeight(drink, "treat", "tea")).toBe(1.8);
+  });
+
+  it("budget/normal 桶恒 1（即便轻食，任意餐段）", () => {
     const f = dish({ id: "e", cuisine: "cn-generic", tags: ["健康轻食"], indulgence: 1, satiety: 1 });
     expect(indulgenceWeight(f, "budget")).toBe(1);
     expect(indulgenceWeight(f, "normal")).toBe(1);
+    expect(indulgenceWeight(f, "normal", "tea")).toBe(1);
+  });
+});
+
+describe("bucketCandidateWeight — tea 场景关闭 role main 偏向", () => {
+  it("非 tea：role===main ×1.6 生效", () => {
+    const mainDish = dish({ id: "m1", cuisine: "cn-generic", role: "main", priceTier: "normal" });
+    const snackDish = dish({ id: "s1", cuisine: "cn-generic", role: "snack", priceTier: "normal" });
+    const ctx = baseCtx(); // meal 缺省
+    expect(bucketCandidateWeight(mainDish, "normal", ctx)).toBeCloseTo(1.6, 6);
+    expect(bucketCandidateWeight(snackDish, "normal", ctx)).toBeCloseTo(1, 6);
+  });
+
+  it("tea：role===main 不再 ×1.6（波奇饭/沙拉不盖过甜品）", () => {
+    const mainDish = dish({ id: "m2", cuisine: "cn-generic", role: "main", priceTier: "normal" });
+    const ctx: BucketPickContext = { ...baseCtx(), meal: "tea" };
+    expect(bucketCandidateWeight(mainDish, "normal", ctx)).toBeCloseTo(1, 6);
+  });
+
+  it("tea treat：高 indulgence 甜品(role snack, satiety 2) 权重高于 role main 轻食(indulgence 2)", () => {
+    const cake = dish({ id: "cake2", cuisine: "western-generic", role: "snack", priceTier: "treat", satiety: 2, indulgence: 5 });
+    const salad = dish({ id: "salad2", cuisine: "cn-generic", role: "main", priceTier: "treat", satiety: 3, indulgence: 2, tags: ["健康轻食"] });
+    const ctx: BucketPickContext = { ...baseCtx(), meal: "tea" };
+    const wCake = bucketCandidateWeight(cake, "treat", ctx);
+    const wSalad = bucketCandidateWeight(salad, "treat", ctx);
+    expect(wCake).toBeGreaterThan(wSalad);
+    expect(wCake).toBeCloseTo(1.8, 6); // 甜品：indulgence>=4 ×1.8，role main 加权不触发
+    expect(wSalad).toBeCloseTo(0.2, 6); // 轻食：健康轻食降权
+  });
+});
+
+describe("pickInPool — tea + treat 抽样不塌到普通菜（端到端）", () => {
+  // 复刻真实 tea 池的价位构成：treat 桶有真甜品/饮品(satiety 低)，normal 桶有正餐轻食。
+  const cake = dish({ id: "cake", cuisine: "western-generic", role: "snack", priceTier: "treat", satiety: 2, indulgence: 5 });
+  const tiramisu = dish({ id: "tira", cuisine: "western-italian", role: "snack", priceTier: "treat", satiety: 2, indulgence: 4 });
+  const dirty = dish({ id: "dirty", cuisine: "cn-generic", kind: "drink", role: "snack", priceTier: "treat", satiety: 1, indulgence: 4 });
+  const pokeBowl = dish({ id: "poke", cuisine: "cn-generic", role: "main", priceTier: "normal", satiety: 3, indulgence: 2 });
+  const chickenSalad = dish({ id: "salad", cuisine: "cn-generic", role: "main", priceTier: "normal", satiety: 2, indulgence: 2, tags: ["健康轻食"] });
+  const pool = [cake, tiramisu, dirty, pokeBowl, chickenSalad];
+
+  it("tea + treat：绝大多数抽到 treat 桶的甜品/饮品，而非 normal 桶的波奇饭/沙拉", () => {
+    const ctx: BucketPickContext = { ...baseCtx(), meal: "tea" };
+    const treatIds = new Set(["cake", "tira", "dirty"]);
+    let treatHits = 0;
+    const N = 5000;
+    for (let i = 0; i < N; i++) {
+      const got = pickInPool(pool, "treat", ctx);
+      if (treatIds.has(got.id)) treatHits++;
+    }
+    // treat 桶非空 → budgetBucketMix.treat 的 0.75 生效，绝大多数落 treat；
+    // 修复前 treat 桶为空只能 fallback normal（波奇饭/沙拉），此处应远高于那种情形。
+    expect(treatHits / N).toBeGreaterThan(0.70);
+  });
+
+  it("正餐 lunch + treat：satiety<3 仍降权（对照，证明没动正餐）", () => {
+    // 同一池按 lunch 口径：treat 桶里 cake/tira/dirty 都 satiety<3 → ×0.2（不像 tea 免罚）。
+    // 断言「lunch 下 satiety<3 的高 indulgence 项不再被特判豁免」——treat 桶内权重回到 0.2。
+    const lunchCtx: BucketPickContext = { ...baseCtx(), meal: "lunch" };
+    expect(bucketCandidateWeight(cake, "treat", lunchCtx)).toBeCloseTo(0.2, 6);
+    expect(bucketCandidateWeight(dirty, "treat", lunchCtx)).toBeCloseTo(0.2, 6);
   });
 });
 
