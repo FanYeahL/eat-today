@@ -309,21 +309,57 @@ body {
  */
 .picker-placemat {
   background-image: radial-gradient(
-    rgb(var(--c-brand) / 0.07) 1.4px,
-    transparent 1.5px
+    rgb(var(--c-brand) / 0.12) 1.5px,
+    transparent 1.6px
   );
   background-size: 18px 18px;
 }
 
-/* 底部桌面色带：暖色渐变横带锚在页面底，与主按钮呼应，收住中部空白、
+/* 底部桌面色带：暖色渐变横带锚在页面底，与主按钮形成一整块行动区（非淡淡一层），
  * 给「菜单板放在餐桌上」的画面感。纯装饰，pointer-events 由使用处控制。 */
 .picker-table-band {
   background: linear-gradient(
     180deg,
     transparent 0%,
-    rgb(var(--c-brand) / 0.06) 35%,
-    rgb(var(--c-accent-hot) / 0.1) 100%
+    rgb(var(--c-brand) / 0.1) 30%,
+    rgb(var(--c-accent-hot) / 0.16) 72%,
+    rgb(var(--c-accent-hot) / 0.24) 100%
   );
+}
+
+/* idle 轻生命感：hero 装饰色块极缓慢位移 + 微缩放（8s，只 transform，
+ * 走合成层不重排；小程序可用 animation 平移实现）。克制、不喧闹。 */
+@keyframes picker-idle-drift {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-10px, 8px) scale(1.06); }
+}
+.picker-idle-drift {
+  animation: picker-idle-drift 9s ease-in-out infinite;
+}
+
+/* 主按钮 tap 触发：一次 press 下压 + glow 亮起（由 JS 加 class，animationend 卸下）。
+ * 非常驻闪、非仅 active:scale —— 点击有明确「按下去 + 发光」的反馈再进 picking。 */
+@keyframes picker-press-glow {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 10px 28px rgb(var(--c-accent-hot) / 0.36);
+  }
+  35% {
+    transform: scale(0.96);
+    box-shadow: 0 6px 18px rgb(var(--c-accent-hot) / 0.3);
+  }
+  70% {
+    transform: scale(1.02);
+    box-shadow: 0 16px 40px rgb(var(--c-accent-hot) / 0.55),
+      0 0 26px rgb(var(--c-accent-hot) / 0.4);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 10px 28px rgb(var(--c-accent-hot) / 0.36);
+  }
+}
+.picker-press-glow {
+  animation: picker-press-glow 0.42s cubic-bezier(0.34, 1.4, 0.64, 1);
 }
 
 /* picking「菜单卡片归位」：小卡从偏移位滑入定位 + 轻微回正（一次性）。
@@ -346,7 +382,9 @@ body {
 /* 降级：低端机 / reduced motion 时，只保留最终态（无位移无缩放） */
 @media (prefers-reduced-motion: reduce) {
   .picker-pop-once,
-  .picker-plate-spin {
+  .picker-plate-spin,
+  .picker-idle-drift,
+  .picker-press-glow {
     animation: none !important;
   }
   .picker-serve-up,

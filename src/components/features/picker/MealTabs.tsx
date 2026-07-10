@@ -27,8 +27,8 @@ const MEAL_ICON: Record<MealType, string> = {
   breakfast: "🥐",
   lunch: "🍚",
   tea: "🍰",
-  dinner: "🍜",
-  midnight: "🍢",
+  dinner: "🍲",
+  midnight: "🍜",
 };
 
 export default function MealTabs({ value, onChange }: MealTabsProps) {

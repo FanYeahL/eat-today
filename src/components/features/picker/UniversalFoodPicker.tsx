@@ -156,8 +156,19 @@ export default function UniversalFoodPicker() {
     if (div.pick) logPick(div.pick, div.filters.budget, action, Date.now());
   };
 
+  // 主按钮 tap 反馈：点一下播放一次 press+glow（class 加上，animationend 卸下），
+  // 非常驻闪、非仅 active:scale。动画跑完再进 picking，节奏更明确。
+  const pickBtnRef = useRef<HTMLButtonElement | null>(null);
+
   // 首次「帮我选一个」：本轮还没见过任何菜。
   const onPick = () => {
+    const btn = pickBtnRef.current;
+    if (btn) {
+      btn.classList.remove("picker-press-glow");
+      // 强制 reflow，保证连点也能重新触发动画
+      void btn.offsetWidth;
+      btn.classList.add("picker-press-glow");
+    }
     void runCast();
   };
 
@@ -307,36 +318,38 @@ export default function UniversalFoodPicker() {
 
   const basketCount = basket.length + (div.pick ? 1 : 0);
 
+  // isolate：建独立层叠上下文，背景层用正 z（z-0）稳在内容之下、
+  // 又不会被负 z-index 压到 main 背后被父级白底盖住（曾导致「背景没加」）。
   return (
-    <main className="relative min-h-screen overflow-hidden">
-      {/* —— 语义背景层（全静态）：奶油底 + 暖色径向渐变 —— */}
+    <main className="relative isolate min-h-screen overflow-hidden">
+      {/* —— 语义背景层（z-0，全静态为主）：奶油底 + 暖色径向渐变 —— */}
       <div
         aria-hidden
-        className="absolute inset-0 -z-10"
+        className="absolute inset-0 z-0"
         style={{
           background:
-            "radial-gradient(125% 85% at 12% -5%, #fffdf9 0%, #fff2e4 46%, #ffe0c8 100%)",
+            "radial-gradient(125% 85% at 12% -5%, #fffdf9 0%, #ffeeda 44%, #ffd9bd 100%)",
         }}
       />
-      {/* 餐垫点阵纹：极淡暖色圆点铺满，给空白一点肌理，不显未完成 */}
-      <div aria-hidden className="picker-placemat absolute inset-0 -z-10" />
-      {/* organic 色块：3 个低透明暖色块，非对称圆角，锚在角落/中侧（非居中、静止） */}
+      {/* 餐垫点阵纹：暖色圆点铺满，可见但克制，给空白肌理 */}
+      <div aria-hidden className="picker-placemat absolute inset-0 z-0" />
+      {/* organic 色块：主锚点色块 22% + 两块辅色，非对称圆角。主锚点带 idle 慢位移。 */}
       <div
         aria-hidden
-        className="absolute -left-24 -top-16 -z-10 h-64 w-64 rounded-[42%_58%_63%_37%/45%_42%_58%_55%] bg-brand/12"
+        className="picker-idle-drift absolute -right-24 top-[24%] z-0 h-72 w-72 rounded-[58%_42%_38%_62%/56%_58%_42%_44%] bg-accent/22 blur-[2px]"
       />
       <div
         aria-hidden
-        className="absolute -right-28 top-[30%] -z-10 h-72 w-72 rounded-[58%_42%_38%_62%/56%_58%_42%_44%] bg-accent/10"
+        className="absolute -left-24 -top-16 z-0 h-64 w-64 rounded-[42%_58%_63%_37%/45%_42%_58%_55%] bg-brand/16"
       />
       <div
         aria-hidden
-        className="absolute -left-16 bottom-[22%] -z-10 h-56 w-56 rounded-[46%_54%_57%_43%/52%_46%_54%_48%] bg-accent-hot/8"
+        className="absolute -left-16 bottom-[26%] z-0 h-56 w-56 rounded-[46%_54%_57%_43%/52%_46%_54%_48%] bg-accent-hot/12"
       />
-      {/* 底部桌面色带：暖色渐变横带，与主按钮呼应，收住中部空白 */}
+      {/* 底部桌面色带：暖色渐变横带，与主按钮形成一整块行动区 */}
       <div
         aria-hidden
-        className="picker-table-band absolute inset-x-0 bottom-0 -z-10 h-52"
+        className="picker-table-band absolute inset-x-0 bottom-0 z-0 h-56"
       />
 
       {/* ===== 次入口面板（浮层）===== */}
@@ -358,7 +371,7 @@ export default function UniversalFoodPicker() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0, y: -12 }}
             transition={{ duration: 0.4, ease: "easeOut" }}
-            className="mx-auto flex min-h-screen w-full max-w-md flex-col px-5 pb-28 pt-6"
+            className="relative z-10 mx-auto flex min-h-screen w-full max-w-md flex-col px-5 pb-28 pt-6"
           >
             {/* 顶栏：中文品牌突出（左，品牌字）+ 工具入口（右上角）。
                 中文「今日菜单板」是主品牌标识，英文降级为极小副标，去模板感。 */}
@@ -393,33 +406,38 @@ export default function UniversalFoodPicker() {
               </div>
             </div>
 
-            {/* Hero 菜单板：暖色渐变色块（非安静白卡），大标题嵌在里面。
-                非对称圆角（右上角超大）+ 主题色柔阴影 + 大 emoji 印章 = 有食欲的菜单板。 */}
+            {/* Hero 菜单板：首页最强色块（暖珊瑚渐变，非浅白卡）。
+                左：品牌大标题 + 定位句；右：餐盘小组件（实体圆盘，非淡水印）。
+                非对称圆角 + 主题色柔阴影 = 有食欲的菜单板。 */}
             <div className="relative mt-6">
               <div
                 aria-hidden
-                className="absolute -right-3 -top-5 h-28 w-28 rounded-[58%_42%_38%_62%/56%_58%_42%_44%] bg-accent-hot/20"
+                className="absolute -right-3 -top-5 z-0 h-28 w-28 rounded-[58%_42%_38%_62%/56%_58%_42%_44%] bg-accent-hot/25"
               />
               <div
-                className="relative overflow-hidden rounded-[2rem] rounded-tr-[5rem] border border-accent-hot/15 px-6 py-7 shadow-[0_22px_48px_rgb(var(--c-accent)_/_0.18)]"
+                className="relative flex items-center gap-3 overflow-hidden rounded-[2rem] rounded-tr-[5rem] border border-accent-hot/25 px-6 py-7 shadow-[0_24px_52px_rgb(var(--c-accent)_/_0.24)]"
                 style={{
                   background:
-                    "linear-gradient(135deg, #fffaf3 0%, #fff0e0 55%, #ffe6d0 100%)",
+                    "linear-gradient(135deg, #ffe7cf 0%, #ffd7b4 58%, #ffc79c 100%)",
                 }}
               >
-                {/* 右下大 emoji 印章：低透明溢出，给菜单板食欲感（不喧宾夺主） */}
-                <span
-                  aria-hidden
-                  className="pointer-events-none absolute -bottom-6 -right-3 select-none text-[7rem] leading-none opacity-[0.12]"
-                >
-                  🍜
-                </span>
-                <h1 className="picker-brand relative text-[2.9rem] leading-[1.06] text-ink">
-                  {HERO.title}
-                </h1>
-                <p className="relative mt-2.5 max-w-[17rem] text-sm leading-relaxed text-ink-muted/90">
-                  {tagline || HERO.lede}
-                </p>
+                {/* 左：品牌大标题 + 定位句 */}
+                <div className="min-w-0 flex-1">
+                  <h1 className="picker-brand text-[2.9rem] leading-[1.06] text-ink">
+                    {HERO.title}
+                  </h1>
+                  <p className="mt-2.5 max-w-[15rem] text-sm leading-relaxed text-ink/70">
+                    {tagline || HERO.lede}
+                  </p>
+                </div>
+                {/* 右：餐盘小组件——实体圆盘 + 内圈 + 菜品 emoji，稳稳坐着 */}
+                <div className="relative shrink-0">
+                  <div className="flex h-[4.5rem] w-[4.5rem] items-center justify-center rounded-full bg-surface shadow-[0_8px_20px_rgb(var(--c-accent)_/_0.22)]">
+                    <div className="flex h-[3.4rem] w-[3.4rem] items-center justify-center rounded-full border-2 border-dashed border-accent-hot/30 text-3xl">
+                      🍜
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -449,21 +467,20 @@ export default function UniversalFoodPicker() {
 
             {/* 弹性留白：把上方内容向视口上半分布，避免中部一大块空白显得未完成。
                 下方固定行动条在其上浮（pb-28 已给出空间）。 */}
-            <div className="min-h-[1.5rem] flex-1" />
-
-            {/* 一句轻提示，坐在桌面色带上方，填补底部呼吸区不至太空 */}
-            <p className="mb-2 text-center text-xs text-ink-muted/55">
-              选好了就点下面这颗按钮，交给我
-            </p>
+            <div className="flex-1" />
 
             {/* 底部固定行动条：主按钮强（拇指区，非居中悬浮）。
-                反馈 = tap 下压（active:scale，小程序可落地），非无限 glow 呼吸 */}
+                反馈 = tap 触发一次 press+glow（onPick 里加 class，animationend 卸下）。 */}
             <div className="pointer-events-none fixed inset-x-0 bottom-0 z-30 flex justify-center px-5 pb-6">
               <div className="pointer-events-auto w-full max-w-md">
                 <button
+                  ref={pickBtnRef}
                   onClick={onPick}
+                  onAnimationEnd={() =>
+                    pickBtnRef.current?.classList.remove("picker-press-glow")
+                  }
                   disabled={casting}
-                  className="picker-dots w-full rounded-2xl bg-gradient-to-r from-accent-hot to-brand py-4 text-lg font-black text-white shadow-[0_10px_28px_rgb(var(--c-accent-hot)_/_0.36)] transition-transform duration-100 active:scale-[0.97] disabled:opacity-70"
+                  className="picker-dots w-full rounded-2xl bg-gradient-to-r from-accent-hot to-brand py-4 text-lg font-black text-white shadow-[0_10px_28px_rgb(var(--c-accent-hot)_/_0.36)] active:scale-[0.98] disabled:opacity-70"
                 >
                   {casting ? "正在为你挑…" : PICK_CTA}
                 </button>
@@ -480,7 +497,7 @@ export default function UniversalFoodPicker() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="mx-auto flex min-h-screen w-full max-w-md flex-col items-center justify-center gap-8 px-5"
+            className="relative z-10 mx-auto flex min-h-screen w-full max-w-md flex-col items-center justify-center gap-8 px-5"
           >
             {/* 三张小菜单卡从下方错峰滑入归位（一次性，transform/opacity）。
                 flex 行 + gap 排开，卡间有真实间距不重叠；各卡轻微倾斜给一点手摊开的活泼。
@@ -517,7 +534,7 @@ export default function UniversalFoodPicker() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -12 }}
             transition={{ duration: 0.35, ease: "easeOut" }}
-            className="mx-auto flex min-h-screen w-full max-w-md flex-col px-5 pb-6 pt-5"
+            className="relative z-10 mx-auto flex min-h-screen w-full max-w-md flex-col px-5 pb-6 pt-5"
           >
             {/* 顶栏：返回（左）+ 今天这桌计数（右，非游戏分数） */}
             <div className="flex items-center justify-between">
@@ -639,7 +656,7 @@ export default function UniversalFoodPicker() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
-            className="mx-auto flex min-h-screen w-full max-w-md flex-col px-5 pb-6 pt-5"
+            className="relative z-10 mx-auto flex min-h-screen w-full max-w-md flex-col px-5 pb-6 pt-5"
           >
             <ShopResults
               cards={shopCards}
