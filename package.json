@@ -15,6 +15,7 @@
     "test:run": "vitest run",
     "lint:data": "node scripts/lint-foods-fulldb.mjs",
     "lint:mojibake": "node scripts/lint-source-mojibake.mjs",
+    "font:brand": "node scripts/gen-brand-font-subset.mjs",
     "typecheck": "tsc --noEmit",
     "audit:ci": "node scripts/audit-ci.mjs",
     "verify": "npm run lint:mojibake && npm run lint:data && npm run test:run && npm run typecheck && npm run lint"

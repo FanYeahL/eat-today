@@ -33,6 +33,12 @@
   /* 旧变量名沿用，指向通道，保持 body 背景/前景一致 */
   --background: rgb(var(--c-base));
   --foreground: rgb(var(--c-ink));
+
+  /* 正文字体栈（系统无衬线，单一可信源）。品牌字体 --font-brand 由 next/font
+   * 在 /picker 的 .picker-theme 容器上注入（见 picker/page.tsx），不在此定义，
+   * 避免手写字体名与 next/font 生成名不一致。 */
+  --font-ui: -apple-system, BlinkMacSystemFont, "PingFang SC",
+    "HarmonyOS Sans SC", "Microsoft YaHei", system-ui, sans-serif;
 }
 
 body {
@@ -182,3 +188,172 @@ body {
     animation: none !important;
   }
 }
+
+/*
+ * ═══════════════════════════════════════════════
+ *  Universal Food Picker / 全民今日吃啥机（/picker 实验主题）
+ * ═══════════════════════════════════════════════
+ * 作用域换肤：只在 .picker-theme 容器内覆盖同名 --c-* 通道，
+ * 换成「明亮·有食欲·organic」暖色盘。旧 :root（清冷蓝绿）完全不动，
+ * /water-concept 继续走原色，方便新旧对照、零回归。
+ *
+ * 复用的 FunnelFilter / MealSwitcher / DiaryView / RecipeLibrary 全走
+ * 这些 token class（border-accent、bg-accent-hot/15、text-ink…），
+ * 在这个作用域内自动变暖色，不用改一行组件代码。
+ */
+.picker-theme {
+  --c-base: 255 248 240; /* #fff8f0 奶油米白，明亮有食欲的底 */
+  --c-surface: 255 255 255; /* #ffffff 卡片纯白 */
+  --c-surface-2: 255 243 232; /* #fff3e8 卡片悬浮态（极淡蜜桃） */
+  --c-brand: 245 166 91; /* #f5a65b 暖阳橙（边框/重点） */
+  --c-brand-soft: 176 138 110; /* #b08a6e 暖棕（次要文字/链接） */
+  --c-accent: 233 84 52; /* #e95434 珊瑚朱（选中/hover，暖底可读） */
+  --c-accent-hot: 200 64 32; /* #c84020 番茄红（渐变端/按钮，白字达 AA） */
+  --c-accent-pink: 214 69 56; /* #d64538 珊瑚红（错误/提示） */
+  --c-info: 43 166 160; /* #2ba6a0 清新青（距离/金额/数字，暖底跳出） */
+  --c-gold: 240 168 60; /* #f0a83c 琥珀金（评分星） */
+  --c-ink: 59 42 34; /* #3b2a22 暖棕黑（主文字，高对比不冷硬） */
+  --c-ink-muted: 138 112 96; /* #8a7060 暖灰棕（次文字） */
+  --c-paper: 59 42 34; /* #3b2a22 中性前景 */
+
+  background: var(--background);
+  color: var(--foreground);
+  /* 覆盖旧变量指针，保证容器内背景/前景取暖色（不影响 :root） */
+  --background: rgb(var(--c-base));
+  --foreground: rgb(var(--c-ink));
+}
+
+/*
+ * 品牌展示字体（得意黑 / Smiley Sans 子集，仅 /picker）。
+ * --font-brand 由 next/font 在 .picker-theme 容器上注入；这里只引用变量 +
+ * 系统字体兜底，绝不手写字体名（避免与 next/font 生成名不一致）。
+ * 只三类文本挂 .picker-brand：品牌标题 / result 菜名 / loading 重点词。
+ * 得意黑本身是斜体(Oblique)字形，故不再叠加 font-style；单字重，不 fake bold，
+ * 靠字号/色/布局突出（组件里已给足字号）。正文/店铺/按钮/chip 一律不挂此类。
+ */
+.picker-brand {
+  font-family: var(--font-brand), var(--font-ui);
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
+/*
+ * picker 动效层 —— 按微信小程序可落地设计（非 Web 炫技）。
+ * 原则：只做轻量、短促、可中断的反馈；仅 transform / opacity（走合成层，
+ * 小程序 animation/transition 也能直接实现）；不做 SVG morph / 大面积 blur /
+ * filter / 粒子 / canvas / 持续高频动画。动效服务「点了→有反应→出结果」。
+ * 命名全 picker- 前缀。时长档位：tap 80–140ms / chip·tab 160–240ms /
+ * reveal 300–600ms / loading 600–800ms。
+ */
+
+/* 主按钮 tap 后「亮一次」（reveal 时也用）：一次性，非无限呼吸 */
+@keyframes picker-pop-once {
+  0% { transform: translateZ(0) scale(1); box-shadow: 0 8px 22px rgb(var(--c-accent-hot) / 0.3); }
+  45% { transform: translateZ(0) scale(1.03); box-shadow: 0 12px 30px rgb(var(--c-accent-hot) / 0.42); }
+  100% { transform: translateZ(0) scale(1); box-shadow: 0 8px 22px rgb(var(--c-accent-hot) / 0.3); }
+}
+
+/* picking 载入：餐盘轻转一圈（600–800ms，一次，非老虎机滚动） */
+@keyframes picker-plate-spin {
+  0% { transform: rotate(0deg) scale(0.94); }
+  100% { transform: rotate(360deg) scale(1); }
+}
+
+/* result「端上桌」：内容从下方轻推上来（纯 translate + opacity） */
+@keyframes picker-serve-up {
+  0% { opacity: 0; transform: translateY(16px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* 主按钮：tap 触发一次高亮（class 由 JS 短暂挂上，animationend 卸下） */
+.picker-pop-once {
+  animation: picker-pop-once 0.5s ease-out;
+}
+/* picking 餐盘转一圈 */
+.picker-plate-spin {
+  animation: picker-plate-spin 0.75s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+/* 「端上桌」分层出现：容器加此类，子项用 --i 控制 stagger 延迟 */
+.picker-serve-up {
+  animation: picker-serve-up 0.42s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: calc(var(--i, 0) * 80ms);
+}
+
+/*
+ * Ben-Day 点阵（借 popArt 的明快点阵纹理，静态，不动）。
+ * 用 ::before 覆盖层承载点阵，不占宿主的 background-image —— 否则会覆盖掉
+ * 按钮自己的 bg-gradient（曾导致主按钮渐变消失、白字看不见）。
+ * 白色极淡圆点叠在橙色主按钮上，做一点流行艺术活力，不喧宾夺主。
+ */
+.picker-dots {
+  position: relative;
+}
+.picker-dots::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background-image: radial-gradient(
+    rgb(255 255 255 / 0.18) 1.5px,
+    transparent 1.6px
+  );
+  background-size: 12px 12px;
+}
+
+/*
+ * 语义背景层（全静态，不乱动 —— 动态感只来自触控/状态切换）。
+ * ─────────────────────────────────────────────
+ * 餐垫点阵纹：极淡暖色圆点铺满底，像餐垫/桌布，给空白一点肌理不显未完成。
+ * 用极低透明 --c-brand 点，不喧宾夺主，正文区在其上仍清晰。
+ */
+.picker-placemat {
+  background-image: radial-gradient(
+    rgb(var(--c-brand) / 0.07) 1.4px,
+    transparent 1.5px
+  );
+  background-size: 18px 18px;
+}
+
+/* 底部桌面色带：暖色渐变横带锚在页面底，与主按钮呼应，收住中部空白、
+ * 给「菜单板放在餐桌上」的画面感。纯装饰，pointer-events 由使用处控制。 */
+.picker-table-band {
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgb(var(--c-brand) / 0.06) 35%,
+    rgb(var(--c-accent-hot) / 0.1) 100%
+  );
+}
+
+/* picking「菜单卡片归位」：小卡从偏移位滑入定位 + 轻微回正（一次性）。
+ * 每张卡用内联 --i 错峰。只动 transform/opacity，小程序可落地。 */
+@keyframes picker-card-land {
+  0% {
+    opacity: 0;
+    transform: translateY(18px) rotate(var(--r, 0deg)) scale(0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) rotate(var(--r, 0deg)) scale(1);
+  }
+}
+.picker-card-land {
+  animation: picker-card-land 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: calc(var(--i, 0) * 120ms);
+}
+
+/* 降级：低端机 / reduced motion 时，只保留最终态（无位移无缩放） */
+@media (prefers-reduced-motion: reduce) {
+  .picker-pop-once,
+  .picker-plate-spin {
+    animation: none !important;
+  }
+  .picker-serve-up,
+  .picker-card-land {
+    animation: none !important;
+    opacity: 1;
+    transform: none;
+  }
+}
+
