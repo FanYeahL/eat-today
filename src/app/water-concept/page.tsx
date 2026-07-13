@@ -32,6 +32,7 @@ import WaterRecipePanel from "@/components/features/water/WaterRecipePanel";
 import FunnelFilter from "@/components/features/water/FunnelFilter";
 import MealSwitcher from "@/components/features/water/MealSwitcher";
 import CityPicker from "@/components/features/water/CityPicker";
+import StyleSwitch from "@/components/common/StyleSwitch";
 import { mealMeta } from "@/config/meals";
 import { keywordOf } from "@/lib/availability";
 import type { Shop } from "@/types/shop";
@@ -398,6 +399,15 @@ export default function WaterConceptPage() {
               >
                 📖 我的干饭日记
               </button>
+              <span className="text-brand-soft/30">·</span>
+              {/* 风格切换（低干扰）：切到新版菜单板，记住选择。与两个弱入口
+                  同排、同字重，不抢「开始投签」主 CTA。 */}
+              <StyleSwitch
+                to="menu"
+                className="transition-colors hover:text-accent"
+              >
+                ✨ 新版菜单板
+              </StyleSwitch>
             </div>
           </motion.div>
         )}

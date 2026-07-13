@@ -31,6 +31,7 @@ import DishReveal from "./DishReveal";
 import ShopResults, { type ShopCard } from "./ShopResults";
 import RecipePanelV2 from "./RecipePanelV2";
 import DiaryPanelV2 from "./DiaryPanelV2";
+import StyleSwitch from "@/components/common/StyleSwitch";
 import {
   PICK_CTA,
   PICKING_LINES,
@@ -391,6 +392,14 @@ export default function UniversalFoodPicker() {
                 </div>
               </div>
               <div className="flex items-center gap-2">
+                {/* 风格切换（低干扰）：切回经典水占版，记住选择。文案「经典版」，
+                    borderless 文字链——比工具 chip 更弱，不抢主 CTA。 */}
+                <StyleSwitch
+                  to="classic"
+                  className="mr-0.5 text-xs font-medium text-ink-muted/60 transition-colors hover:text-accent"
+                >
+                  经典版
+                </StyleSwitch>
                 <button
                   onClick={() => setPanel("cook")}
                   className="flex items-center gap-1 rounded-full border border-brand/30 bg-surface/70 px-3 py-1.5 text-xs font-medium text-ink-muted transition-transform duration-100 active:scale-[0.94]"
