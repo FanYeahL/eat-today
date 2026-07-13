@@ -369,6 +369,20 @@ body {
   animation: picker-stage-pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
 
+/* 食物焦点 idle：整只盘连食物极轻起伏（上下浮 + 极轻呼吸缩放），4.5s，只 transform、
+ * 低频、克制。CHOOSE 屏唯一 idle 循环——只作用于食物焦点，不碰背景/贴纸/扫光。
+ * 用户不操作时也能感知「页面是活的」；reduced-motion 下关闭（见下方 @media）。
+ * 注：与切餐段的一次性 picker-stage-pop 分属不同元素（pop 在 emoji span，idle 在外层
+ * 浮动包裹），避免 animation 属性打架。 */
+@keyframes picker-food-idle {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-5px) scale(1.03); }
+}
+.picker-food-idle {
+  animation: picker-food-idle 4.5s ease-in-out infinite;
+  will-change: transform;
+}
+
 /* 纸底颗粒：极淡噪点感（叠在暖米底上，给 MCM「印刷海报」的纸质，纯静态） */
 .picker-theme .picker-paper-grain {
   background-image: radial-gradient(
@@ -385,6 +399,7 @@ body {
   .picker-pop-once,
   .picker-plate-spin,
   .picker-press-glow,
+  .picker-food-idle,
   .picker-stage-pop {
     animation: none !important;
   }
