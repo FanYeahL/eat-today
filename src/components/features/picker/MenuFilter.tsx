@@ -138,27 +138,34 @@ export default function MenuFilter({
 
   return (
     <div className="flex w-full flex-col gap-3">
-      {/* 填空句：左对齐、允许换行，slot 嵌在句子里 */}
-      <p className="text-lg font-semibold leading-loose text-ink">
-        我想吃
-        <Slot
-          text={familiesSummary(value.families)}
-          active={open === "flavor"}
-          onClick={() => toggle("flavor")}
-        />
-        ，今天
-        <Slot
-          text={moodLabel}
-          active={open === "mood"}
-          onClick={() => toggle("mood")}
-        />
-        ，预算
-        <Slot
-          text={budgetLabel}
-          active={open === "budget"}
-          onClick={() => toggle("budget")}
-        />
-        。
+      {/* 填空句：左对齐、允许换行——但每个「词 + Slot」用 inline-flex whitespace-nowrap
+          绑成一个不可拆的短语 token，保证「预算」等中文词不会被断成「预/算」。 */}
+      <p className="flex flex-wrap items-center gap-x-1 gap-y-2 text-lg font-semibold leading-relaxed text-ink">
+        <span className="inline-flex items-center whitespace-nowrap">
+          我想吃
+          <Slot
+            text={familiesSummary(value.families)}
+            active={open === "flavor"}
+            onClick={() => toggle("flavor")}
+          />
+        </span>
+        <span className="inline-flex items-center whitespace-nowrap">
+          ，今天
+          <Slot
+            text={moodLabel}
+            active={open === "mood"}
+            onClick={() => toggle("mood")}
+          />
+        </span>
+        <span className="inline-flex items-center whitespace-nowrap">
+          ，预算
+          <Slot
+            text={budgetLabel}
+            active={open === "budget"}
+            onClick={() => toggle("budget")}
+          />
+          。
+        </span>
       </p>
 
       {/* 展开的选项面板：一次只开一个槽，选项用足够大的按钮 */}
