@@ -194,29 +194,30 @@ body {
  *  Universal Food Picker / 全民今日吃啥机（/picker 实验主题）
  * ═══════════════════════════════════════════════
  * 作用域换肤：只在 .picker-theme 容器内覆盖同名 --c-* 通道，
- * 换成「明亮·有食欲·organic」暖色盘。旧 :root（清冷蓝绿）完全不动，
- * /water-concept 继续走原色，方便新旧对照、零回归。
+ * 换成「clean food utility」现代盘：干净暖白 + 中性 charcoal + 清爽食欲暖色（tomato/橙）
+ * + 一点 retro-blue 冷色点缀。目标比例 90% 暖白中性 / 8% 暖色 / 2% 冷色。
+ * 旧 :root（清冷蓝绿）完全不动，/water-concept 继续走原色，方便新旧对照、零回归。
  *
  * 复用的 FunnelFilter / MealSwitcher / DiaryView / RecipeLibrary 全走
  * 这些 token class（border-accent、bg-accent-hot/15、text-ink…），
- * 在这个作用域内自动变暖色，不用改一行组件代码。
+ * 在这个作用域内自动跟随现代盘，不用改一行组件代码。
  */
 .picker-theme {
-  --c-base: 245 233 211; /* #f5e9d3 暖米色纸底（MCM warm beige，非纯白/浅粉橙） */
-  --c-surface: 255 251 244; /* #fffbf4 柔白卡（暖白，非纯白） */
-  --c-surface-2: 246 236 220; /* #f6ecdc 卡片悬浮态（暖米） */
-  --c-brand: 217 118 66; /* #d97642 atomic orange（边框/重点/主暖） */
-  --c-brand-soft: 139 115 85; /* #8b7355 teak 木棕（次要文字/链接） */
-  --c-accent: 229 122 119; /* #e57a77 珊瑚（选中/hover，暖底可读） */
-  --c-accent-hot: 200 64 32; /* #c84020 番茄红（渐变端/按钮，白字达 AA） */
+  --c-base: 255 248 240; /* #FFF8F0 干净暖白（页面底，不发黄旧） */
+  --c-surface: 255 252 247; /* #FFFCF7 近白卡 */
+  --c-surface-2: 251 246 240; /* #FBF6F0 极浅暖灰白（悬浮态） */
+  --c-brand: 222 90 22; /* #DE5A16 清爽食欲橙（重点/主暖，白字达 AA-large 3.76:1） */
+  --c-brand-soft: 138 130 123; /* #8A827B 中性暖灰（次要文字/链接，去木棕相） */
+  --c-accent: 240 113 104; /* #F07168 亮珊瑚（与 tomato 同族） */
+  --c-accent-hot: 240 86 60; /* #F0563C 清爽 tomato（主 CTA/重点，白字达 AA 大字） */
   --c-accent-pink: 214 69 56; /* #d64538 珊瑚红（错误/提示） */
-  --c-info: 125 155 168; /* #7d9ba8 retro blue（冷色分区/几何，暖底跳出不刺眼） */
-  --c-olive: 74 124 89; /* #4a7c59 olive green（MCM 第二冷色/几何/olive 分区） */
-  --c-mustard: 212 165 116; /* #d4a574 mustard 芥末黄（暖中间色/几何/描边） */
-  --c-gold: 224 158 62; /* #e09e3e 琥珀金（评分星） */
-  --c-ink: 44 36 22; /* #2c2416 MCM deep brown 主文字（高对比暖厚） */
-  --c-ink-muted: 107 93 79; /* #6b5d4f walnut 木棕（次文字） */
-  --c-paper: 44 36 22; /* #2c2416 中性前景 */
+  --c-info: 125 155 168; /* #7d9ba8 retro blue（唯一冷色点缀） */
+  --c-olive: 74 124 89; /* #4a7c59 olive（留通道，无 live 消费） */
+  --c-mustard: 212 165 116; /* #d4a574 mustard（留通道，无 live 消费） */
+  --c-gold: 224 158 62; /* #e09e3e 琥珀金（评分星 / DishReveal 辣度 chip 仍用） */
+  --c-ink: 31 26 23; /* #1F1A17 中性 charcoal 主文字（几乎无棕相，高对比） */
+  --c-ink-muted: 107 101 96; /* #6B6560 中性暖灰（次文字） */
+  --c-paper: 31 26 23; /* #1F1A17 中性前景 */
 
   background: var(--background);
   color: var(--foreground);

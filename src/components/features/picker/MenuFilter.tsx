@@ -64,10 +64,10 @@ function Slot({
     <button
       onClick={onClick}
       aria-expanded={active}
-      className={`mx-0.5 inline-flex items-center gap-1 rounded-xl border-2 px-2.5 py-1 text-base font-bold transition-all duration-200 active:scale-[0.95] ${
+      className={`mx-0.5 inline-flex items-center gap-1 rounded-xl border px-2.5 py-1 text-base font-bold transition-all duration-200 active:scale-[0.95] ${
         active
-          ? "border-ink/80 bg-brand text-white shadow-[-2px_2px_0_0_rgb(var(--c-ink))]"
-          : "border-ink/40 bg-base text-ink shadow-[-2px_2px_0_0_rgb(var(--c-ink)_/_0.5)]"
+          ? "border-transparent bg-brand text-white"
+          : "border-ink/12 bg-surface text-ink"
       }`}
     >
       {text}

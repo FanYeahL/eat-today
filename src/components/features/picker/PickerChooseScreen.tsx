@@ -76,13 +76,13 @@ export default function PickerChooseScreen({
         <div className="flex items-center gap-2">
           <button
             onClick={onOpenCook}
-            className="flex items-center gap-1 rounded-full border-2 border-ink/15 bg-surface/80 px-3 py-1.5 text-xs font-semibold text-ink-muted transition-transform duration-100 active:scale-[0.94]"
+            className="flex items-center gap-1 rounded-full border border-ink/10 bg-surface px-3 py-1.5 text-xs font-semibold text-ink-muted transition-transform duration-100 active:scale-[0.94]"
           >
             {SIDE_ENTRIES.cook.emoji} {SIDE_ENTRIES.cook.label}
           </button>
           <button
             onClick={onOpenDiary}
-            className="flex items-center gap-1 rounded-full border-2 border-ink/15 bg-surface/80 px-3 py-1.5 text-xs font-semibold text-ink-muted transition-transform duration-100 active:scale-[0.94]"
+            className="flex items-center gap-1 rounded-full border border-ink/10 bg-surface px-3 py-1.5 text-xs font-semibold text-ink-muted transition-transform duration-100 active:scale-[0.94]"
           >
             {SIDE_ENTRIES.diary.emoji} {SIDE_ENTRIES.diary.label}
           </button>
@@ -102,7 +102,7 @@ export default function PickerChooseScreen({
       {/* Hero：今日菜单海报 */}
       <PickerMenuPoster meal={meal} tagline={tagline} />
 
-      {/* 餐段 tab：奶油 pill 容器（选中白底 + coral 字，见 MealTabs） */}
+      {/* 餐段 tab：奶油 pill 容器（选中白底 + info 字，见 MealTabs） */}
       <div className="mt-5">
         <span className="mb-2 block text-xs font-bold uppercase tracking-[0.12em] text-ink-muted/70">
           这会儿是
@@ -110,8 +110,8 @@ export default function PickerChooseScreen({
         <MealTabs value={meal} onChange={onChangeMeal} />
       </div>
 
-      {/* 填空句式筛选：白票据卡（深棕描边 + 非对称圆角），slot 已改高对比 mustard 芯片 */}
-      <div className="mt-4 rounded-2xl rounded-bl-[3rem] border-2 border-ink/12 bg-surface/85 px-5 py-4 shadow-[0_12px_30px_rgb(var(--c-ink)_/_0.08)]">
+      {/* 填空句式筛选：现代白卡（1px 柔边 + soft shadow，无粗描边/无夸张非对称圆角） */}
+      <div className="mt-4 rounded-3xl border border-ink/8 bg-surface px-5 py-4 shadow-[0_1px_2px_rgb(0_0_0_/_0.04),0_8px_24px_rgb(0_0_0_/_0.05)]">
         <MenuFilter
           value={filters}
           onChange={onChangeFilters}
