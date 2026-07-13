@@ -64,10 +64,10 @@ function Slot({
     <button
       onClick={onClick}
       aria-expanded={active}
-      className={`mx-0.5 inline-flex items-center gap-1 rounded-xl px-2.5 py-1 text-base font-bold transition-all duration-200 active:scale-[0.95] ${
+      className={`mx-0.5 inline-flex items-center gap-1 rounded-xl border-2 px-2.5 py-1 text-base font-bold transition-all duration-200 active:scale-[0.95] ${
         active
-          ? "bg-accent text-white shadow-[0_4px_14px_rgb(var(--c-accent)_/_0.3)]"
-          : "bg-accent-hot/15 text-accent-hot"
+          ? "border-ink/80 bg-accent text-white shadow-[-2px_2px_0_0_rgb(var(--c-ink))]"
+          : "border-ink/70 bg-mustard/35 text-ink shadow-[-2px_2px_0_0_rgb(var(--c-mustard))]"
       }`}
     >
       {text}
@@ -166,10 +166,10 @@ export default function MenuFilter({
         {open && (
           <motion.div
             key={open}
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.24, ease: "easeOut" }}
+            initial={{ opacity: 0, height: 0, y: -6, scale: 0.97 }}
+            animate={{ opacity: 1, height: "auto", y: 0, scale: 1 }}
+            exit={{ opacity: 0, height: 0, y: -6, scale: 0.97 }}
+            transition={{ duration: 0.28, ease: [0.34, 1.4, 0.64, 1] }}
             className="overflow-hidden"
           >
             <div className="flex flex-col gap-3 rounded-2xl border border-brand/20 bg-surface/80 p-3.5">

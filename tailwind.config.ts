@@ -22,6 +22,8 @@ const config: Config = {
         "accent-hot": "rgb(var(--c-accent-hot) / <alpha-value>)",
         "accent-pink": "rgb(var(--c-accent-pink) / <alpha-value>)",
         info: "rgb(var(--c-info) / <alpha-value>)",
+        olive: "rgb(var(--c-olive) / <alpha-value>)",
+        mustard: "rgb(var(--c-mustard) / <alpha-value>)",
         gold: "rgb(var(--c-gold) / <alpha-value>)",
         ink: "rgb(var(--c-ink) / <alpha-value>)",
         "ink-muted": "rgb(var(--c-ink-muted) / <alpha-value>)",

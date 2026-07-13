@@ -202,19 +202,21 @@ body {
  * 在这个作用域内自动变暖色，不用改一行组件代码。
  */
 .picker-theme {
-  --c-base: 255 248 240; /* #fff8f0 奶油米白，明亮有食欲的底 */
-  --c-surface: 255 255 255; /* #ffffff 卡片纯白 */
-  --c-surface-2: 255 243 232; /* #fff3e8 卡片悬浮态（极淡蜜桃） */
-  --c-brand: 245 166 91; /* #f5a65b 暖阳橙（边框/重点） */
-  --c-brand-soft: 176 138 110; /* #b08a6e 暖棕（次要文字/链接） */
-  --c-accent: 233 84 52; /* #e95434 珊瑚朱（选中/hover，暖底可读） */
+  --c-base: 245 233 211; /* #f5e9d3 暖米色纸底（MCM warm beige，非纯白/浅粉橙） */
+  --c-surface: 255 251 244; /* #fffbf4 柔白卡（暖白，非纯白） */
+  --c-surface-2: 246 236 220; /* #f6ecdc 卡片悬浮态（暖米） */
+  --c-brand: 217 118 66; /* #d97642 atomic orange（边框/重点/主暖） */
+  --c-brand-soft: 139 115 85; /* #8b7355 teak 木棕（次要文字/链接） */
+  --c-accent: 229 122 119; /* #e57a77 珊瑚（选中/hover，暖底可读） */
   --c-accent-hot: 200 64 32; /* #c84020 番茄红（渐变端/按钮，白字达 AA） */
   --c-accent-pink: 214 69 56; /* #d64538 珊瑚红（错误/提示） */
-  --c-info: 43 166 160; /* #2ba6a0 清新青（距离/金额/数字，暖底跳出） */
-  --c-gold: 240 168 60; /* #f0a83c 琥珀金（评分星） */
-  --c-ink: 59 42 34; /* #3b2a22 暖棕黑（主文字，高对比不冷硬） */
-  --c-ink-muted: 138 112 96; /* #8a7060 暖灰棕（次文字） */
-  --c-paper: 59 42 34; /* #3b2a22 中性前景 */
+  --c-info: 125 155 168; /* #7d9ba8 retro blue（冷色分区/几何，暖底跳出不刺眼） */
+  --c-olive: 74 124 89; /* #4a7c59 olive green（MCM 第二冷色/几何/olive 分区） */
+  --c-mustard: 212 165 116; /* #d4a574 mustard 芥末黄（暖中间色/几何/描边） */
+  --c-gold: 224 158 62; /* #e09e3e 琥珀金（评分星） */
+  --c-ink: 44 36 22; /* #2c2416 MCM deep brown 主文字（高对比暖厚） */
+  --c-ink-muted: 107 93 79; /* #6b5d4f walnut 木棕（次文字） */
+  --c-paper: 44 36 22; /* #2c2416 中性前景 */
 
   background: var(--background);
   color: var(--foreground);
@@ -391,13 +393,105 @@ body {
   animation-delay: calc(var(--i, 0) * 120ms);
 }
 
+/*
+ * ── Web 灰度版首屏「持续但低频」动效（AtomicHearth 复古菜单海报的生命感）──
+ * 先部署 Web、后降级小程序：这里加 3 类持续动效，全部只跑 transform/opacity（合成层），
+ * 低频（4s+ / 12s+），reduced-motion 一律降级为静态。小程序阶段可只保留 tap/reveal。
+ */
+
+/* 食物舞台：碗盘轻微上下浮 + 轻微 rotate，4.5s 循环（有生命感、不喧闹） */
+@keyframes picker-food-float {
+  0%, 100% { transform: translateY(0) rotate(-2deg); }
+  50% { transform: translateY(-8px) rotate(2deg); }
+}
+.picker-food-float {
+  animation: picker-food-float 4.5s ease-in-out infinite;
+  will-change: transform;
+}
+
+/* 背景有机几何：慢速漂移 + 极缓自转，14s / 22s（poster 背景活起来但退到最底） */
+@keyframes picker-shape-drift {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  50% { transform: translate(14px, -18px) rotate(6deg); }
+}
+.picker-shape-drift {
+  animation: picker-shape-drift 14s ease-in-out infinite;
+  will-change: transform;
+}
+@keyframes picker-shape-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+.picker-shape-spin {
+  animation: picker-shape-spin 22s linear infinite;
+  will-change: transform;
+}
+
+/* CTA idle：每 ~6s 一次极轻的高光扫过（借 shimmer 思路，但低频、克制、非常驻闪）。
+ * 用 ::after 一条斜向白色高光带平移过按钮，只动 transform/opacity。 */
+.picker-cta-shine {
+  position: relative;
+  overflow: hidden;
+}
+.picker-cta-shine::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 40%;
+  height: 100%;
+  pointer-events: none;
+  background: linear-gradient(
+    100deg,
+    transparent 0%,
+    rgb(255 255 255 / 0.28) 50%,
+    transparent 100%
+  );
+  transform: translateX(-160%) skewX(-18deg);
+  animation: picker-cta-shine 6s ease-in-out infinite;
+}
+@keyframes picker-cta-shine {
+  0%, 72% { transform: translateX(-160%) skewX(-18deg); opacity: 0; }
+  80% { opacity: 1; }
+  100% { transform: translateX(320%) skewX(-18deg); opacity: 0; }
+}
+
+/* meal 切换时，hero 舞台食物做一次 spring pop（一次性，由 key 变化触发重挂） */
+@keyframes picker-stage-pop {
+  0% { opacity: 0; transform: scale(0.6) translateY(10px); }
+  60% { opacity: 1; transform: scale(1.12) translateY(-2px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+.picker-stage-pop {
+  animation: picker-stage-pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+/* 纸底颗粒：极淡噪点感（叠在暖米底上，给 MCM「印刷海报」的纸质，纯静态） */
+.picker-theme .picker-paper-grain {
+  background-image: radial-gradient(
+      rgb(var(--c-ink) / 0.05) 0.5px,
+      transparent 0.6px
+    ),
+    radial-gradient(rgb(var(--c-ink) / 0.04) 0.5px, transparent 0.6px);
+  background-size: 7px 7px, 11px 11px;
+  background-position: 0 0, 4px 6px;
+}
+
 /* 降级：低端机 / reduced motion 时，只保留最终态（无位移无缩放） */
 @media (prefers-reduced-motion: reduce) {
   .picker-pop-once,
   .picker-plate-spin,
   .picker-idle-drift,
-  .picker-press-glow {
+  .picker-press-glow,
+  .picker-food-float,
+  .picker-shape-drift,
+  .picker-shape-spin,
+  .picker-stage-pop {
     animation: none !important;
+  }
+  .picker-cta-shine::after {
+    animation: none !important;
+    opacity: 0 !important;
   }
   .picker-serve-up,
   .picker-card-land {

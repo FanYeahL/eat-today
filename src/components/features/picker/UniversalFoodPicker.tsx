@@ -25,22 +25,18 @@ import { logPick, type PickAction } from "@/lib/pick-log";
 import { recordVisit } from "@/lib/regulars";
 import { keywordOf } from "@/lib/availability";
 import { mealTaglines } from "@/config/meals";
-import MenuFilter from "./MenuFilter";
-import MealTabs from "./MealTabs";
 import DishReveal from "./DishReveal";
 import ShopResults, { type ShopCard } from "./ShopResults";
 import RecipePanelV2 from "./RecipePanelV2";
 import DiaryPanelV2 from "./DiaryPanelV2";
-import StyleSwitch from "@/components/common/StyleSwitch";
+import PickerAtmosphere from "./PickerAtmosphere";
+import PickerChooseScreen from "./PickerChooseScreen";
 import {
-  PICK_CTA,
   PICKING_LINES,
   RESULT_LINES,
   RESULT_ACTIONS,
   RESULT_LABELS,
   EXHAUSTED_HINT,
-  SIDE_ENTRIES,
-  HERO,
   randomLine,
 } from "./picker-copy";
 import type { Shop } from "@/types/shop";
@@ -323,34 +319,8 @@ export default function UniversalFoodPicker() {
   // 又不会被负 z-index 压到 main 背后被父级白底盖住（曾导致「背景没加」）。
   return (
     <main className="relative isolate min-h-screen overflow-hidden">
-      {/* —— 语义背景层（z-0，全静态）：干净奶油暖底，克制不脏 —— */}
-      <div
-        aria-hidden
-        className="absolute inset-0 z-0"
-        style={{
-          background:
-            "radial-gradient(125% 85% at 15% -8%, #fffaf3 0%, #fff3e7 46%, #ffe6cf 100%)",
-        }}
-      />
-      {/* 餐垫点阵纹：暖色圆点铺满，可见但克制，给空白肌理 */}
-      <div aria-hidden className="picker-placemat absolute inset-0 z-0" />
-      {/* 极淡斜向暖色 band：给一点层次，不喧闹、不发脏 */}
-      <div aria-hidden className="picker-warm-band absolute inset-0 z-0" />
-      {/* 右上暖锚点色块（唯一 idle 慢位移，其余静态） */}
-      <div
-        aria-hidden
-        className="picker-idle-drift absolute -right-24 top-[18%] z-0 h-64 w-64 rounded-[58%_42%_38%_62%/56%_58%_42%_44%] bg-accent/18 blur-[2px]"
-      />
-      {/* 薄荷青小面积角落点缀（5% 冷色，透明度极低，不做大底色） */}
-      <div
-        aria-hidden
-        className="absolute -left-10 top-[6%] z-0 h-40 w-40 rounded-full bg-info/[0.08] blur-[6px]"
-      />
-      {/* 底部桌面色带：暖色渐变横带，与主按钮形成一整块行动区 */}
-      <div
-        aria-hidden
-        className="picker-table-band absolute inset-x-0 bottom-0 z-0 h-56"
-      />
+      {/* 复古菜单海报氛围层（MCM 纸底 + 有机几何 + 慢漂移，见 PickerAtmosphere） */}
+      <PickerAtmosphere />
 
       {/* ===== 次入口面板（浮层）===== */}
       <AnimatePresence>
@@ -363,7 +333,7 @@ export default function UniversalFoodPicker() {
       </AnimatePresence>
 
       <AnimatePresence mode="wait">
-        {/* ══════════ ① CHOOSE：今日菜单板 ══════════ */}
+        {/* ══════════ ① CHOOSE：今日菜单板（复古菜单海报，见 PickerChooseScreen）══════════ */}
         {phase === "choose" && (
           <motion.div
             key="choose"
@@ -371,141 +341,22 @@ export default function UniversalFoodPicker() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0, y: -12 }}
             transition={{ duration: 0.4, ease: "easeOut" }}
-            className="relative z-10 mx-auto flex min-h-screen w-full max-w-md flex-col px-5 pb-28 pt-6"
           >
-            {/* 顶栏：中文品牌突出（左，品牌字）+ 工具入口（右上角）。
-                中文「今日菜单板」是主品牌标识，英文降级为极小副标，去模板感。 */}
-            <div className="flex items-start justify-between">
-              <div className="flex items-center gap-2">
-                <span
-                  aria-hidden
-                  className="h-6 w-[3px] rounded-full bg-gradient-to-b from-accent-hot to-brand"
-                />
-                <div className="flex flex-col leading-none">
-                  <span className="picker-brand text-lg text-ink">
-                    {HERO.board}
-                  </span>
-                  <span className="mt-0.5 text-[10px] uppercase tracking-[0.18em] text-ink-muted/50">
-                    {HERO.brand}
-                  </span>
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => setPanel("cook")}
-                  className="flex items-center gap-1 rounded-full border border-brand/30 bg-surface/70 px-3 py-1.5 text-xs font-medium text-ink-muted transition-transform duration-100 active:scale-[0.94]"
-                >
-                  {SIDE_ENTRIES.cook.emoji} {SIDE_ENTRIES.cook.label}
-                </button>
-                <button
-                  onClick={() => setPanel("diary")}
-                  className="flex items-center gap-1 rounded-full border border-brand/30 bg-surface/70 px-3 py-1.5 text-xs font-medium text-ink-muted transition-transform duration-100 active:scale-[0.94]"
-                >
-                  {SIDE_ENTRIES.diary.emoji} {SIDE_ENTRIES.diary.label}
-                </button>
-              </div>
-            </div>
-
-            {/* 彩蛋入口：工具区下面、右对齐、极弱（切回经典水占版并记住选择）。
-                11px + surface/60 + 淡边，tap 反馈不依赖 hover（小程序无 hover），不抢主视觉。 */}
-            <div className="mt-2 flex justify-end">
-              <StyleSwitch
-                to="classic"
-                className="inline-flex items-center gap-1 rounded-full border border-accent-hot/15 bg-surface/60 px-2.5 py-1 text-[11px] font-medium text-ink-muted/70 transition-transform duration-100 active:scale-[0.94]"
-              >
-                👀 点我会怎样
-              </StyleSwitch>
-            </div>
-
-            {/* 一整张「今日菜单板」：蜜桃板头（品牌 + 餐盘）+ 奶油板身（餐段 + 筛选）
-                归入同一块，去掉三块孤立卡片和中部空洞，读感是餐桌上放着一张菜单。
-                主画面干净有食欲，非红底广告卡；冷色（薄荷青）只做餐盘虚线环点缀。 */}
-            <div className="relative mt-4 overflow-hidden rounded-[1.75rem] rounded-tr-[4rem] bg-surface/85 shadow-[0_18px_44px_rgb(var(--c-accent)_/_0.13)] ring-1 ring-accent-hot/10">
-              {/* 板头：蜜桃暖渐变 + 深色标题（非白字），右侧白盘 + 薄荷青虚线环 */}
-              <div
-                className="relative flex items-center gap-3 px-6 pb-6 pt-7"
-                style={{
-                  background:
-                    "linear-gradient(135deg, #fff0d8 0%, #ffd39e 55%, #ffad82 100%)",
-                }}
-              >
-                {/* 左侧细色条：coral → gold 细渐变（4px），暖而不是红色错误感 */}
-                <span
-                  aria-hidden
-                  className="absolute left-0 top-0 h-full w-1 bg-gradient-to-b from-accent-hot to-gold"
-                />
-                {/* 左：品牌大标题 + 定位句（深色 ink） */}
-                <div className="min-w-0 flex-1">
-                  <h1 className="picker-brand text-[2.7rem] leading-[1.06] text-ink">
-                    {HERO.title}
-                  </h1>
-                  <p className="mt-2 max-w-[15rem] text-sm leading-relaxed text-ink/70">
-                    {tagline || HERO.lede}
-                  </p>
-                </div>
-                {/* 右：餐盘小组件——白盘 + 薄荷青虚线内圈（唯一冷色点缀） */}
-                <div className="relative shrink-0">
-                  <div className="flex h-[4.5rem] w-[4.5rem] items-center justify-center rounded-full bg-surface shadow-[0_8px_20px_rgb(var(--c-accent)_/_0.2)]">
-                    <div className="flex h-[3.4rem] w-[3.4rem] items-center justify-center rounded-full border-2 border-dashed border-info/55 text-3xl">
-                      🍜
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* 板身：奶油白，承载餐段 + 筛选，紧凑排布，与板头连成一块 */}
-              <div className="space-y-4 px-5 pb-5 pt-4">
-                {/* 餐段 tab（picker 专属 MealTabs：奶油 pill 容器 + 选中白底轻阴影 + coral 字）*/}
-                <div>
-                  <span className="mb-2 block text-xs font-medium text-ink-muted/70">
-                    这会儿是
-                  </span>
-                  <MealTabs value={div.meal} onChange={onChangeMeal} />
-                </div>
-
-                {/* 极淡暖色分隔细线（2px 感），分出餐段 / 筛选，不用粗边框 */}
-                <div
-                  aria-hidden
-                  className="h-px bg-gradient-to-r from-transparent via-accent-hot/15 to-transparent"
-                />
-
-                {/* 填空句式筛选：直接坐在板身上，不再套第二层卡片，减少卡中卡 */}
-                <MenuFilter
-                  value={div.filters}
-                  onChange={onChangeFilters}
-                  region={div.region}
-                  onRegionChange={onChangeRegion}
-                />
-              </div>
-            </div>
-
-            {exhausted && (
-              <p className="mt-4 text-sm font-medium text-accent">
-                {EXHAUSTED_HINT}
-              </p>
-            )}
-
-            {/* 弹性留白：把上方内容向视口上半分布，避免中部一大块空白显得未完成。
-                下方固定行动条在其上浮（pb-28 已给出空间）。 */}
-            <div className="flex-1" />
-
-            {/* 底部固定行动条：主按钮强（拇指区，非居中悬浮）。
-                反馈 = tap 触发一次 press+glow（onPick 里加 class，animationend 卸下）。 */}
-            <div className="pointer-events-none fixed inset-x-0 bottom-0 z-30 flex justify-center px-5 pb-6">
-              <div className="pointer-events-auto w-full max-w-md">
-                <button
-                  ref={pickBtnRef}
-                  onClick={onPick}
-                  onAnimationEnd={() =>
-                    pickBtnRef.current?.classList.remove("picker-press-glow")
-                  }
-                  disabled={casting}
-                  className="picker-dots w-full rounded-2xl bg-gradient-to-r from-accent-hot to-brand py-4 text-lg font-black text-white shadow-[0_10px_26px_rgb(var(--c-accent-hot)_/_0.32)] active:scale-[0.98] disabled:opacity-70"
-                >
-                  {casting ? "正在为你挑…" : PICK_CTA}
-                </button>
-              </div>
-            </div>
+            <PickerChooseScreen
+              meal={div.meal}
+              filters={div.filters}
+              region={div.region}
+              tagline={tagline}
+              exhausted={exhausted}
+              casting={casting}
+              pickBtnRef={pickBtnRef}
+              onPick={onPick}
+              onChangeMeal={onChangeMeal}
+              onChangeFilters={onChangeFilters}
+              onChangeRegion={onChangeRegion}
+              onOpenCook={() => setPanel("cook")}
+              onOpenDiary={() => setPanel("diary")}
+            />
           </motion.div>
         )}
 
