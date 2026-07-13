@@ -66,8 +66,8 @@ function Slot({
       aria-expanded={active}
       className={`mx-0.5 inline-flex items-center gap-1 rounded-xl border-2 px-2.5 py-1 text-base font-bold transition-all duration-200 active:scale-[0.95] ${
         active
-          ? "border-ink/80 bg-accent text-white shadow-[-2px_2px_0_0_rgb(var(--c-ink))]"
-          : "border-ink/70 bg-mustard/35 text-ink shadow-[-2px_2px_0_0_rgb(var(--c-mustard))]"
+          ? "border-ink/80 bg-brand text-white shadow-[-2px_2px_0_0_rgb(var(--c-ink))]"
+          : "border-ink/40 bg-base text-ink shadow-[-2px_2px_0_0_rgb(var(--c-ink)_/_0.5)]"
       }`}
     >
       {text}
@@ -100,7 +100,7 @@ function Opt({
       onClick={onClick}
       className={`flex items-center gap-1.5 rounded-full border px-3.5 py-2 text-sm font-medium transition-all duration-200 active:scale-[0.94] ${
         selected
-          ? "-translate-y-0.5 border-accent bg-accent text-white shadow-[0_5px_14px_rgb(var(--c-accent)_/_0.3)]"
+          ? "-translate-y-0.5 border-brand bg-brand text-white shadow-[0_5px_14px_rgb(var(--c-brand)_/_0.3)]"
           : "border-brand/40 bg-surface text-ink-muted"
       }`}
     >

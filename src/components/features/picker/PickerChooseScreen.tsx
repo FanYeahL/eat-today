@@ -3,21 +3,18 @@
 /**
  * PickerChooseScreen / 今日菜单板 CHOOSE 首屏（仅 /picker）
  * ─────────────────────────────────────────────
- * 从 UniversalFoodPicker 抽出的首屏表现层，翻译自 uiprompt
- * 「retro-midCenturyModern / AtomicHearth」的复古菜单海报语言（见下方映射）。
- * 只做编排 + 表现：所有业务状态/回调由父组件（orchestrator）通过 props 注入，
- * 本组件不碰 useDivinationPick/useShops/pick-core，逻辑零耦合。
+ * 「删到高级」重构后的首屏编排层。视觉概念是「现代菜单票据」——不是复古模板拼贴：
+ * 设计感来自暖纸底 + 深墨字 + 票据边框 + 排版节奏 + 一只干净插画餐盘 + 一个轻交互，
+ * 全屏无 MCM 图形贴纸。配色收敛到四类：暖纸 / 深墨字 / 一个暖 accent（brand）/
+ * 一个冷色（info retro-blue）。只做编排 + 表现：业务状态/回调由父组件（orchestrator）
+ * 通过 props 注入，本组件不碰 useDivinationPick/useShops/pick-core，逻辑零耦合。
  *
- * uiprompt 模板映射（主模板 AtomicHearth，辅助借 PopArt 点阵）：
- *  - PickerAtmosphere  ← AtomicHearth hero 背景「abstract shapes」构图（KidneyShape/
- *    Starburst/AtomicOrbit/Boomerang + warm-beige 纸底 + 慢漂移 animate-*）。
- *  - PickerMenuPoster  ← AtomicHearth hero 不对称 poster（"Est." 徽章 + 大标题左 +
- *    graphic 右 + 非对称圆角 + 深棕字压暖底，非红底白字）。
- *  - PickerFoodStage   ← AtomicHearth hero 的 composed poster graphic（白票据框 +
- *    mix-blend 双圆 + 中央主图），主图换成餐段食物 emoji。
- *  - PickerBottomAction← AtomicHearth CTA（MCM offset hard-shadow + 深棕描边），
- *    橙红只在主操作出现；点阵取自 PopArt 的 Ben-Day dots（.picker-dots）。
- *  - MealTabs / MenuFilter：沿用现有组件（写回同一 Filters/MealType），只调其视觉。
+ * 子组件构成：
+ *  - PickerAtmosphere  ← 安静的暖纸背景（纸底 + 纸纹 + 一处极轻暖光晕，零 SVG/零动画）。
+ *  - PickerMenuPoster  ← 今日菜单票据（票据边框 + 撕票齿孔 + 餐段徽章 + 大标题 + 食物焦点）。
+ *  - PickerFoodStage   ← 食物焦点（插画餐盘 PickerPlate + 盘心缩小 emoji，切餐段一次 pop）。
+ *  - PickerBottomAction← 主 CTA（橙红只在主操作出现，静态 Ben-Day 点阵 + tap press-glow）。
+ *  - MealTabs / MenuFilter：沿用现有组件（写回同一 Filters/MealType），配色已收敛。
  */
 
 import PickerMenuPoster from "./PickerMenuPoster";
@@ -67,7 +64,7 @@ export default function PickerChooseScreen({
         <div className="flex items-center gap-2">
           <span
             aria-hidden
-            className="h-6 w-[3px] rounded-full bg-gradient-to-b from-accent-hot to-mustard"
+            className="h-6 w-[3px] rounded-full bg-brand"
           />
           <div className="flex flex-col leading-none">
             <span className="picker-brand text-lg text-ink">{HERO.board}</span>

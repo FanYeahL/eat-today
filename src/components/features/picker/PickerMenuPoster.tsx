@@ -1,19 +1,22 @@
 "use client";
 
 /**
- * PickerMenuPoster / 今日菜单海报（hero，仅 /picker CHOOSE 屏，首屏核心构图）
+ * PickerMenuPoster / 今日菜单票据（hero，仅 /picker CHOOSE 屏，首屏核心）
  * ─────────────────────────────────────────────
- * 翻译自 AtomicHearth hero 的不对称 poster 构图，但把「趣味」收进卡片内部：
- *   顶行：餐段票据徽章（早饭菜单 / MENU TICKET，随 meal 动态，不与顶部品牌重复）+ 大标题；
- *   中央：食物舞台（PickerFoodStage）放大成视觉焦点，背后 KidneyShape 有机色块；
+ * 「删到高级」重构：不再是复古 poster 拼贴（mustard 书脊 + 背后 KidneyShape + MCM 图形）。
+ * 改成一张干净的「今日菜单票据」——设计感来自暖纸柔白卡、深墨字、票据边框（一个非对称
+ * 圆角 + 左侧撕票齿孔虚线边）、排版节奏，加一只插画餐盘（PickerFoodStage）作食物焦点。
+ * 全屏无 MCM 贴纸；暖 accent 只有 brand，冷色只有 info（retro-blue），克制收敛。
+ *
+ * 构成：
+ *   顶行：餐段徽章（早饭菜单…，随 meal 动态，中性 ink 字）+ Menu Ticket 微标签（info 冷色）；
+ *   标题：今天吃什么（品牌字）；
+ *   中央：插画餐盘 + 盘心食物 emoji（视觉焦点）；
  *   下方：一句定位关心话。
- * 深棕字压在暖米/柔白底上（非红底白字广告卡）；左侧 mustard→orange 细书脊锚点。
- * 卡内自带 MCM 图形（食物舞台的轨道/星爆/回旋镖 + 背后肾形），手机首屏也有模板感。
  */
 
 import type { MealType } from "@/types/food";
 import PickerFoodStage from "./PickerFoodStage";
-import { KidneyShape } from "./PickerShapes";
 import { HERO } from "./picker-copy";
 
 /** 餐段 → 票据徽章文案（不复用顶部品牌「今日菜单板」，避免重复）。 */
@@ -33,40 +36,35 @@ type Props = {
 
 export default function PickerMenuPoster({ meal, tagline }: Props) {
   return (
-    <div className="relative mt-3 overflow-hidden rounded-[1.5rem] rounded-tr-[3.75rem] border-2 border-ink/12 bg-surface/90 px-5 pb-6 pt-5 shadow-[0_18px_40px_rgb(var(--c-ink)_/_0.1)]">
-      {/* 左侧 mustard→orange 细书脊 */}
+    <div className="relative mt-3 overflow-hidden rounded-2xl rounded-tr-[2.75rem] border border-ink/12 bg-surface pb-6 pl-7 pr-5 pt-5">
+      {/* 左侧撕票齿孔：细虚线边，给「票据」的实物感（纯装饰，非色块书脊） */}
       <span
         aria-hidden
-        className="absolute left-0 top-0 h-full w-1.5 bg-gradient-to-b from-mustard to-brand"
+        className="absolute inset-y-4 left-3 border-l-2 border-dashed border-ink/15"
       />
 
-      {/* 顶行：餐段票据徽章 + 大标题 */}
-      <div className="relative z-10">
-        <div className="flex items-center gap-2">
-          <span className="inline-block rounded-md border-2 border-ink/70 bg-mustard/25 px-2 py-0.5 text-[11px] font-black uppercase tracking-[0.14em] text-ink">
-            {MEAL_MENU_LABEL[meal]}
-          </span>
-          <span className="text-[10px] font-bold uppercase tracking-[0.22em] text-ink-muted/60">
-            Menu Ticket
-          </span>
-        </div>
-        <h1 className="picker-brand mt-2 text-[2.9rem] leading-[0.96] text-ink">
-          {HERO.title}
-        </h1>
+      {/* 顶行：餐段徽章（中性 ink）+ Menu Ticket 微标签（info 冷色） */}
+      <div className="flex items-center gap-2">
+        <span className="inline-block rounded-md border border-ink/25 bg-base px-2 py-0.5 text-[11px] font-black uppercase tracking-[0.14em] text-ink">
+          {MEAL_MENU_LABEL[meal]}
+        </span>
+        <span className="text-[10px] font-bold uppercase tracking-[0.22em] text-info">
+          Menu Ticket
+        </span>
       </div>
 
-      {/* 中央：食物舞台（视觉焦点）+ 背后有机肾形色块（MCM 分区色） */}
-      <div className="relative mt-4 flex items-center justify-center">
-        <div className="absolute inset-x-2 top-2 -z-0 h-32 text-brand/18">
-          <KidneyShape className="h-full w-full" />
-        </div>
-        <div className="relative z-10">
-          <PickerFoodStage meal={meal} />
-        </div>
+      {/* 标题 */}
+      <h1 className="picker-brand mt-2 text-[2.9rem] leading-[0.96] text-ink">
+        {HERO.title}
+      </h1>
+
+      {/* 中央：插画餐盘 + 盘心食物（视觉焦点） */}
+      <div className="mt-4 flex items-center justify-center">
+        <PickerFoodStage meal={meal} />
       </div>
 
       {/* 下方：一句定位关心话 */}
-      <p className="relative z-10 mt-4 text-center text-sm leading-relaxed text-ink-muted">
+      <p className="mt-4 text-center text-sm leading-relaxed text-ink-muted">
         {tagline || HERO.lede}
       </p>
     </div>

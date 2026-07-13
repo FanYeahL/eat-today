@@ -304,52 +304,9 @@ body {
 }
 
 /*
- * 语义背景层（全静态，不乱动 —— 动态感只来自触控/状态切换）。
- * ─────────────────────────────────────────────
- * 餐垫点阵纹：极淡暖色圆点铺满底，像餐垫/桌布，给空白一点肌理不显未完成。
- * 用极低透明 --c-brand 点，不喧宾夺主，正文区在其上仍清晰。
+ * 语义背景层：餐垫点阵、暖色 band、桌面色带、idle 漂移均已随「删到高级」重构删除
+ * （CHOOSE 屏零环境循环 / 零装饰底纹；背景收敛为纸底 + 纸纹 + 一处极轻暖光晕）。
  */
-.picker-placemat {
-  background-image: radial-gradient(
-    rgb(var(--c-brand) / 0.12) 1.5px,
-    transparent 1.6px
-  );
-  background-size: 18px 18px;
-}
-
-/* 极淡斜向暖色 band：给背景一点非对称层次，克制不发脏（纯装饰、无 animation）。
- * 后代选择器锚定 .picker-theme，只作用于 /picker，旧 /water-concept 完全不受影响。 */
-.picker-theme .picker-warm-band {
-  background: linear-gradient(
-    118deg,
-    transparent 0%,
-    rgb(var(--c-brand) / 0.07) 44%,
-    rgb(var(--c-accent-hot) / 0.06) 60%,
-    transparent 78%
-  );
-}
-
-/* 底部桌面色带：暖色渐变横带锚在页面底，与主按钮形成一整块行动区（非淡淡一层），
- * 给「菜单板放在餐桌上」的画面感。纯装饰，pointer-events 由使用处控制。 */
-.picker-table-band {
-  background: linear-gradient(
-    180deg,
-    transparent 0%,
-    rgb(var(--c-brand) / 0.1) 30%,
-    rgb(var(--c-accent-hot) / 0.16) 72%,
-    rgb(var(--c-accent-hot) / 0.24) 100%
-  );
-}
-
-/* idle 轻生命感：hero 装饰色块极缓慢位移 + 微缩放（8s，只 transform，
- * 走合成层不重排；小程序可用 animation 平移实现）。克制、不喧闹。 */
-@keyframes picker-idle-drift {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  50% { transform: translate(-10px, 8px) scale(1.06); }
-}
-.picker-idle-drift {
-  animation: picker-idle-drift 9s ease-in-out infinite;
-}
 
 /* 主按钮 tap 触发：一次 press 下压 + glow 亮起（由 JS 加 class，animationend 卸下）。
  * 非常驻闪、非仅 active:scale —— 点击有明确「按下去 + 发光」的反馈再进 picking。 */
@@ -394,69 +351,14 @@ body {
 }
 
 /*
- * ── Web 灰度版首屏「持续但低频」动效（AtomicHearth 复古菜单海报的生命感）──
- * 先部署 Web、后降级小程序：这里加 3 类持续动效，全部只跑 transform/opacity（合成层），
- * 低频（4s+ / 12s+），reduced-motion 一律降级为静态。小程序阶段可只保留 tap/reveal。
+ * ── CHOOSE 屏动效收敛（「删到高级」重构）──
+ * 环境循环动效（食物浮动 / 背景漂移 / 极缓自转 / CTA idle 高光）全部删除：
+ * CHOOSE 屏零环境循环。核心动效只留切餐段的 picker-stage-pop（下）+ CTA tap 的
+ * picker-press-glow（上）；产品交互（MealTabs layoutId 滑块 / MenuFilter 展开）由组件自带。
+ * 全部 transform/opacity + reduced-motion 降级。
  */
 
-/* 食物舞台：碗盘轻微上下浮 + 轻微 rotate，4.5s 循环（有生命感、不喧闹） */
-@keyframes picker-food-float {
-  0%, 100% { transform: translateY(0) rotate(-2deg); }
-  50% { transform: translateY(-8px) rotate(2deg); }
-}
-.picker-food-float {
-  animation: picker-food-float 4.5s ease-in-out infinite;
-  will-change: transform;
-}
-
-/* 背景有机几何：慢速漂移 + 极缓自转，14s / 22s（poster 背景活起来但退到最底） */
-@keyframes picker-shape-drift {
-  0%, 100% { transform: translate(0, 0) rotate(0deg); }
-  50% { transform: translate(14px, -18px) rotate(6deg); }
-}
-.picker-shape-drift {
-  animation: picker-shape-drift 14s ease-in-out infinite;
-  will-change: transform;
-}
-@keyframes picker-shape-spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-.picker-shape-spin {
-  animation: picker-shape-spin 22s linear infinite;
-  will-change: transform;
-}
-
-/* CTA idle：每 ~6s 一次极轻的高光扫过（借 shimmer 思路，但低频、克制、非常驻闪）。
- * 用 ::after 一条斜向白色高光带平移过按钮，只动 transform/opacity。 */
-.picker-cta-shine {
-  position: relative;
-  overflow: hidden;
-}
-.picker-cta-shine::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 40%;
-  height: 100%;
-  pointer-events: none;
-  background: linear-gradient(
-    100deg,
-    transparent 0%,
-    rgb(255 255 255 / 0.28) 50%,
-    transparent 100%
-  );
-  transform: translateX(-160%) skewX(-18deg);
-  animation: picker-cta-shine 6s ease-in-out infinite;
-}
-@keyframes picker-cta-shine {
-  0%, 72% { transform: translateX(-160%) skewX(-18deg); opacity: 0; }
-  80% { opacity: 1; }
-  100% { transform: translateX(320%) skewX(-18deg); opacity: 0; }
-}
-
-/* meal 切换时，hero 舞台食物做一次 spring pop（一次性，由 key 变化触发重挂） */
+/* meal 切换时，hero 食物焦点做一次 spring pop（一次性，由 key 变化触发重挂） */
 @keyframes picker-stage-pop {
   0% { opacity: 0; transform: scale(0.6) translateY(10px); }
   60% { opacity: 1; transform: scale(1.12) translateY(-2px); }
@@ -481,17 +383,9 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .picker-pop-once,
   .picker-plate-spin,
-  .picker-idle-drift,
   .picker-press-glow,
-  .picker-food-float,
-  .picker-shape-drift,
-  .picker-shape-spin,
   .picker-stage-pop {
     animation: none !important;
-  }
-  .picker-cta-shine::after {
-    animation: none !important;
-    opacity: 0 !important;
   }
   .picker-serve-up,
   .picker-card-land {

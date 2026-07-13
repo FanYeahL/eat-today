@@ -54,7 +54,7 @@ export default function MealTabs({ value, onChange }: MealTabsProps) {
               <motion.span
                 layoutId="meal-tab-slider"
                 aria-hidden
-                className="absolute inset-0 -z-0 rounded-xl bg-surface shadow-[0_4px_12px_rgb(var(--c-accent)_/_0.16)]"
+                className="absolute inset-0 -z-0 rounded-xl bg-surface shadow-[0_4px_12px_rgb(var(--c-info)_/_0.16)]"
                 transition={{ type: "spring", stiffness: 480, damping: 34 }}
               />
             )}
@@ -67,7 +67,7 @@ export default function MealTabs({ value, onChange }: MealTabsProps) {
             </span>
             <span
               className={`relative z-10 leading-none transition-colors duration-200 ${
-                selected ? "text-accent" : "text-ink-muted/70"
+                selected ? "text-info" : "text-ink-muted/70"
               }`}
             >
               {m.label}
