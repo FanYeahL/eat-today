@@ -323,31 +323,45 @@ export default function UniversalFoodPicker() {
   // 又不会被负 z-index 压到 main 背后被父级白底盖住（曾导致「背景没加」）。
   return (
     <main className="relative isolate min-h-screen overflow-hidden">
-      {/* —— 语义背景层（z-0，全静态为主）：奶油底 + 暖色径向渐变 —— */}
+      {/* —— 语义背景层（z-0，全静态）：冷暖双区。
+          上/右暖橙（食欲），左下压一块薄荷青（--c-info）作冷色，形成明显冷暖对比，
+          不再是一整片浅橙。两个 radial 叠加：暖色主底 + 青色角落。 —— */}
       <div
         aria-hidden
         className="absolute inset-0 z-0"
         style={{
           background:
-            "radial-gradient(125% 85% at 12% -5%, #fffdf9 0%, #ffeeda 44%, #ffd9bd 100%)",
+            "radial-gradient(120% 80% at 82% -8%, #fff4e2 0%, #ffd9b0 42%, #ffb27a 100%)",
         }}
       />
+      {/* 左下薄荷青冷区：明显但克制的第二色，和暖橙拉开冷暖 */}
+      <div
+        aria-hidden
+        className="absolute inset-0 z-0"
+        style={{
+          background:
+            "radial-gradient(95% 70% at 8% 108%, rgb(var(--c-info) / 0.42) 0%, rgb(var(--c-info) / 0.14) 40%, transparent 68%)",
+        }}
+      />
+      {/* 静态斜带：一条暖 + 一条青，交叉给背景层次（纯装饰、不动） */}
+      <div aria-hidden className="picker-warm-band absolute inset-0 z-0" />
+      <div aria-hidden className="picker-cool-band absolute inset-0 z-0" />
       {/* 餐垫点阵纹：暖色圆点铺满，可见但克制，给空白肌理 */}
       <div aria-hidden className="picker-placemat absolute inset-0 z-0" />
-      {/* organic 色块：主锚点色块 22% + 两块辅色，非对称圆角。主锚点带 idle 慢位移。 */}
+      {/* organic 色块：右上暖锚点（带 idle 慢位移）+ 左侧一块明显青绿辅色（冷）+ 底部暖色。 */}
       <div
         aria-hidden
-        className="picker-idle-drift absolute -right-24 top-[24%] z-0 h-72 w-72 rounded-[58%_42%_38%_62%/56%_58%_42%_44%] bg-accent/22 blur-[2px]"
+        className="picker-idle-drift absolute -right-24 top-[20%] z-0 h-72 w-72 rounded-[58%_42%_38%_62%/56%_58%_42%_44%] bg-accent/28 blur-[2px]"
       />
       <div
         aria-hidden
-        className="absolute -left-24 -top-16 z-0 h-64 w-64 rounded-[42%_58%_63%_37%/45%_42%_58%_55%] bg-brand/16"
+        className="absolute -left-20 top-[30%] z-0 h-64 w-64 rounded-[42%_58%_63%_37%/45%_42%_58%_55%] bg-info/24"
       />
       <div
         aria-hidden
-        className="absolute -left-16 bottom-[26%] z-0 h-56 w-56 rounded-[46%_54%_57%_43%/52%_46%_54%_48%] bg-accent-hot/12"
+        className="absolute -left-10 bottom-[24%] z-0 h-48 w-48 rounded-[46%_54%_57%_43%/52%_46%_54%_48%] bg-info/18"
       />
-      {/* 底部桌面色带：暖色渐变横带，与主按钮形成一整块行动区 */}
+      {/* 底部桌面色带：暖色渐变横带，与主按钮形成一整块行动区（锚定 CTA） */}
       <div
         aria-hidden
         className="picker-table-band absolute inset-x-0 bottom-0 z-0 h-56"
@@ -392,14 +406,6 @@ export default function UniversalFoodPicker() {
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                {/* 风格切换（低干扰）：切回经典水占版，记住选择。文案「👀 点我会怎样」
-                    （神秘彩蛋感，不明说目的地），borderless 文字链——比工具 chip 更弱，不抢主 CTA。 */}
-                <StyleSwitch
-                  to="classic"
-                  className="mr-0.5 text-xs font-medium text-ink-muted/60 transition-colors hover:text-accent"
-                >
-                  👀 点我会怎样
-                </StyleSwitch>
                 <button
                   onClick={() => setPanel("cook")}
                   className="flex items-center gap-1 rounded-full border border-brand/30 bg-surface/70 px-3 py-1.5 text-xs font-medium text-ink-muted transition-transform duration-100 active:scale-[0.94]"
@@ -415,34 +421,50 @@ export default function UniversalFoodPicker() {
               </div>
             </div>
 
-            {/* Hero 菜单板：首页最强色块（暖珊瑚渐变，非浅白卡）。
-                左：品牌大标题 + 定位句；右：餐盘小组件（实体圆盘，非淡水印）。
-                非对称圆角 + 主题色柔阴影 = 有食欲的菜单板。 */}
+            {/* 彩蛋入口（独立成行、右对齐、极弱）：切回经典水占版，记住选择。
+                文案「👀 点我会怎样」不明说目的地。用 tap 反馈（active:scale），不依赖
+                hover（小程序无 hover）；[11px]+/70 透明度确保弱于上方两个 chip、更弱于主 CTA。 */}
+            <div className="mt-1.5 flex justify-end">
+              <StyleSwitch
+                to="classic"
+                className="inline-flex items-center gap-1 rounded-full border border-accent-hot/20 bg-surface/60 px-2.5 py-1 text-[11px] font-medium text-ink-muted/70 transition-transform duration-100 active:scale-[0.94]"
+              >
+                👀 点我会怎样
+              </StyleSwitch>
+            </div>
+
+            {/* Hero 菜单板：首页最强色块——饱满橙红渐变（与更浅/偏冷的背景强对比），
+                白字标题读感强、有食欲不广告。右侧餐盘配薄荷青环，呼应背景冷色。 */}
             <div className="relative mt-6">
               <div
                 aria-hidden
-                className="absolute -right-3 -top-5 z-0 h-28 w-28 rounded-[58%_42%_38%_62%/56%_58%_42%_44%] bg-accent-hot/25"
+                className="absolute -right-3 -top-5 z-0 h-28 w-28 rounded-[58%_42%_38%_62%/56%_58%_42%_44%] bg-accent-hot/40"
               />
               <div
-                className="relative flex items-center gap-3 overflow-hidden rounded-[2rem] rounded-tr-[5rem] border border-accent-hot/25 px-6 py-7 shadow-[0_24px_52px_rgb(var(--c-accent)_/_0.24)]"
+                className="relative flex items-center gap-3 overflow-hidden rounded-[2rem] rounded-tr-[5rem] px-6 py-7 shadow-[0_26px_54px_rgb(var(--c-accent-hot)_/_0.4)]"
                 style={{
                   background:
-                    "linear-gradient(135deg, #ffe7cf 0%, #ffd7b4 58%, #ffc79c 100%)",
+                    "linear-gradient(135deg, #ff8a4c 0%, #f0562f 55%, #d63f22 100%)",
                 }}
               >
-                {/* 左：品牌大标题 + 定位句 */}
+                {/* 左侧色条（静态）：薄荷青竖条压在橙红上，冷暖对比锚点，像菜单书脊 */}
+                <span
+                  aria-hidden
+                  className="absolute left-0 top-0 h-full w-1.5 bg-info"
+                />
+                {/* 左：品牌大标题 + 定位句（白字，橙红底达对比） */}
                 <div className="min-w-0 flex-1">
-                  <h1 className="picker-brand text-[2.9rem] leading-[1.06] text-ink">
+                  <h1 className="picker-brand text-[2.9rem] leading-[1.06] text-white">
                     {HERO.title}
                   </h1>
-                  <p className="mt-2.5 max-w-[15rem] text-sm leading-relaxed text-ink/70">
+                  <p className="mt-2.5 max-w-[15rem] text-sm leading-relaxed text-white/85">
                     {tagline || HERO.lede}
                   </p>
                 </div>
-                {/* 右：餐盘小组件——实体圆盘 + 内圈 + 菜品 emoji，稳稳坐着 */}
+                {/* 右：餐盘小组件——白盘 + 薄荷青虚线内圈（冷色点缀），稳稳坐着 */}
                 <div className="relative shrink-0">
-                  <div className="flex h-[4.5rem] w-[4.5rem] items-center justify-center rounded-full bg-surface shadow-[0_8px_20px_rgb(var(--c-accent)_/_0.22)]">
-                    <div className="flex h-[3.4rem] w-[3.4rem] items-center justify-center rounded-full border-2 border-dashed border-accent-hot/30 text-3xl">
+                  <div className="flex h-[4.5rem] w-[4.5rem] items-center justify-center rounded-full bg-surface shadow-[0_10px_24px_rgb(var(--c-accent-hot)_/_0.35)]">
+                    <div className="flex h-[3.4rem] w-[3.4rem] items-center justify-center rounded-full border-2 border-dashed border-info/60 text-3xl">
                       🍜
                     </div>
                   </div>
@@ -450,16 +472,16 @@ export default function UniversalFoodPicker() {
               </div>
             </div>
 
-            {/* 餐段 tab：选中滑块平移 + 轻回弹（picker 专属 MealTabs） */}
-            <div className="mt-7">
-              <span className="mb-2 block text-xs font-medium text-ink-muted/70">
+            {/* 餐段 tab：坐在一块薄荷青浅垫上（冷调），与下方暖调筛选卡分出层级 */}
+            <div className="mt-7 rounded-2xl border border-info/25 bg-info/10 px-3 py-3">
+              <span className="mb-2 block px-1 text-xs font-medium text-ink-muted/70">
                 这会儿是
               </span>
               <MealTabs value={div.meal} onChange={onChangeMeal} />
             </div>
 
-            {/* 填空句式筛选：我想吃[…]，今天[…]，预算[…]（非对称圆角呼应 hero） */}
-            <div className="mt-5 rounded-2xl rounded-bl-[3.5rem] border border-brand/15 bg-surface/70 px-5 py-4 shadow-[0_10px_28px_rgb(var(--c-brand)_/_0.08)]">
+            {/* 填空句式筛选：纯白卡 + 暖色左描边，与上方冷调餐段垫对照，层级清晰 */}
+            <div className="mt-5 rounded-2xl rounded-bl-[3.5rem] border border-accent-hot/25 border-l-4 border-l-accent-hot bg-surface px-5 py-4 shadow-[0_12px_30px_rgb(var(--c-accent)_/_0.14)]">
               <MenuFilter
                 value={div.filters}
                 onChange={onChangeFilters}
@@ -489,7 +511,7 @@ export default function UniversalFoodPicker() {
                     pickBtnRef.current?.classList.remove("picker-press-glow")
                   }
                   disabled={casting}
-                  className="picker-dots w-full rounded-2xl bg-gradient-to-r from-accent-hot to-brand py-4 text-lg font-black text-white shadow-[0_10px_28px_rgb(var(--c-accent-hot)_/_0.36)] active:scale-[0.98] disabled:opacity-70"
+                  className="picker-dots w-full rounded-2xl bg-gradient-to-r from-accent-hot via-accent to-brand py-[1.15rem] text-xl font-black tracking-wide text-white shadow-[0_16px_38px_rgb(var(--c-accent-hot)_/_0.5)] ring-1 ring-white/20 active:scale-[0.98] disabled:opacity-70"
                 >
                   {casting ? "正在为你挑…" : PICK_CTA}
                 </button>

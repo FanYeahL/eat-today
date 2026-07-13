@@ -315,6 +315,29 @@ body {
   background-size: 18px 18px;
 }
 
+/* 静态暖光斜带：一条明显的暖色斜带（纯装饰、不动，无 animation）。
+ * 后代选择器锚定 .picker-theme，只作用于 /picker，旧 /water-concept 完全不受影响。 */
+.picker-theme .picker-warm-band {
+  background: linear-gradient(
+    116deg,
+    transparent 0%,
+    rgb(var(--c-accent-hot) / 0.14) 44%,
+    rgb(var(--c-brand) / 0.16) 58%,
+    transparent 74%
+  );
+}
+
+/* 静态薄荷青斜带：反方向一条冷色带，和暖带交叉出冷暖层次（纯装饰、不动）。 */
+.picker-theme .picker-cool-band {
+  background: linear-gradient(
+    -122deg,
+    transparent 0%,
+    rgb(var(--c-info) / 0.16) 48%,
+    rgb(var(--c-info) / 0.06) 64%,
+    transparent 82%
+  );
+}
+
 /* 底部桌面色带：暖色渐变横带锚在页面底，与主按钮形成一整块行动区（非淡淡一层），
  * 给「菜单板放在餐桌上」的画面感。纯装饰，pointer-events 由使用处控制。 */
 .picker-table-band {
