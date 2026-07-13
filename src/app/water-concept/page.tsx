@@ -400,13 +400,13 @@ export default function WaterConceptPage() {
                 📖 我的干饭日记
               </button>
               <span className="text-brand-soft/30">·</span>
-              {/* 风格切换（低干扰）：切到新版菜单板，记住选择。与两个弱入口
-                  同排、同字重，不抢「开始投签」主 CTA。 */}
+              {/* 风格切换（低干扰）：切到新版菜单板，记住选择。文案「👀 点我会怎样」
+                  （神秘彩蛋感，不明说目的地），与两个弱入口同排、同字重，不抢「开始投签」主 CTA。 */}
               <StyleSwitch
                 to="menu"
                 className="transition-colors hover:text-accent"
               >
-                ✨ 新版菜单板
+                👀 点我会怎样
               </StyleSwitch>
             </div>
           </motion.div>

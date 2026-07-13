@@ -392,13 +392,13 @@ export default function UniversalFoodPicker() {
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                {/* 风格切换（低干扰）：切回经典水占版，记住选择。文案「经典版」，
-                    borderless 文字链——比工具 chip 更弱，不抢主 CTA。 */}
+                {/* 风格切换（低干扰）：切回经典水占版，记住选择。文案「👀 点我会怎样」
+                    （神秘彩蛋感，不明说目的地），borderless 文字链——比工具 chip 更弱，不抢主 CTA。 */}
                 <StyleSwitch
                   to="classic"
                   className="mr-0.5 text-xs font-medium text-ink-muted/60 transition-colors hover:text-accent"
                 >
-                  经典版
+                  👀 点我会怎样
                 </StyleSwitch>
                 <button
                   onClick={() => setPanel("cook")}
