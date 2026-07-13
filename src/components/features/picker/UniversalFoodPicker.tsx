@@ -318,9 +318,9 @@ export default function UniversalFoodPicker() {
   // isolate：建独立层叠上下文，背景层用正 z（z-0）稳在内容之下、
   // 又不会被负 z-index 压到 main 背后被父级白底盖住（曾导致「背景没加」）。
   return (
-    <main className="relative isolate min-h-screen overflow-hidden">
-      {/* 复古菜单海报氛围层（MCM 纸底 + 有机几何 + 慢漂移，见 PickerAtmosphere） */}
-      <PickerAtmosphere />
+    <main data-meal={div.meal} className="relative isolate min-h-screen overflow-hidden">
+      {/* 饭点氛围背景层（按 meal 换底色 + 一个 ambient，见 PickerAtmosphere） */}
+      <PickerAtmosphere meal={div.meal} />
 
       {/* ===== 次入口面板（浮层）===== */}
       <AnimatePresence>
@@ -458,7 +458,7 @@ export default function UniversalFoodPicker() {
               <button
                 key={div.pick.id}
                 onClick={onConfirm}
-                className="picker-pop-once w-full rounded-2xl bg-gradient-to-r from-accent-hot to-brand py-4 text-base font-black text-white shadow-[0_10px_28px_rgb(var(--c-accent-hot)_/_0.34)] transition-transform duration-100 active:scale-[0.97]"
+                className="picker-pop-once w-full rounded-2xl bg-gradient-to-r from-[rgb(var(--c-cta-a))] to-[rgb(var(--c-cta-b))] py-4 text-base font-black text-white shadow-[0_10px_28px_rgb(var(--c-cta-a)_/_0.34)] transition-transform duration-100 active:scale-[0.97]"
               >
                 {RESULT_ACTIONS.confirm(basketCount)} →
               </button>

@@ -245,7 +245,7 @@ export default function ShopResults({
                       onVisit(card);
                       window.open(amapLink(card), "_blank", "noopener,noreferrer");
                     }}
-                    className="shrink-0 rounded-full bg-gradient-to-r from-accent-hot to-brand px-4 py-2 text-sm font-semibold text-white transition-transform duration-100 active:scale-[0.95]"
+                    className="shrink-0 rounded-full bg-gradient-to-r from-[rgb(var(--c-cta-a))] to-[rgb(var(--c-cta-b))] px-4 py-2 text-sm font-semibold text-white transition-transform duration-100 active:scale-[0.95]"
                   >
                     去这儿 ›
                   </button>

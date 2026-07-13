@@ -219,10 +219,83 @@ body {
   --c-ink-muted: 107 101 96; /* #6B6560 中性暖灰（次文字） */
   --c-paper: 31 26 23; /* #1F1A17 中性前景 */
 
+  /* 固定 CTA 色对：所有 meal 不变，钉死在白字达 AA-large 的 tomato→orange。
+   * 三处白字渐变主按钮指到这对（见 PickerBottomAction / UniversalFoodPicker / ShopResults），
+   * 这样 per-meal accent 可随意变色而 CTA 白字始终达标、且五时段共用一套按钮结构。 */
+  --c-cta-a: 240 86 60; /* #F0563C tomato（渐变起，白字 AA-large 3.44:1） */
+  --c-cta-b: 222 90 22; /* #DE5A16 orange（渐变止，白字 AA-large 3.76:1） */
+
   background: var(--background);
   color: var(--foreground);
   /* 覆盖旧变量指针，保证容器内背景/前景取暖色（不影响 :root） */
   --background: rgb(var(--c-base));
+  --foreground: rgb(var(--c-ink));
+}
+
+/*
+ * ── 饭点氛围主题：五时段 token 覆盖（data-meal 在 UniversalFoodPicker 的 <main>）──
+ * 后代选择器命中 main 及全部子树 = 全 phase（choose/picking/result/shops + 面板）一致换气质。
+ * 组件零改：整路由的 bg-surface/text-ink/bg-accent-hot 经 tailwind 解析 rgb(var(--c-*)/α)，
+ * 覆盖同名通道即全跟随。light 三时段保 charcoal ink；dark 两时段 solid 深色翻转（不用半透明脏玻璃）。
+ * CTA 走固定 --c-cta-*，不随 meal 变（白字始终达标）。
+ */
+
+/* 早餐：清晨暖黄 + 少量番茄橙（浅） */
+.picker-theme [data-meal="breakfast"] {
+  --c-base: 255 245 224; /* #FFF5E0 清晨暖黄 */
+  --c-surface: 255 251 242; /* #FFFBF2 暖白卡 */
+  --c-surface-2: 253 244 227; /* #FDF4E3 悬浮态 */
+  --c-brand: 232 122 40; /* #E87A28 番茄橙（暖，重点） */
+  --c-accent: 240 138 92; /* #F08A5C 柔橙 */
+  --c-accent-hot: 240 96 56; /* #F06038 番茄红重点 */
+}
+
+/* 午餐：干净暖白 + 鲜明橙/阳光黄（浅） */
+.picker-theme [data-meal="lunch"] {
+  --c-base: 255 250 236; /* #FFFAEC 干净暖白偏阳光 */
+  --c-surface: 255 253 247; /* #FFFDF7 近白卡 */
+  --c-surface-2: 253 246 230; /* #FDF6E6 悬浮态 */
+  --c-brand: 240 138 24; /* #F08A18 阳光橙黄 */
+  --c-accent: 245 176 40; /* #F5B028 阳光黄 */
+  --c-accent-hot: 240 96 48; /* #F06030 明亮橙 */
+}
+
+/* 下午茶：蜜桃/杏橙 + 一点淡紫灰（浅） */
+.picker-theme [data-meal="tea"] {
+  --c-base: 252 238 228; /* #FCEEE4 蜜桃暖 */
+  --c-surface: 255 246 240; /* #FFF6F0 蜜桃白卡 */
+  --c-surface-2: 249 235 226; /* #F9EBE2 悬浮态 */
+  --c-brand: 226 122 92; /* #E27A5C 杏橙 */
+  --c-accent: 176 150 168; /* #B096A8 一点淡紫灰 */
+  --c-accent-hot: 232 108 84; /* #E86C54 夕阳橙红 */
+  --c-ink: 42 33 30; /* #2A211E 暖 charcoal（配蜜桃底更暖，仍高对比） */
+}
+
+/* 晚饭：夜蓝深暖灰底 + tomato（深，solid 翻转） */
+.picker-theme [data-meal="dinner"] {
+  --c-base: 30 32 40; /* #1E2028 夜蓝深底 */
+  --c-surface: 42 44 54; /* #2A2C36 solid 暖黑卡（不透明，非脏玻璃） */
+  --c-surface-2: 52 54 66; /* #343642 稍浅卡 */
+  --c-brand: 240 118 66; /* #F07642 暖橙（夜色光源） */
+  --c-accent: 122 142 168; /* #7A8EA8 夜蓝灰点缀 */
+  --c-accent-hot: 240 96 60; /* #F0603C tomato（夜色主光源） */
+  --c-ink: 244 238 230; /* #F4EEE6 暖白主文字 */
+  --c-ink-muted: 178 170 160; /* #B2AAA0 低亮暖灰次文字 */
+  --c-paper: 244 238 230;
+  --foreground: rgb(var(--c-ink));
+}
+
+/* 夜宵：深蓝黑/墨色 + 暖橙小光（深，solid 翻转，更暗） */
+.picker-theme [data-meal="midnight"] {
+  --c-base: 20 22 32; /* #141620 深蓝黑墨底 */
+  --c-surface: 30 33 44; /* #1E212C solid 墨黑卡（不透明） */
+  --c-surface-2: 40 43 56; /* #282B38 稍浅卡 */
+  --c-brand: 240 132 76; /* #F0844C 暖橙小光 */
+  --c-accent: 108 122 150; /* #6C7A96 墨蓝点缀 */
+  --c-accent-hot: 240 112 68; /* #F07044 暖橙主光源 */
+  --c-ink: 240 234 226; /* #F0EAE2 暖白主文字 */
+  --c-ink-muted: 168 160 152; /* #A8A098 低亮暖灰次文字 */
+  --c-paper: 240 234 226;
   --foreground: rgb(var(--c-ink));
 }
 
@@ -383,6 +456,63 @@ body {
   will-change: transform;
 }
 
+/*
+ * ── 饭点氛围 ambient 动效（每 meal 恰好一层，PickerAtmosphere 选渲染）──
+ * 全 .picker-amb-* 前缀、只 transform/opacity、很慢很轻不抢主内容；reduced-motion 全关（见下）。
+ */
+
+/* breakfast 蒸汽：极淡窄竖条缓慢上升 + 淡入淡出（2-3 条错峰，非铺满烟） */
+@keyframes picker-amb-steam {
+  0% { opacity: 0; transform: translateY(8px) scaleY(0.8); }
+  30% { opacity: 0.5; }
+  100% { opacity: 0; transform: translateY(-40px) scaleY(1.15); }
+}
+.picker-amb-steam { animation: picker-amb-steam 9s ease-in-out infinite; will-change: transform, opacity; }
+
+/* lunch 阳光：near-static 斜带，只 opacity 轻呼吸（不位移、不过曝） */
+@keyframes picker-amb-sun {
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 0.5; }
+}
+.picker-amb-sun { animation: picker-amb-sun 12s ease-in-out infinite; will-change: opacity; }
+
+/* tea 夕阳：右上暖光晕缓慢位移 + 轻呼吸（光从侧后来） */
+@keyframes picker-amb-sunset {
+  0%, 100% { opacity: 0.4; transform: translate(0, 0); }
+  50% { opacity: 0.5; transform: translate(-14px, 10px); }
+}
+.picker-amb-sunset { animation: picker-amb-sunset 16s ease-in-out infinite; will-change: transform, opacity; }
+
+/* dinner 城市光点：极慢明灭（多颗错峰） */
+@keyframes picker-amb-citydot {
+  0%, 100% { opacity: 0.15; }
+  50% { opacity: 0.5; }
+}
+.picker-amb-citydot { animation: picker-amb-citydot 7s ease-in-out infinite; will-change: opacity; }
+
+/* dinner 流星：低频（12s 一次）短暂划过，其余时间不可见 */
+@keyframes picker-amb-meteor {
+  0% { opacity: 0; transform: translate(-30px, -20px); }
+  6% { opacity: 0.7; }
+  14% { opacity: 0; transform: translate(120px, 80px); }
+  100% { opacity: 0; transform: translate(120px, 80px); }
+}
+.picker-amb-meteor { animation: picker-amb-meteor 12s linear infinite; will-change: transform, opacity; }
+
+/* midnight 黑猫：极慢呼吸（scaleY，transform-origin 底） */
+@keyframes picker-amb-catbreathe {
+  0%, 100% { transform: scaleY(1); }
+  50% { transform: scaleY(1.04); }
+}
+.picker-amb-catbreathe { transform-origin: bottom; animation: picker-amb-catbreathe 5s ease-in-out infinite; will-change: transform; }
+
+/* midnight 猫尾：偶尔轻摆（9s 一次，短暂 rotate） */
+@keyframes picker-amb-tail {
+  0%, 92%, 100% { transform: rotate(0deg); }
+  96% { transform: rotate(-6deg); }
+}
+.picker-amb-tail { transform-origin: left bottom; animation: picker-amb-tail 9s ease-in-out infinite; will-change: transform; }
+
 /* 纸底颗粒：极淡噪点感（叠在暖米底上，给 MCM「印刷海报」的纸质，纯静态） */
 .picker-theme .picker-paper-grain {
   background-image: radial-gradient(
@@ -400,7 +530,14 @@ body {
   .picker-plate-spin,
   .picker-press-glow,
   .picker-food-idle,
-  .picker-stage-pop {
+  .picker-stage-pop,
+  .picker-amb-steam,
+  .picker-amb-sun,
+  .picker-amb-sunset,
+  .picker-amb-citydot,
+  .picker-amb-meteor,
+  .picker-amb-catbreathe,
+  .picker-amb-tail {
     animation: none !important;
   }
   .picker-serve-up,

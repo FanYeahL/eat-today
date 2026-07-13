@@ -34,7 +34,7 @@ export default function PickerBottomAction({ btnRef, onPick, casting }: Props) {
             }
           }}
           disabled={casting}
-          className="w-full rounded-2xl bg-accent-hot py-4 text-lg font-bold tracking-wide text-white shadow-[0_6px_20px_rgb(var(--c-accent-hot)_/_0.28)] transition-transform active:scale-[0.98] disabled:opacity-70"
+          className="w-full rounded-2xl bg-[rgb(var(--c-cta-a))] py-4 text-lg font-bold tracking-wide text-white shadow-[0_6px_20px_rgb(var(--c-cta-a)_/_0.28)] transition-transform active:scale-[0.98] disabled:opacity-70"
         >
           {casting ? "正在为你挑…" : PICK_CTA}
         </button>
