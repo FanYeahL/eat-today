@@ -315,26 +315,15 @@ body {
   background-size: 18px 18px;
 }
 
-/* 静态暖光斜带：一条明显的暖色斜带（纯装饰、不动，无 animation）。
+/* 极淡斜向暖色 band：给背景一点非对称层次，克制不发脏（纯装饰、无 animation）。
  * 后代选择器锚定 .picker-theme，只作用于 /picker，旧 /water-concept 完全不受影响。 */
 .picker-theme .picker-warm-band {
   background: linear-gradient(
-    116deg,
+    118deg,
     transparent 0%,
-    rgb(var(--c-accent-hot) / 0.14) 44%,
-    rgb(var(--c-brand) / 0.16) 58%,
-    transparent 74%
-  );
-}
-
-/* 静态薄荷青斜带：反方向一条冷色带，和暖带交叉出冷暖层次（纯装饰、不动）。 */
-.picker-theme .picker-cool-band {
-  background: linear-gradient(
-    -122deg,
-    transparent 0%,
-    rgb(var(--c-info) / 0.16) 48%,
-    rgb(var(--c-info) / 0.06) 64%,
-    transparent 82%
+    rgb(var(--c-brand) / 0.07) 44%,
+    rgb(var(--c-accent-hot) / 0.06) 60%,
+    transparent 78%
   );
 }
 
