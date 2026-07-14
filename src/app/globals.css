@@ -554,6 +554,19 @@ body {
 @keyframes picker-scene-flicker { 0%, 100% { opacity: 0.25; } 50% { opacity: 0.95; } }
 .picker-scene-flicker { animation: picker-scene-flicker 9s ease-in-out infinite; }
 
+/* dinner 霓虹招牌：粉块用「闪两下灭一下」的非对称节奏（比对称呼吸更像真霓虹）。
+   青块复用对称的 picker-scene-flicker（错峰由内联 delay 定）。 */
+@keyframes picker-scene-neon-pink {
+  0%, 6% { opacity: 0.7; }
+  9%, 15% { opacity: 0.1; }
+  18%, 24% { opacity: 0.7; }
+  27%, 33% { opacity: 0.1; }
+  36%, 80% { opacity: 0.7; }
+  84%, 96% { opacity: 0.08; }
+  100% { opacity: 0.7; }
+}
+.picker-scene-neon-pink { animation: picker-scene-neon-pink 7s ease-in-out infinite; will-change: opacity; }
+
 /* 流星：快速划过（尾迹 ≤1s 内完成），其余时间不可见。周期由内联 animation-duration 定。
    角度经 --meteor-angle 进 keyframe，沿旋转后的自身轴 translateX 滑行——尾迹与轨迹共线，
    斜下坠（正角度 30–40° 向右下、~145° 向左下）。旧写法 translate(140,92) 会整体替换
