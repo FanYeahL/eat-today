@@ -3,14 +3,18 @@
 /**
  * PickerScene / 饭点「场景舞台」编排器（替代 PickerAtmosphere，/picker 所有 phase 背后渲染一次）
  * ─────────────────────────────────────────────
- * 全屏场景层（z-0，落在 z-10 内容之下）：一层天空渐变（走 data-meal 的 --sky-0/-1/-2 token，
- * 地平线以下过渡到 --c-base 桌面色）+ 当前 meal 的一整幕场景（SCENE map 选层，不写 if 链）。
+ * 全屏场景层（z-0，落在 z-10 内容之下）：三层叠放——
+ *   ① 天空渐变兜底（走 data-meal 的 --sky-0/-1/-2 token）：图未加载/加载失败时的底色，永远在。
+ *   ② 板绘底图层（新，V3）：/scenes/{meal}.webp，object-cover object-top，底部 25% mask 渐隐；
+ *      图缺失或加载失败时 onError 自动隐藏，回落到 ① 的渐变——无图时页面与旧版零差异。
+ *   ③ 当前 meal 的一整幕 SVG 场景（SCENE map 选层）+ 动效薄层，叠在底图之上。
  * 场景之间用 crossfade 过渡（AnimatePresence key=meal），reduced-motion 下瞬切（duration 0）。
  *
- * 硬约束：动画只 transform/opacity 的 CSS keyframes；reduced-motion 全停但静态场景保留；
- * 场景不抢主内容——但氛围本身是产品体验的一部分（本轮方向：场景即舞台，内容浮其上）。
+ * 硬约束：动画只 transform/opacity 的 CSS keyframes；reduced-motion 全停但静态场景/底图保留；
+ * 场景不抢主内容；无 backdrop-filter；底图有渐变兜底（图挂了也不白屏不破相）。
  */
 
+import { useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import type { MealType } from "@/types/food";
 import { mealScene, type SceneKey } from "../picker-meal-scenes";
@@ -29,6 +33,36 @@ const SCENE: Record<SceneKey, () => JSX.Element> = {
   midnight: SceneMidnight,
 };
 
+/**
+ * 板绘底图（V3）：约定路径 /scenes/{meal}.webp。图不存在或加载失败时 onError 自隐，
+ * 露出下方 --sky 渐变兜底——所以「没有任何图」时页面与旧版完全一致。
+ * 底部 25% 用 mask 渐隐到桌面色，筛选卡/CTA 区永远干净。每 meal 随 crossfade 重挂（key）。
+ */
+function SceneBitmap({ meal }: { meal: MealType }) {
+  const [failed, setFailed] = useState(false);
+  if (failed) return null;
+  return (
+    <div
+      className="absolute inset-x-0 top-0 h-[62vh]"
+      style={{
+        maskImage: "linear-gradient(to bottom, black 75%, transparent 100%)",
+        WebkitMaskImage: "linear-gradient(to bottom, black 75%, transparent 100%)",
+      }}
+    >
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={`/scenes/${meal}.webp`}
+        alt=""
+        aria-hidden
+        className="h-full w-full object-cover object-top"
+        loading="eager"
+        decoding="async"
+        onError={() => setFailed(true)}
+      />
+    </div>
+  );
+}
+
 export default function PickerScene({ meal }: { meal: MealType }) {
   const reduce = useReducedMotion();
   const scene = mealScene(meal);
@@ -39,8 +73,8 @@ export default function PickerScene({ meal }: { meal: MealType }) {
       aria-hidden
       className="pointer-events-none absolute inset-0 z-0 overflow-hidden"
     >
-      {/* 天空渐变：三段 --sky（顶→中→地平线），地平线以下过渡到桌面色 --c-base。
-          场景视窗高约 62vh（含天空 + 地平线），下方是桌面区。 */}
+      {/* ① 天空渐变兜底：三段 --sky（顶→中→地平线），地平线以下过渡到桌面色 --c-base。
+          底图加载前 / 失败时的底色，永远在最底层。场景视窗高约 62vh（含天空 + 地平线）。 */}
       <div
         className="absolute inset-x-0 top-0 h-[62vh]"
         style={{
@@ -51,7 +85,7 @@ export default function PickerScene({ meal }: { meal: MealType }) {
       {/* 桌面区底色 */}
       <div className="absolute inset-x-0 bottom-0 top-[62vh] bg-base" />
 
-      {/* 当前 meal 的一整幕场景，crossfade 切换 */}
+      {/* 当前 meal：底图 ② + SVG 场景 ③，一起 crossfade 切换 */}
       <AnimatePresence mode="sync">
         <motion.div
           key={meal}
@@ -61,6 +95,7 @@ export default function PickerScene({ meal }: { meal: MealType }) {
           exit={{ opacity: 0 }}
           transition={{ duration: reduce ? 0 : 0.8, ease: "easeInOut" }}
         >
+          <SceneBitmap meal={meal} />
           <Scene />
         </motion.div>
       </AnimatePresence>
