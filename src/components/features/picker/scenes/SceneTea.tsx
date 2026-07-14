@@ -18,12 +18,27 @@ export default function SceneTea() {
         style={{ left: "72%", top: "16vh" }}
       />
 
-      {/* 落日盘：大、低、半沉（底部 1/3 被地平线裁），锚定顶 ~14vh */}
+      {/* 落日盘：大、低，锚定顶 ~14vh */}
       <LightDisc
         size={92}
         color="rgb(255 184 119 / 0.92)"
         glow="rgb(255 140 66 / 0.9)"
         style={{ left: "72%", top: "14vh" }}
+      />
+
+      {/* 云堤：裁住落日下缘约 1/3，让「悬在半空的午后太阳」读作「沉入云海的夕阳」。
+          同天色渐变（上透明→sky-1→sky-2），在日盘之上、极慢横移 ±6px 像云不像色块。 */}
+      <div
+        className="picker-scene-cloudbank absolute"
+        style={{
+          left: "calc(72% - 110px)",
+          top: "calc(14vh + 14px)",
+          width: 220,
+          height: 48,
+          borderRadius: 9999,
+          background:
+            "linear-gradient(180deg, rgb(var(--sky-1) / 0) 0%, rgb(var(--sky-1)) 45%, rgb(var(--sky-2)) 100%)",
+        }}
       />
 
       {/* 染色横云 ×3：橙粉，极慢横移 */}

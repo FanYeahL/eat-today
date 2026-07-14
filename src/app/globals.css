@@ -530,6 +530,13 @@ body {
 }
 .picker-scene-rays { transform-origin: center bottom; animation: picker-scene-rays 30s ease-in-out infinite; will-change: transform, opacity; }
 
+/* tea 云堤：极慢横移 ±6px，让裁住落日下缘的那条云像云不像色块。 */
+@keyframes picker-scene-cloudbank {
+  0%, 100% { transform: translateX(-6px); }
+  50% { transform: translateX(6px); }
+}
+.picker-scene-cloudbank { animation: picker-scene-cloudbank 20s ease-in-out infinite; will-change: transform; }
+
 /* 云极慢横移（tea / lunch 共用，方向/时长由内联 style 定）。 */
 @keyframes picker-scene-cloud {
   0% { transform: translateX(-8%); }
