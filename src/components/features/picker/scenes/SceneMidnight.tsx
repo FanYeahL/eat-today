@@ -34,23 +34,28 @@ export default function SceneMidnight() {
         />
       </div>
 
-      {/* 屋顶剪影 + 一扇亮窗（深夜留的一盏灯）。猫已搬到盘边，屋顶只留一排静房 + 一扇灯。
+      {/* 一条舒缓大弧线屋脊（构图签名：极简负空间——唯一单曲线的一幕）。猫已搬到盘边，
+          弧线上只留烟囱一根（左 1/3）+ 亮窗一扇（右 1/3）。「安宁寂静」= 一条弧 + 一扇灯 + 一轮月。
           topVh 44：坐在食物焦点下方一带、meal tab 之上，避免被下半筛选卡盖住。 */}
       <SilhouetteBand topVh={44}>
         <div className="relative h-[120px] w-full">
           <svg viewBox="0 0 400 120" preserveAspectRatio="none" className="h-full w-full">
-            {/* 一排安静的坡顶矮房 */}
+            {/* 单条舒缓大弧：左侧起于较高处（56% 高≈y53），缓弧到右侧较低（70% 高≈y36），
+                填满弧下负空间。烟囱：左 1/3 处一根小矩形从弧脊竖起。 */}
             <path
               fill="rgb(var(--sil))"
-              d="M0 120 L0 84 L60 84 L90 60 L120 84 L200 84 L200 74 L260 74 L300 44 L340 74 L400 74 L400 120 Z"
+              d="M0 120 L0 60 Q140 30 240 44 Q330 56 400 40 L400 120 Z"
             />
+            {/* 烟囱（左 1/3，从弧脊竖起） */}
+            <rect x="120" y="30" width="12" height="20" fill="rgb(var(--sil))" />
+            <rect x="117" y="27" width="18" height="5" fill="rgb(var(--sil))" />
           </svg>
-          {/* 亮窗：暖橙，极慢呼吸 */}
+          {/* 亮窗（右 1/3）：暖橙，极慢呼吸 */}
           <div
             className="picker-scene-window absolute"
             style={{
-              left: "62%",
-              top: 58,
+              left: "68%",
+              top: 52,
               width: 12,
               height: 14,
               borderRadius: 2,
