@@ -77,12 +77,13 @@ export default function SceneDinner() {
         ]}
       />
 
-      {/* 小月牙（高处，锚定顶 ~6vh） */}
+      {/* 小月牙：下移左移到 right 34% / top 12vh，避开右上角 chip 堆 + 「点我会怎样」switch
+          （原 right14%/top6vh 撞进两者底下）。与满月同区，五幕月相位置一致。 */}
       <div
         className="absolute"
         style={{
-          right: "14%",
-          top: "6vh",
+          right: "34%",
+          top: "12vh",
           width: 26,
           height: 26,
           borderRadius: "50%",

@@ -57,7 +57,9 @@ export default function PickerFoodStage({ meal }: { meal: MealType }) {
           <SleepingCat
             style={{ right: -18, bottom: -10, width: 92, left: "auto", top: "auto" }}
           />
-          <Zzz style={{ right: 10, top: -26, left: "auto" }} />
+          {/* Zzz 贴着猫头（盘右下）飘起——原来飘到标题右上、隔着整个盘子读不出「猫在打盹」。
+              猫头约在 stage (100,118)，z 从此处上方 ~14px 起、往右上飘。 */}
+          <Zzz style={{ left: 96, top: 96, right: "auto" }} />
         </div>
       )}
     </div>

@@ -24,8 +24,9 @@ export default function SceneMidnight() {
         ]}
       />
 
-      {/* 大柔满月（右上，锚顶 ~7vh），极慢呼吸 */}
-      <div className="picker-scene-moon absolute" style={{ right: "16%", top: "7vh" }}>
+      {/* 大柔满月：下移左移到 right 30% / top 12vh，避开右上角工具 chip 堆
+          （原 right16%/top7vh 垫在 chip 底下，半透 chip 叠上去像 bug、月亮也被切） */}
+      <div className="picker-scene-moon absolute" style={{ right: "30%", top: "12vh" }}>
         <LightDisc
           size={72}
           color="rgb(242 235 221 / 0.92)"
