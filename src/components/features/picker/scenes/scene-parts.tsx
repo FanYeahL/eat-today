@@ -256,9 +256,10 @@ export function Bird({ style, delay = 0 }: { style?: CSSProperties; delay?: numb
   );
 }
 
-/** 打盹黑猫（midnight 主角，90–110px 蜷坐剪影）：呼吸 + 尾巴卷 + 耳朵抖，各挂独立 <g>。
+/** 打盹黑猫（midnight 主角，蜷坐剪影）：呼吸 + 尾巴卷 + 耳朵抖，各挂独立 <g>。
+ *  从屋顶搬到食物盘边打盹——「黑猫在旁边打盹」。
  *  fill 显式传入——深夜近黑天空上纯 --sil 看不见，用「月光下的暖黑剪影」色让猫读得出。 */
-export function CatOnRoof({
+export function SleepingCat({
   style,
   fill = "#05070C",
 }: {

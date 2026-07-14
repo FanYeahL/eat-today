@@ -1,12 +1,13 @@
 /**
- * SceneMidnight / 深夜月 + 打盹黑猫（主角）
+ * SceneMidnight / 深夜月（背景层）
  * ─────────────────────────────────────────────
- * 最暗天空、更少更慢的星 + 大柔满月（呼吸）+ 屋顶剪影（一扇窗亮暖橙，呼吸）+
- * 黑猫主角（90–110px 蜷坐屋顶，呼吸/尾巴卷/耳朵抖）+ Zzz 打盹。
+ * 最暗天空、更少更慢的星 + 大柔满月（呼吸）+ 屋顶剪影（一扇窗亮暖橙，呼吸）。
  * 满月锚定顶 ~7vh，result/shops 首卡盖住地平线时月亮仍完整可见。
+ * 黑猫主角已搬到食物盘边打盹（见 PickerFoodStage 的 SleepingCat）——屋顶少了主角，
+ * 负空间感反而更「安宁寂静」。
  */
 
-import { Stars, LightDisc, CatOnRoof, Zzz, SilhouetteBand } from "./scene-parts";
+import { Stars, LightDisc, SilhouetteBand } from "./scene-parts";
 
 export default function SceneMidnight() {
   return (
@@ -32,7 +33,7 @@ export default function SceneMidnight() {
         />
       </div>
 
-      {/* 屋顶剪影 + 一扇亮窗（深夜留的一盏灯）+ 黑猫主角坐屋顶。
+      {/* 屋顶剪影 + 一扇亮窗（深夜留的一盏灯）。猫已搬到盘边，屋顶只留一排静房 + 一扇灯。
           topVh 44：坐在食物焦点下方一带、meal tab 之上，避免被下半筛选卡盖住。 */}
       <SilhouetteBand topVh={44}>
         <div className="relative h-[120px] w-full">
@@ -56,10 +57,6 @@ export default function SceneMidnight() {
               boxShadow: "0 0 12px 2px rgb(var(--glow) / 0.5)",
             }}
           />
-          {/* 黑猫主角：蹲坐在左侧坡顶上 */}
-          <CatOnRoof style={{ left: "12%", top: -46 }} />
-          {/* Zzz：猫头上方 */}
-          <Zzz style={{ left: "24%", top: -66 }} />
         </div>
       </SilhouetteBand>
     </div>
