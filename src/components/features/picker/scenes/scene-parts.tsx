@@ -211,10 +211,13 @@ export function Cloud({
   style,
   duration,
   delay = 0,
+  width = 90,
 }: {
   style?: CSSProperties;
   duration: number;
   delay?: number;
+  /** 云体宽度（近大远小给纯天空层次）。 */
+  width?: number;
 }) {
   return (
     <div
@@ -227,8 +230,8 @@ export function Cloud({
     >
       <div
         style={{
-          width: 90,
-          height: 22,
+          width,
+          height: Math.round(width * 0.24),
           borderRadius: 9999,
           background: "rgb(255 255 255 / 0.5)",
         }}

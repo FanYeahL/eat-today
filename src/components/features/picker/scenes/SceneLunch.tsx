@@ -1,8 +1,9 @@
 /**
- * SceneLunch / 正午正能量（最简单，通透空旷）
+ * SceneLunch / 正午正能量（构图签名：零地平线纯天空，大负空间——唯一没有剪影带的一幕）
  * ─────────────────────────────────────────────
- * 顶部偏右实体太阳（圆盘 + 12 道短光芒，极慢自转）+ 光柱 ×2（opacity 呼吸）+ 尘埃微粒 + 白云 ×2。
- * 剪影无/极浅。太阳锚定顶 ~10vh，正能量 = 看得见太阳在转。
+ * 顶部偏右实体太阳（圆盘 + 12 道短光芒，极慢自转）+ 光柱 ×2（opacity 呼吸，最宽那条指向餐盘）+
+ * 尘埃微粒 + 白云 ×2（近大远小）。明确无任何剪影带——辨识度就是通透空旷。
+ * 太阳锚定顶 ~10vh，正能量 = 看得见太阳在转。
  */
 
 import { Cloud } from "./scene-parts";
@@ -70,15 +71,16 @@ export default function SceneLunch() {
     <div className="absolute inset-0">
       <SpinningSun />
 
-      {/* 光柱 ×2：从太阳斜向下的宽光带，opacity 呼吸 + 轻移，错峰 */}
+      {/* 光柱 ×2：从太阳斜向下的宽光带，opacity 呼吸 + 轻移，错峰。
+          最宽那条角度加大（28deg）指向餐盘位置（屏幕中偏下），为 P2 盘下光池做铺垫。 */}
       <div
         className="picker-scene-shaft absolute"
         style={{
-          right: "10%",
+          right: "14%",
           top: 0,
-          width: 120,
-          height: "48vh",
-          transform: "rotate(14deg)",
+          width: 130,
+          height: "52vh",
+          transform: "rotate(28deg)",
           transformOrigin: "top center",
           background: "linear-gradient(to bottom, rgb(255 240 200 / 0.18), transparent 82%)",
         }}
@@ -126,9 +128,9 @@ export default function SceneLunch() {
         />
       ))}
 
-      {/* 白云 ×2：极慢横移 */}
-      <Cloud duration={110} style={{ top: "8vh", left: 0 }} />
-      <Cloud duration={140} delay={-50} style={{ top: "18vh", left: 0 }} />
+      {/* 白云 ×2：近大远小（140 / 90px），给纯天空一点层次；极慢横移 */}
+      <Cloud duration={110} width={140} style={{ top: "18vh", left: 0 }} />
+      <Cloud duration={140} delay={-50} width={90} style={{ top: "8vh", left: 0 }} />
     </div>
   );
 }
