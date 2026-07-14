@@ -30,6 +30,7 @@ import ShopResults, { type ShopCard } from "./ShopResults";
 import RecipePanelV2 from "./RecipePanelV2";
 import DiaryPanelV2 from "./DiaryPanelV2";
 import PickerScene from "./scenes/PickerScene";
+import PickerForeground from "./scenes/PickerForeground";
 import PickerChooseScreen from "./PickerChooseScreen";
 import {
   PICKING_LINES,
@@ -321,6 +322,9 @@ export default function UniversalFoodPicker() {
     <main data-meal={div.meal} className="relative isolate min-h-screen overflow-hidden">
       {/* 饭点「场景舞台」背景层（按 meal 换整幕场景，见 PickerScene） */}
       <PickerScene meal={div.meal} />
+
+      {/* 前景层（z-[5]，夹在场景 z-0 与内容 z-10 之间；可与标题/盘子交叠但压不住文字） */}
+      <PickerForeground meal={div.meal} />
 
       {/* ===== 次入口面板（浮层）===== */}
       <AnimatePresence>
