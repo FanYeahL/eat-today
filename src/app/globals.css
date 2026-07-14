@@ -547,12 +547,15 @@ body {
 @keyframes picker-scene-flicker { 0%, 100% { opacity: 0.25; } 50% { opacity: 0.95; } }
 .picker-scene-flicker { animation: picker-scene-flicker 9s ease-in-out infinite; }
 
-/* 流星：快速划过（尾迹 0.9s 内完成），其余时间不可见。周期由内联 animation-duration 定。 */
+/* 流星：快速划过（尾迹 ≤1s 内完成），其余时间不可见。周期由内联 animation-duration 定。
+   角度经 --meteor-angle 进 keyframe，沿旋转后的自身轴 translateX 滑行——尾迹与轨迹共线，
+   斜下坠（正角度 30–40° 向右下、~145° 向左下）。旧写法 translate(140,92) 会整体替换
+   组件 inline 的 rotate，旋转丢失（横线沿对角平移）。 */
 @keyframes picker-scene-meteor {
-  0% { opacity: 0; transform: translate(0, 0); }
+  0% { opacity: 0; transform: rotate(var(--meteor-angle, 35deg)) translateX(0); }
   4% { opacity: 0.9; }
-  9% { opacity: 0; transform: translate(140px, 92px); }
-  100% { opacity: 0; transform: translate(140px, 92px); }
+  9% { opacity: 0; transform: rotate(var(--meteor-angle, 35deg)) translateX(280px); }
+  100% { opacity: 0; transform: rotate(var(--meteor-angle, 35deg)) translateX(280px); }
 }
 .picker-scene-meteor { will-change: transform, opacity; }
 

@@ -92,9 +92,10 @@ export default function SceneDinner() {
         }}
       />
 
-      {/* 流星 ×2：低频、快速划过、起点/角度不同（起点在顶部带内） */}
-      <Meteor style={{ left: "18%", top: "9vh" }} duration={11} delay={0} angle={-22} />
-      <Meteor style={{ left: "60%", top: "5vh" }} duration={15} delay={6} angle={-16} />
+      {/* 流星 ×2：低频、快速划过（≤1s）、斜下坠、方向不同。
+          35° 从左上向右下、145° 从右上向左下；两颗错峰（delay 0 / 6s）。 */}
+      <Meteor style={{ left: "10%", top: "6vh" }} duration={11} delay={0} angle={35} />
+      <Meteor style={{ left: "85%", top: "8vh" }} duration={11} delay={6} angle={145} />
 
       {/* 地平线橙暖 glow（天际线后，与 skyline 带对齐在 ~46vh） */}
       <div
