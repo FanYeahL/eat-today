@@ -22,39 +22,40 @@ export default function SceneBreakfast() {
       <Bird style={{ top: "8vh", left: 0 }} />
       <Bird style={{ top: "12vh", left: 0 }} delay={-9} />
 
-      {/* 市集剪影 + 炊烟 + 三角旗（topVh 46：食物焦点下方、meal tab 之上；炊烟往上飘进焦点区） */}
-      <SilhouetteBand opacity={0.2} topVh={46}>
+      {/* 市集剪影 + 炊烟 + 三角旗（topVh 46：食物焦点下方、meal tab 之上；炊烟往上飘进焦点区）。
+          容器 opacity 保持 1：0.2 淡化写进各剪影 fill，否则会连炊烟/灯球一起打折（0.65×0.2≈0.13 不可见）。 */}
+      <SilhouetteBand topVh={46}>
         <div className="relative h-[92px] w-full">
           <svg viewBox="0 0 400 92" preserveAspectRatio="none" className="h-full w-full">
             {/* 地面 */}
-            <rect x="0" y="82" width="400" height="10" fill="rgb(var(--sil))" />
+            <rect x="0" y="82" width="400" height="10" fill="rgb(var(--sil) / 0.2)" />
             {/* 摊位 1（带雨棚 + 蒸笼） */}
-            <path fill="rgb(var(--sil))" d="M40 82 L40 52 L120 52 L120 82 Z" />
-            <path fill="rgb(var(--sil))" d="M32 52 L128 52 L118 40 L42 40 Z" />
+            <path fill="rgb(var(--sil) / 0.2)" d="M40 82 L40 52 L120 52 L120 82 Z" />
+            <path fill="rgb(var(--sil) / 0.2)" d="M32 52 L128 52 L118 40 L42 40 Z" />
             {/* 蒸笼堆（炊烟从这里起） */}
-            <rect x="62" y="60" width="26" height="22" fill="rgb(var(--sil))" />
+            <rect x="62" y="60" width="26" height="22" fill="rgb(var(--sil) / 0.2)" />
             {/* 摊位 2 */}
-            <path fill="rgb(var(--sil))" d="M230 82 L230 56 L320 56 L320 82 Z" />
-            <path fill="rgb(var(--sil))" d="M222 56 L328 56 L318 44 L232 44 Z" />
-            <rect x="256" y="62" width="24" height="20" fill="rgb(var(--sil))" />
+            <path fill="rgb(var(--sil) / 0.2)" d="M230 82 L230 56 L320 56 L320 82 Z" />
+            <path fill="rgb(var(--sil) / 0.2)" d="M222 56 L328 56 L318 44 L232 44 Z" />
+            <rect x="256" y="62" width="24" height="20" fill="rgb(var(--sil) / 0.2)" />
             {/* 灯杆 */}
-            <rect x="180" y="34" width="4" height="48" fill="rgb(var(--sil))" />
-            <circle cx="182" cy="32" r="5" fill="rgb(var(--glow))" opacity="0.5" />
+            <rect x="180" y="34" width="4" height="48" fill="rgb(var(--sil) / 0.2)" />
+            {/* 灯球：全强度渲染后会从有效 ~0.1 跳到显眼，压到 0.4 让它读作「点着的灯」而不刺眼 */}
+            <circle cx="182" cy="32" r="5" fill="rgb(var(--glow))" opacity="0.4" />
           </svg>
 
-          {/* 三角旗串（灯杆↔摊位），轻摆 */}
+          {/* 三角旗串（灯杆↔摊位），轻摆。旗比剪影实一点（0.45）让「热闹」立起来 */}
           <svg
             viewBox="0 0 160 20"
             className="picker-scene-flag absolute"
             style={{ left: "34%", top: 6, width: 160 }}
           >
-            <path d="M0 2 L160 2" stroke="rgb(var(--sil))" strokeWidth="1" />
+            <path d="M0 2 L160 2" stroke="rgb(var(--sil) / 0.45)" strokeWidth="1" />
             {Array.from({ length: 8 }).map((_, i) => (
               <path
                 key={i}
                 d={`M${i * 20} 2 L${i * 20 + 16} 2 L${i * 20 + 8} 14 Z`}
-                fill="rgb(var(--sil))"
-                opacity={0.9}
+                fill="rgb(var(--sil) / 0.45)"
               />
             ))}
           </svg>
