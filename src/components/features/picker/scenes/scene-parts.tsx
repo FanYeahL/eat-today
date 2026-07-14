@@ -115,38 +115,41 @@ export function RayFan({
   );
 }
 
-/** 星野：一个 SVG 里若干小星点，三档 twinkle 错峰。 */
+/** 星野：一层 div 里若干正圆小点，三档 twinkle 错峰。
+ *  用 div + border-radius:50% 而非 SVG 缩放——SVG viewBox 铺满非等比容器会把圆点拉成椭圆。
+ *  x/y 直接当百分比用（相对 38vh 星空带），点径 = 2r px（1–2px）。 */
 export function Stars({
   points,
 }: {
   points: { x: number; y: number; r: number; speed: "a" | "b" | "c" }[];
 }) {
   return (
-    <svg
-      viewBox="0 0 100 60"
-      preserveAspectRatio="none"
-      className="absolute inset-x-0 top-0 h-[38vh] w-full"
-    >
+    <div className="absolute inset-x-0 top-0 h-[38vh]">
       {points.map((p, i) => (
-        <circle
+        <div
           key={i}
-          cx={p.x}
-          cy={p.y}
-          r={p.r}
-          fill="#FFFFFF"
-          className={`picker-scene-twinkle-${p.speed}`}
+          className={`picker-scene-twinkle-${p.speed} absolute`}
+          style={{
+            left: `${p.x}%`,
+            top: `${p.y}%`,
+            width: p.r * 2,
+            height: p.r * 2,
+            borderRadius: "50%",
+            background: "#FFFFFF",
+          }}
         />
       ))}
-    </svg>
+    </div>
   );
 }
 
-/** 流星：渐变尾迹细线，快速划过（周期由 duration 定），起点/角度由 style 定。 */
+/** 流星：渐变尾迹细线，沿自身轴斜下坠划过（周期由 duration 定），起点/角度由 style + angle 定。
+ *  角度经 --meteor-angle 交给 keyframe（在旋转后的轴上 translateX），尾迹与轨迹共线。 */
 export function Meteor({
   style,
   duration,
   delay,
-  angle = -20,
+  angle = 35,
 }: {
   style?: CSSProperties;
   duration: number;
