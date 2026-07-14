@@ -40,7 +40,7 @@ export default function DishReveal({ food, line }: DishRevealProps) {
     // key=food.id：换一道时整卡重挂，分层动效重放
     <article
       key={food.id}
-      className="relative w-full overflow-hidden rounded-[2rem] rounded-tr-[5.5rem] border border-brand/20 bg-surface shadow-[0_22px_50px_rgb(var(--c-accent)_/_0.16)]"
+      className="picker-glass meal-transition relative w-full overflow-hidden rounded-[2rem] rounded-tr-[5.5rem]"
     >
       {/* ① 顶部小标：今天推荐（菜单板口吻，非「开奖」） */}
       <div

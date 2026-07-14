@@ -225,11 +225,38 @@ body {
   --c-cta-a: 240 86 60; /* #F0563C tomato（渐变起，白字 AA-large 3.44:1） */
   --c-cta-b: 222 90 22; /* #DE5A16 orange（渐变止，白字 AA-large 3.76:1） */
 
+  /* 场景 token 兜底（各 data-meal 会覆盖；这里给安全默认，避免初次绘制取到 undefined）。 */
+  --sky-0: 234 244 247;
+  --sky-1: 255 236 201;
+  --sky-2: 255 217 162;
+  --glow: 255 193 99;
+  --sil: 122 82 54;
+
   background: var(--background);
   color: var(--foreground);
   /* 覆盖旧变量指针，保证容器内背景/前景取暖色（不影响 :root） */
   --background: rgb(var(--c-base));
   --foreground: rgb(var(--c-ink));
+}
+
+/*
+ * 半透 solid 卡（替代 backdrop-filter 玻璃）——两端一致、无脏玻璃、小程序可迁移。
+ * 内容卡半透，透出下方场景氛围色；投影用场景光源色 --glow 给内容「打光」。
+ * 透明度区间：浅色 0.72–0.82 / 深色 0.62–0.72，以「卡上文字 ≥4.5:1」为下限往透里调。
+ */
+.picker-theme .picker-glass {
+  background: rgb(var(--c-surface) / 0.82);
+  border: 1px solid rgb(var(--c-ink) / 0.08);
+  box-shadow: 0 12px 32px rgb(var(--glow) / 0.14);
+}
+.picker-theme [data-meal="dinner"] .picker-glass,
+.picker-theme [data-meal="midnight"] .picker-glass {
+  background: rgb(var(--c-surface) / 0.72);
+  border-color: rgb(255 255 255 / 0.1);
+}
+/* 切时段颜色平滑（含 box-shadow：--glow 逐时段变，不加会瞬跳）。挂具体组件，不用通配符。 */
+.meal-transition {
+  transition: background-color 0.6s, color 0.6s, border-color 0.6s, box-shadow 0.6s;
 }
 
 /*
@@ -248,6 +275,12 @@ body {
   --c-brand: 232 122 40; /* #E87A28 番茄橙（暖，重点） */
   --c-accent: 240 138 92; /* #F08A5C 柔橙 */
   --c-accent-hot: 240 96 56; /* #F06038 番茄红重点 */
+  /* 场景（天空 3 段 + 光源 + 剪影）：清晨市集 */
+  --sky-0: 234 244 247; /* #EAF4F7 淡青白天顶 */
+  --sky-1: 255 236 201; /* #FFECC9 暖杏中段 */
+  --sky-2: 255 217 162; /* #FFD9A2 晨金地平线 */
+  --glow: 255 193 99; /* #FFC163 晨光光源 */
+  --sil: 122 82 54; /* #7A5236 市集剪影（用 α0.16） */
 }
 
 /* 午餐：干净暖白 + 鲜明橙/阳光黄（浅） */
@@ -258,6 +291,12 @@ body {
   --c-brand: 240 138 24; /* #F08A18 阳光橙黄 */
   --c-accent: 245 176 40; /* #F5B028 阳光黄 */
   --c-accent-hot: 240 96 48; /* #F06030 明亮橙 */
+  /* 场景：正午通透（剪影极浅或无） */
+  --sky-0: 255 254 248; /* #FFFEF8 近白天顶 */
+  --sky-1: 255 244 214; /* #FFF4D6 暖白中段 */
+  --sky-2: 255 233 184; /* #FFE9B8 暖金地平线 */
+  --glow: 255 211 77; /* #FFD34D 正午太阳 */
+  --sil: 201 183 154; /* #C9B79A 极浅远山（α0.06） */
 }
 
 /* 下午茶：蜜桃/杏橙 + 一点淡紫灰（浅） */
@@ -269,6 +308,12 @@ body {
   --c-accent: 176 150 168; /* #B096A8 一点淡紫灰 */
   --c-accent-hot: 232 108 84; /* #E86C54 夕阳橙红 */
   --c-ink: 42 33 30; /* #2A211E 暖 charcoal（配蜜桃底更暖，仍高对比） */
+  /* 场景：夕阳（三段最出氛围，淡紫→橘粉→橙金） */
+  --sky-0: 217 201 224; /* #D9C9E0 淡紫天顶 */
+  --sky-1: 255 197 160; /* #FFC5A0 橘粉中段 */
+  --sky-2: 255 158 96; /* #FF9E60 橙金地平线 */
+  --glow: 255 140 66; /* #FF8C42 落日光源 */
+  --sil: 90 64 88; /* #5A4058 屋顶/树剪影（α0.35 逆光） */
 }
 
 /* 晚饭：夜蓝深暖灰底 + tomato（深，solid 翻转） */
@@ -283,6 +328,12 @@ body {
   --c-ink-muted: 178 170 160; /* #B2AAA0 低亮暖灰次文字 */
   --c-paper: 244 238 230;
   --foreground: rgb(var(--c-ink));
+  /* 场景：都市夜（天际线 + 亮窗 + 流星） */
+  --sky-0: 15 20 32; /* #0F1420 夜空顶 */
+  --sky-1: 26 35 56; /* #1A2338 中段 */
+  --sky-2: 51 65 94; /* #33415E 地平线光污染微亮 */
+  --glow: 240 118 66; /* #F07642 城市暖光 */
+  --sil: 11 14 22; /* #0B0E16 天际线近黑 */
 }
 
 /* 夜宵：深蓝黑/墨色 + 暖橙小光（深，solid 翻转，更暗） */
@@ -297,6 +348,12 @@ body {
   --c-ink-muted: 168 160 152; /* #A8A098 低亮暖灰次文字 */
   --c-paper: 240 234 226;
   --foreground: rgb(var(--c-ink));
+  /* 场景：月夜（满月 + 屋顶亮窗 + 黑猫） */
+  --sky-0: 7 9 15; /* #07090F 最暗天顶 */
+  --sky-1: 14 17 28; /* #0E111C 中段 */
+  --sky-2: 22 26 40; /* #161A28 地平线 */
+  --glow: 240 132 76; /* #F0844C 暖橙小光/亮窗 */
+  --sil: 10 12 18; /* #0A0C12 屋顶近黑 */
 }
 
 /*
@@ -457,61 +514,99 @@ body {
 }
 
 /*
- * ── 饭点氛围 ambient 动效（每 meal 恰好一层，PickerAtmosphere 选渲染）──
- * 全 .picker-amb-* 前缀、只 transform/opacity、很慢很轻不抢主内容；reduced-motion 全关（见下）。
+ * ══════════════════════════════════════════════
+ *  饭点氛围「场景舞台」动效（picker-scene-*）
+ * ══════════════════════════════════════════════
+ * 全屏场景:天空渐变 + 光源 + 粒子 + 地平线剪影,内容浮其上。每个场景静止帧本身就是一幅画,
+ * 动效只让它活。全 .picker-scene-* 前缀、只 transform/opacity 的 CSS keyframes(无 canvas/JS 逐帧,
+ * 保小程序可迁移)。reduced-motion 下由下方 [class*="picker-scene-"] catch-all 全停,但静态场景 DOM 保留。
+ * 具体各 @keyframes 见下。
  */
 
-/* breakfast 蒸汽：极淡窄竖条缓慢上升 + 淡入淡出（2-3 条错峰，非铺满烟） */
-@keyframes picker-amb-steam {
-  0% { opacity: 0; transform: translateY(8px) scaleY(0.8); }
+/* tea 放射光芒：整组极慢左右微转 + 呼吸（场景灵魂）。 */
+@keyframes picker-scene-rays {
+  0%, 100% { transform: rotate(-3deg); opacity: 0.7; }
+  50% { transform: rotate(3deg); opacity: 1; }
+}
+.picker-scene-rays { transform-origin: center bottom; animation: picker-scene-rays 30s ease-in-out infinite; will-change: transform, opacity; }
+
+/* 云极慢横移（tea / lunch 共用，方向/时长由内联 style 定）。 */
+@keyframes picker-scene-cloud {
+  0% { transform: translateX(-8%); }
+  100% { transform: translateX(108%); }
+}
+.picker-scene-cloud { will-change: transform; animation: picker-scene-cloud 120s linear infinite; }
+
+/* 星星三档 twinkle（错峰）。 */
+@keyframes picker-scene-twinkle { 0%, 100% { opacity: 0.2; } 50% { opacity: 0.9; } }
+.picker-scene-twinkle-a { animation: picker-scene-twinkle 4s ease-in-out infinite; }
+.picker-scene-twinkle-b { animation: picker-scene-twinkle 6s ease-in-out infinite; }
+.picker-scene-twinkle-c { animation: picker-scene-twinkle 8s ease-in-out infinite; }
+
+/* 楼窗 flicker（城市是活的）。 */
+@keyframes picker-scene-flicker { 0%, 100% { opacity: 0.25; } 50% { opacity: 0.95; } }
+.picker-scene-flicker { animation: picker-scene-flicker 9s ease-in-out infinite; }
+
+/* 流星：快速划过（尾迹 0.9s 内完成），其余时间不可见。周期由内联 animation-duration 定。 */
+@keyframes picker-scene-meteor {
+  0% { opacity: 0; transform: translate(0, 0); }
+  4% { opacity: 0.9; }
+  9% { opacity: 0; transform: translate(140px, 92px); }
+  100% { opacity: 0; transform: translate(140px, 92px); }
+}
+.picker-scene-meteor { will-change: transform, opacity; }
+
+/* 月亮极慢呼吸。 */
+@keyframes picker-scene-moon { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.03); } }
+.picker-scene-moon { transform-origin: center; animation: picker-scene-moon 8s ease-in-out infinite; will-change: transform; }
+
+/* 亮窗暖光呼吸（深夜留的一盏灯）。 */
+@keyframes picker-scene-window { 0%, 100% { opacity: 0.7; } 50% { opacity: 1; } }
+.picker-scene-window { animation: picker-scene-window 7s ease-in-out infinite; }
+
+/* 黑猫主角：呼吸 / 尾巴卷 / 耳朵抖（分属不同 <g>，reduced-motion 全停但猫仍画出）。 */
+@keyframes picker-scene-cat-breathe { 0%, 100% { transform: scaleY(1); } 50% { transform: scaleY(1.035); } }
+.picker-scene-cat-breathe { transform-origin: bottom; animation: picker-scene-cat-breathe 5s ease-in-out infinite; will-change: transform; }
+@keyframes picker-scene-cat-tail { 0%, 88%, 100% { transform: rotate(0deg); } 94% { transform: rotate(-10deg); } }
+.picker-scene-cat-tail { transform-origin: left bottom; animation: picker-scene-cat-tail 11s ease-in-out infinite; }
+@keyframes picker-scene-cat-ear { 0%, 92%, 100% { transform: rotate(0deg); } 96% { transform: rotate(3deg); } }
+.picker-scene-cat-ear { transform-origin: center bottom; animation: picker-scene-cat-ear 15s ease-in-out infinite; }
+
+/* Zzz 上浮渐隐（打盹）。stagger 由内联 animation-delay 定。 */
+@keyframes picker-scene-zzz {
+  0% { opacity: 0; transform: translateY(0) scale(0.8); }
   30% { opacity: 0.5; }
-  100% { opacity: 0; transform: translateY(-40px) scaleY(1.15); }
+  100% { opacity: 0; transform: translateY(-16px) scale(1.1); }
 }
-.picker-amb-steam { animation: picker-amb-steam 9s ease-in-out infinite; will-change: transform, opacity; }
+.picker-scene-zzz { animation: picker-scene-zzz 6s ease-in-out infinite; will-change: transform, opacity; }
 
-/* lunch 阳光：near-static 斜带，只 opacity 轻呼吸（不位移、不过曝） */
-@keyframes picker-amb-sun {
-  0%, 100% { opacity: 0.35; }
-  50% { opacity: 0.5; }
+/* breakfast 炊烟上升（错峰，内联 delay/duration）。 */
+@keyframes picker-scene-steam {
+  0% { opacity: 0; transform: translateY(6px) scaleX(0.8) scaleY(0.9); }
+  25% { opacity: 0.55; }
+  100% { opacity: 0; transform: translateY(-72px) scaleX(1.4) scaleY(1.2); }
 }
-.picker-amb-sun { animation: picker-amb-sun 12s ease-in-out infinite; will-change: opacity; }
+.picker-scene-steam { transform-origin: center bottom; will-change: transform, opacity; }
 
-/* tea 夕阳：右上暖光晕缓慢位移 + 轻呼吸（光从侧后来） */
-@keyframes picker-amb-sunset {
-  0%, 100% { opacity: 0.4; transform: translate(0, 0); }
-  50% { opacity: 0.5; transform: translate(-14px, 10px); }
-}
-.picker-amb-sunset { animation: picker-amb-sunset 16s ease-in-out infinite; will-change: transform, opacity; }
+/* breakfast 三角旗轻摆（热闹但不吵）。 */
+@keyframes picker-scene-flag { 0%, 100% { transform: skewX(-4deg); } 50% { transform: skewX(4deg); } }
+.picker-scene-flag { transform-origin: top center; animation: picker-scene-flag 6s ease-in-out infinite; }
 
-/* dinner 城市光点：极慢明灭（多颗错峰） */
-@keyframes picker-amb-citydot {
-  0%, 100% { opacity: 0.15; }
-  50% { opacity: 0.5; }
-}
-.picker-amb-citydot { animation: picker-amb-citydot 7s ease-in-out infinite; will-change: opacity; }
+/* 飞鸟横穿（breakfast，可选）。 */
+@keyframes picker-scene-bird { 0% { opacity: 0; transform: translate(-10%, 0); } 10%, 80% { opacity: 0.25; } 100% { opacity: 0; transform: translate(110%, -20px); } }
+.picker-scene-bird { will-change: transform, opacity; animation: picker-scene-bird 18s linear infinite; }
 
-/* dinner 流星：低频（12s 一次）短暂划过，其余时间不可见 */
-@keyframes picker-amb-meteor {
-  0% { opacity: 0; transform: translate(-30px, -20px); }
-  6% { opacity: 0.7; }
-  14% { opacity: 0; transform: translate(120px, 80px); }
-  100% { opacity: 0; transform: translate(120px, 80px); }
-}
-.picker-amb-meteor { animation: picker-amb-meteor 12s linear infinite; will-change: transform, opacity; }
+/* lunch 太阳极慢自转（正能量 = 看得见太阳在转）。 */
+@keyframes picker-scene-sunspin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+.picker-scene-sunspin { transform-origin: center; animation: picker-scene-sunspin 60s linear infinite; will-change: transform; }
 
-/* midnight 黑猫：极慢呼吸（scaleY，transform-origin 底） */
-@keyframes picker-amb-catbreathe {
-  0%, 100% { transform: scaleY(1); }
-  50% { transform: scaleY(1.04); }
-}
-.picker-amb-catbreathe { transform-origin: bottom; animation: picker-amb-catbreathe 5s ease-in-out infinite; will-change: transform; }
+/* lunch 光柱 opacity 呼吸 + 轻移。 */
+@keyframes picker-scene-shaft { 0%, 100% { opacity: 0.5; transform: translateX(0); } 50% { opacity: 1; transform: translateX(10px); } }
+.picker-scene-shaft { animation: picker-scene-shaft 20s ease-in-out infinite; will-change: transform, opacity; }
 
-/* midnight 猫尾：偶尔轻摆（9s 一次，短暂 rotate） */
-@keyframes picker-amb-tail {
-  0%, 92%, 100% { transform: rotate(0deg); }
-  96% { transform: rotate(-6deg); }
-}
-.picker-amb-tail { transform-origin: left bottom; animation: picker-amb-tail 9s ease-in-out infinite; will-change: transform; }
+/* lunch 尘埃微粒上浮闪烁。 */
+@keyframes picker-scene-mote { 0% { opacity: 0; transform: translateY(0); } 50% { opacity: 0.5; } 100% { opacity: 0; transform: translateY(-24px); } }
+.picker-scene-mote { will-change: transform, opacity; }
 
 /* 纸底颗粒：极淡噪点感（叠在暖米底上，给 MCM「印刷海报」的纸质，纯静态） */
 .picker-theme .picker-paper-grain {
@@ -531,13 +626,8 @@ body {
   .picker-press-glow,
   .picker-food-idle,
   .picker-stage-pop,
-  .picker-amb-steam,
-  .picker-amb-sun,
-  .picker-amb-sunset,
-  .picker-amb-citydot,
-  .picker-amb-meteor,
-  .picker-amb-catbreathe,
-  .picker-amb-tail {
+  [class*="picker-scene-"] {
+    /* catch-all：所有场景动效类（Phase 2 陆续加）自动覆盖，静态场景 DOM 仍保留 */
     animation: none !important;
   }
   .picker-serve-up,

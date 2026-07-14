@@ -29,7 +29,7 @@ import DishReveal from "./DishReveal";
 import ShopResults, { type ShopCard } from "./ShopResults";
 import RecipePanelV2 from "./RecipePanelV2";
 import DiaryPanelV2 from "./DiaryPanelV2";
-import PickerAtmosphere from "./PickerAtmosphere";
+import PickerScene from "./scenes/PickerScene";
 import PickerChooseScreen from "./PickerChooseScreen";
 import {
   PICKING_LINES,
@@ -319,8 +319,8 @@ export default function UniversalFoodPicker() {
   // 又不会被负 z-index 压到 main 背后被父级白底盖住（曾导致「背景没加」）。
   return (
     <main data-meal={div.meal} className="relative isolate min-h-screen overflow-hidden">
-      {/* 饭点氛围背景层（按 meal 换底色 + 一个 ambient，见 PickerAtmosphere） */}
-      <PickerAtmosphere meal={div.meal} />
+      {/* 饭点「场景舞台」背景层（按 meal 换整幕场景，见 PickerScene） */}
+      <PickerScene meal={div.meal} />
 
       {/* ===== 次入口面板（浮层）===== */}
       <AnimatePresence>
@@ -422,8 +422,8 @@ export default function UniversalFoodPicker() {
               )}
             </div>
 
-            {/* 海报主视觉 */}
-            <div className="mt-4">
+            {/* 海报主视觉：顶部留 ≥18vh 天空带，让当前时段光源（太阳/月亮）在卡片上方完整可见 */}
+            <div className="mt-[13vh]">
               <DishReveal food={div.pick} line={resultLine} />
             </div>
 

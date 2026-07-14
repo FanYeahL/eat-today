@@ -36,7 +36,7 @@ export default function MealTabs({ value, onChange }: MealTabsProps) {
     <div
       role="radiogroup"
       aria-label="选择餐段"
-      className="flex items-stretch gap-1 rounded-2xl bg-surface-2/60 p-1"
+      className="picker-glass meal-transition flex items-stretch gap-1 rounded-2xl p-1"
     >
       {meals.map((m) => {
         const selected = m.type === value;

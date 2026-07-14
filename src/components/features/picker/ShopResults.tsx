@@ -207,7 +207,7 @@ export default function ShopResults({
                   key={card.id}
                   // 店卡轻微 stagger 出现（.picker-serve-up + --i，克制：最多 6 档延迟）。
                   // 语义可迁移小程序（class + animation-delay），非 JS 逐帧。
-                  className={`picker-serve-up flex items-center gap-3 rounded-3xl border border-brand/20 bg-surface px-4 py-3 shadow-[0_10px_26px_rgb(var(--c-brand)_/_0.1)] ${
+                  className={`picker-serve-up meal-transition flex items-center gap-3 rounded-3xl border border-ink/10 bg-surface/85 px-4 py-3 shadow-[0_8px_20px_rgb(var(--glow)_/_0.1)] ${
                     i % 2 === 0 ? "rounded-tr-[2.75rem]" : "rounded-bl-[2.75rem]"
                   }`}
                   style={{ ["--i" as string]: Math.min(i, 6) }}

@@ -3,18 +3,16 @@
 /**
  * PickerChooseScreen / 今日菜单板 CHOOSE 首屏（仅 /picker）
  * ─────────────────────────────────────────────
- * 「删到高级」重构后的首屏编排层。视觉概念是「现代菜单票据」——不是复古模板拼贴：
- * 设计感来自暖纸底 + 深墨字 + 票据边框 + 排版节奏 + 一只干净插画餐盘 + 一个轻交互，
- * 全屏无 MCM 图形贴纸。配色收敛到四类：暖纸 / 深墨字 / 一个暖 accent（brand）/
- * 一个冷色（info retro-blue）。只做编排 + 表现：业务状态/回调由父组件（orchestrator）
- * 通过 props 注入，本组件不碰 useDivinationPick/useShops/pick-core，逻辑零耦合。
+ * 场景舞台重构后的首屏编排层：背景是按 meal 换的整幕场景（PickerScene，在 orchestrator 里渲染），
+ * 本屏内容浮在场景上——上半（场景视窗/天空）放品牌行 + hero（徽章/标题/食物焦点），下半（桌面区）
+ * 放餐段 tab / 筛选卡 / CTA，用半透 solid 卡（.picker-glass，无 blur）透出场景氛围色。
+ * 只做编排 + 表现：业务状态/回调由父组件通过 props 注入，本组件不碰 useDivinationPick/useShops/pick-core。
  *
  * 子组件构成：
- *  - PickerAtmosphere  ← 安静的暖纸背景（纸底 + 纸纹 + 一处极轻暖光晕，零 SVG/零动画）。
- *  - PickerMenuPoster  ← 今日菜单票据（票据边框 + 撕票齿孔 + 餐段徽章 + 大标题 + 食物焦点）。
- *  - PickerFoodStage   ← 食物焦点（插画餐盘 PickerPlate + 盘心缩小 emoji，切餐段一次 pop）。
- *  - PickerBottomAction← 主 CTA（橙红只在主操作出现，静态 Ben-Day 点阵 + tap press-glow）。
- *  - MealTabs / MenuFilter：沿用现有组件（写回同一 Filters/MealType），配色已收敛。
+ *  - PickerMenuPoster  ← hero（去白卡：徽章 + 大标题 + 食物焦点 + tagline 直接排在天空上）。
+ *  - PickerFoodStage   ← 食物焦点（插画餐盘 + emoji，idle 起伏 + 切餐段一次 pop）。
+ *  - PickerBottomAction← 主 CTA（固定 --c-cta-* tomato，全时段最醒目）。
+ *  - MealTabs / MenuFilter：沿用现有组件（写回同一 Filters/MealType），容器改半透 solid。
  */
 
 import PickerMenuPoster from "./PickerMenuPoster";
@@ -76,13 +74,13 @@ export default function PickerChooseScreen({
         <div className="flex items-center gap-2">
           <button
             onClick={onOpenCook}
-            className="flex items-center gap-1 rounded-full border border-ink/10 bg-surface px-3 py-1.5 text-xs font-semibold text-ink-muted transition-transform duration-100 active:scale-[0.94]"
+            className="picker-glass meal-transition flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-semibold text-ink-muted transition-transform duration-100 active:scale-[0.94]"
           >
             {SIDE_ENTRIES.cook.emoji} {SIDE_ENTRIES.cook.label}
           </button>
           <button
             onClick={onOpenDiary}
-            className="flex items-center gap-1 rounded-full border border-ink/10 bg-surface px-3 py-1.5 text-xs font-semibold text-ink-muted transition-transform duration-100 active:scale-[0.94]"
+            className="picker-glass meal-transition flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-semibold text-ink-muted transition-transform duration-100 active:scale-[0.94]"
           >
             {SIDE_ENTRIES.diary.emoji} {SIDE_ENTRIES.diary.label}
           </button>
@@ -110,8 +108,8 @@ export default function PickerChooseScreen({
         <MealTabs value={meal} onChange={onChangeMeal} />
       </div>
 
-      {/* 填空句式筛选：现代白卡（1px 柔边 + soft shadow，无粗描边/无夸张非对称圆角） */}
-      <div className="mt-4 rounded-3xl border border-ink/8 bg-surface px-5 py-4 shadow-[0_1px_2px_rgb(0_0_0_/_0.04),0_8px_24px_rgb(0_0_0_/_0.05)]">
+      {/* 填空句式筛选：半透 solid 卡（浮在桌面区，透出场景氛围色） */}
+      <div className="picker-glass meal-transition mt-4 rounded-3xl px-5 py-4">
         <MenuFilter
           value={filters}
           onChange={onChangeFilters}

@@ -1,24 +1,21 @@
 "use client";
 
 /**
- * PickerMenuPoster / 今日菜单卡（hero，仅 /picker CHOOSE 屏，首屏核心）
+ * PickerMenuPoster / 今日菜单 hero（仅 /picker CHOOSE 屏，首屏核心）
  * ─────────────────────────────────────────────
- * clean food utility 重构：不再是复古票据（撕票齿孔虚线 + 硬边徽章 + 夸张非对称圆角 +
- * Menu Ticket 英文微标签）。改成一张干净的现代卡片——近白卡 + 1px 柔边 + soft shadow +
- * 统一圆角，设计感来自留白与排版节奏，加一只更有食欲的食物焦点（PickerFoodStage）。
+ * 场景舞台重构：去掉白卡壳，徽章/大标题/食物焦点/tagline 直接排在场景视窗（天空）上，
+ * 「食物坐在晨光/夕阳里」。文字走 --c-ink（深色时段自动翻暖白，站在深天空上仍可读）。
+ * 徽章用半透 solid 底（.picker-glass）浮在天空上；无卡壳、无 soft shadow 框。
+ * 小屏：食物焦点允许骑在地平线上（盘下缘压过剪影带），不硬塞进视窗。
  *
- * 构成：
- *   顶行：餐段徽章（早饭菜单…，随 meal 动态，浅底中性字）；
- *   标题：今天吃什么（品牌字）；
- *   中央：食物焦点（暖圆底 + emoji）；
- *   下方：一句定位关心话。
+ * 构成：餐段徽章 + 大标题「今天吃什么」+ 食物焦点（PickerFoodStage）+ 一句关心话。
  */
 
 import type { MealType } from "@/types/food";
 import PickerFoodStage from "./PickerFoodStage";
 import { HERO } from "./picker-copy";
 
-/** 餐段 → 卡片徽章文案（不复用顶部品牌「今日菜单板」，避免重复）。 */
+/** 餐段 → 徽章文案（不复用顶部品牌「今日菜单板」，避免重复）。 */
 const MEAL_MENU_LABEL: Record<MealType, string> = {
   breakfast: "早饭菜单",
   lunch: "午饭菜单",
@@ -35,26 +32,24 @@ type Props = {
 
 export default function PickerMenuPoster({ meal, tagline }: Props) {
   return (
-    <div className="relative mt-3 overflow-hidden rounded-3xl border border-ink/8 bg-surface px-5 pb-6 pt-5 shadow-[0_1px_2px_rgb(0_0_0_/_0.04),0_8px_24px_rgb(0_0_0_/_0.06)]">
-      {/* 顶行：餐段徽章（浅底中性字，无硬边） */}
-      <div className="flex items-center gap-2">
-        <span className="inline-block rounded-md bg-surface-2 px-2 py-0.5 text-[11px] font-bold uppercase tracking-[0.12em] text-ink-muted">
-          {MEAL_MENU_LABEL[meal]}
-        </span>
-      </div>
+    <div className="relative mt-3 flex flex-col items-center text-center">
+      {/* 餐段徽章：半透 solid 底，浮在天空上 */}
+      <span className="picker-glass meal-transition inline-block rounded-full px-3 py-1 text-[11px] font-bold uppercase tracking-[0.14em] text-ink-muted">
+        {MEAL_MENU_LABEL[meal]}
+      </span>
 
-      {/* 标题 */}
-      <h1 className="picker-brand mt-2 text-[2.9rem] leading-[0.96] text-ink">
+      {/* 标题：站在天空上（深色时段自动暖白） */}
+      <h1 className="picker-brand meal-transition mt-2 text-[2.9rem] leading-[0.98] text-ink">
         {HERO.title}
       </h1>
 
-      {/* 中央：食物焦点（暖圆底 + emoji） */}
-      <div className="mt-4 flex items-center justify-center">
+      {/* 食物焦点：视窗中下部，地平线剪影在其后 */}
+      <div className="mt-3 flex items-center justify-center">
         <PickerFoodStage meal={meal} />
       </div>
 
-      {/* 下方：一句定位关心话 */}
-      <p className="mt-4 text-center text-sm leading-relaxed text-ink-muted">
+      {/* 一句关心话 */}
+      <p className="meal-transition mt-3 max-w-[18rem] text-sm leading-relaxed text-ink-muted">
         {tagline || HERO.lede}
       </p>
     </div>
