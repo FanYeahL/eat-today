@@ -37,28 +37,33 @@ const SCENE: Record<SceneKey, () => JSX.Element> = {
  * 板绘底图（V3）：约定路径 /scenes/{meal}.webp。图不存在或加载失败时 onError 自隐，
  * 露出下方 --sky 渐变兜底——所以「没有任何图」时页面与旧版完全一致。
  * 底部 25% 用 mask 渐隐到桌面色，筛选卡/CTA 区永远干净。每 meal 随 crossfade 重挂（key）。
+ * 动态感 Tier 1：图层包裹挂 Ken Burns 呼吸（picker-scene-kenburns），mask 在外层不参与动画。
  */
 function SceneBitmap({ meal }: { meal: MealType }) {
   const [failed, setFailed] = useState(false);
   if (failed) return null;
   return (
     <div
-      className="absolute inset-x-0 top-0 h-[62vh]"
+      className="absolute inset-x-0 top-0 h-[62vh] overflow-hidden"
       style={{
         maskImage: "linear-gradient(to bottom, black 75%, transparent 100%)",
         WebkitMaskImage: "linear-gradient(to bottom, black 75%, transparent 100%)",
       }}
     >
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={`/scenes/${meal}.webp`}
-        alt=""
-        aria-hidden
-        className="h-full w-full object-cover object-top"
-        loading="eager"
-        decoding="async"
-        onError={() => setFailed(true)}
-      />
+      {/* Ken Burns 呼吸包裹：极慢缩放漂移让静态底图「活」；scale 基准 1 起步不露边，
+          外层 overflow-hidden 兜住漂移溢出。 */}
+      <div className="picker-scene-kenburns h-full w-full">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={`/scenes/${meal}.webp`}
+          alt=""
+          aria-hidden
+          className="h-full w-full object-cover object-top"
+          loading="eager"
+          decoding="async"
+          onError={() => setFailed(true)}
+        />
+      </div>
     </div>
   );
 }

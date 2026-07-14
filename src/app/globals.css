@@ -523,6 +523,19 @@ body {
  * 具体各 @keyframes 见下。
  */
 
+/* 底图 Ken Burns 呼吸（V3 动态感 Tier 1，必做，零资产成本）：板绘底图极慢缩放漂移，
+   scale 基准 1 起步（不缩小免露边），55s alternate。挂在 img 包裹 div 上，mask 层在外不参与。
+   reduced-motion 下由 [class*="picker-scene-"] catch-all 停。 */
+@keyframes picker-scene-kenburns {
+  0% { transform: scale(1) translateY(0); }
+  100% { transform: scale(1.045) translateY(-6px); }
+}
+.picker-scene-kenburns {
+  animation: picker-scene-kenburns 55s ease-in-out infinite alternate;
+  transform-origin: center top;
+  will-change: transform;
+}
+
 /* tea 放射光芒：整组极慢左右微转 + 呼吸（场景灵魂）。 */
 @keyframes picker-scene-rays {
   0%, 100% { transform: rotate(-3deg); opacity: 0.7; }
