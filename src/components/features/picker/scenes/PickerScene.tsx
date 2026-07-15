@@ -24,8 +24,9 @@ import SceneTea from "./SceneTea";
 import SceneDinner from "./SceneDinner";
 import SceneMidnight from "./SceneMidnight";
 
-/** 场景选层 map（SceneKey → 场景组件），不写 if 链。 */
-const SCENE: Record<SceneKey, () => JSX.Element> = {
+/** 场景选层 map（SceneKey → 场景组件 | null），不写 if 链。
+ *  V3 起，纯底图接管的时段（如 tea）返回 null 组件——底图 + Ken Burns 即完整画面，无动效薄层。 */
+const SCENE: Record<SceneKey, () => JSX.Element | null> = {
   breakfast: SceneBreakfast,
   lunch: SceneLunch,
   tea: SceneTea,

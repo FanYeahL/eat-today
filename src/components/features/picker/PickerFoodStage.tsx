@@ -15,9 +15,10 @@
 
 import type { MealType } from "@/types/food";
 import { Plate } from "./PickerPlate";
-import { SleepingCat, Zzz } from "./scenes/scene-parts";
 
-/** 餐段 → 盘心食物 emoji（与 MealTabs 图标同源口径：食物系，非时段图标）。 */
+/** 餐段 → 盘心食物 emoji（与 MealTabs 图标同源口径：食物系，非时段图标）。
+ *  注：midnight 不走此组件（底图自带碗+猫，整个食物焦点在 PickerMenuPoster 撤掉），
+ *  这里保留 midnight 键仅为类型完整。 */
 const STAGE_EMOJI: Record<MealType, string> = {
   breakfast: "🥐",
   lunch: "🍚",
@@ -47,21 +48,6 @@ export default function PickerFoodStage({ meal }: { meal: MealType }) {
           </span>
         </div>
       </div>
-
-      {/* 夜宵：黑猫蜷在盘右下打盹，Zzz 从猫头飘向盘边。
-          刻意放在 idle 包裹【外面】——盘子浮、猫趴着不动，「盘在动猫在睡」才有生命感；
-          放进 idle 里猫会跟盘一起 4.5s 起伏，打盹的猫飘着反而怪。
-          key={meal} 让切到夜宵时淡入；只与盘子交叠，不遮菜名/tagline。 */}
-      {meal === "midnight" && (
-        <div key={meal} className="picker-serve-up absolute inset-0">
-          <SleepingCat
-            style={{ right: -18, bottom: -10, width: 92, left: "auto", top: "auto" }}
-          />
-          {/* Zzz 贴着猫头（盘右下）飘起——原来飘到标题右上、隔着整个盘子读不出「猫在打盹」。
-              猫头约在 stage (100,118)，z 从此处上方 ~14px 起、往右上飘。 */}
-          <Zzz style={{ left: 96, top: 96, right: "auto" }} />
-        </div>
-      )}
     </div>
   );
 }

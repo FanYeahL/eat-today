@@ -9,6 +9,9 @@
  * 小屏：食物焦点允许骑在地平线上（盘下缘压过剪影带），不硬塞进视窗。
  *
  * 构成：餐段徽章 + 大标题「今天吃什么」+ 食物焦点（PickerFoodStage）+ 一句关心话。
+ * 例外：midnight 底图是室内视角、自带桌上汤面碗 + 灯下睡猫——UI 层的食物焦点整个撤掉
+ * （否则和底图的碗+猫双份），标题/关心话直接浮在底图的汤面+猫上，陪伴感由底图扛。
+ * 撤掉处留同高 spacer 保持竖向节奏，让关心话仍落在底图碗+猫一带。
  */
 
 import type { MealType } from "@/types/food";
@@ -43,9 +46,14 @@ export default function PickerMenuPoster({ meal, tagline }: Props) {
         {HERO.title}
       </h1>
 
-      {/* 食物焦点：视窗中下部，地平线剪影在其后 */}
+      {/* 食物焦点：视窗中下部，地平线剪影在其后。midnight 撤掉（底图自带碗+猫），
+          留同高 spacer（h-36，与 PickerFoodStage 外框等高）保持竖向节奏。 */}
       <div className="mt-3 flex items-center justify-center">
-        <PickerFoodStage meal={meal} />
+        {meal === "midnight" ? (
+          <div aria-hidden className="h-36 w-36 shrink-0" />
+        ) : (
+          <PickerFoodStage meal={meal} />
+        )}
       </div>
 
       {/* 一句关心话 */}

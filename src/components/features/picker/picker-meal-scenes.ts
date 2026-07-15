@@ -26,11 +26,12 @@ export interface MealScene {
 
 /**
  * 五时段场景。色值不在此（在 CSS token 块），此处只定 scene 选层 + dark 断言。
- *  - breakfast 清晨市集：低太阳 + 摊位剪影 + 炊烟
- *  - lunch     正午通透：自转太阳 + 光柱 + 尘埃 + 白云
- *  - tea       黄昏夕阳：半沉落日 + 放射光芒 + 染色云 + 屋顶剪影
- *  - dinner    都市夜（深）：天际线亮窗 + 星 + 流星
- *  - midnight  深夜月（深）：满月 + 屋顶亮窗 + 黑猫主角 + Zzz
+ * V3 起质感由 /scenes/{meal}.webp 板绘底图承担，Scene* 组件只留叠在底图上的动效薄层：
+ *  - breakfast 清晨市集：底图（含蒸笼摊子）+ 炊烟 SteamWisp ×2
+ *  - lunch     正午通透：底图（纯天空 + 风筝），无动效薄层
+ *  - tea       黄昏夕阳：底图（落日 + 光芒），无动效薄层
+ *  - dinner    都市夜（深）：底图（天际线亮窗霓虹）+ 星 + 流星
+ *  - midnight  深夜月（深）：底图（室内视角：窗外满月 + 暖灯 + 桌上汤面 + 灯下睡猫），无动效薄层
  */
 export const MEAL_SCENES: Record<MealType, MealScene> = {
   breakfast: { scene: "breakfast", dark: false },

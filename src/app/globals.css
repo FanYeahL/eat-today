@@ -536,54 +536,16 @@ body {
   will-change: transform;
 }
 
-/* tea 放射光芒：整组极慢左右微转 + 呼吸（场景灵魂）。 */
-@keyframes picker-scene-rays {
-  0%, 100% { transform: rotate(-3deg); opacity: 0.7; }
-  50% { transform: rotate(3deg); opacity: 1; }
-}
-.picker-scene-rays { transform-origin: center bottom; animation: picker-scene-rays 30s ease-in-out infinite; will-change: transform, opacity; }
-
-/* tea 云堤：极慢横移 ±6px，让裁住落日下缘的那条云像云不像色块。 */
-@keyframes picker-scene-cloudbank {
-  0%, 100% { transform: translateX(-6px); }
-  50% { transform: translateX(6px); }
-}
-.picker-scene-cloudbank { animation: picker-scene-cloudbank 20s ease-in-out infinite; will-change: transform; }
-
-/* 云极慢横移（tea / lunch 共用，方向/时长由内联 style 定）。 */
-@keyframes picker-scene-cloud {
-  0% { transform: translateX(-8%); }
-  100% { transform: translateX(108%); }
-}
-.picker-scene-cloud { will-change: transform; animation: picker-scene-cloud 120s linear infinite; }
-
-/* 星星三档 twinkle（错峰）。 */
+/* 星星三档 twinkle（错峰）。dinner 天空带保留。 */
 @keyframes picker-scene-twinkle { 0%, 100% { opacity: 0.2; } 50% { opacity: 0.9; } }
 .picker-scene-twinkle-a { animation: picker-scene-twinkle 4s ease-in-out infinite; }
 .picker-scene-twinkle-b { animation: picker-scene-twinkle 6s ease-in-out infinite; }
 .picker-scene-twinkle-c { animation: picker-scene-twinkle 8s ease-in-out infinite; }
 
-/* 楼窗 flicker（城市是活的）。 */
-@keyframes picker-scene-flicker { 0%, 100% { opacity: 0.25; } 50% { opacity: 0.95; } }
-.picker-scene-flicker { animation: picker-scene-flicker 9s ease-in-out infinite; }
-
-/* dinner 霓虹招牌：粉块用「闪两下灭一下」的非对称节奏（比对称呼吸更像真霓虹）。
-   青块复用对称的 picker-scene-flicker（错峰由内联 delay 定）。 */
-@keyframes picker-scene-neon-pink {
-  0%, 6% { opacity: 0.7; }
-  9%, 15% { opacity: 0.1; }
-  18%, 24% { opacity: 0.7; }
-  27%, 33% { opacity: 0.1; }
-  36%, 80% { opacity: 0.7; }
-  84%, 96% { opacity: 0.08; }
-  100% { opacity: 0.7; }
-}
-.picker-scene-neon-pink { animation: picker-scene-neon-pink 7s ease-in-out infinite; will-change: opacity; }
-
 /* 流星：快速划过（尾迹 ≤1s 内完成），其余时间不可见。周期由内联 animation-duration 定。
    角度经 --meteor-angle 进 keyframe，沿旋转后的自身轴 translateX 滑行——尾迹与轨迹共线，
    斜下坠（正角度 30–40° 向右下、~145° 向左下）。旧写法 translate(140,92) 会整体替换
-   组件 inline 的 rotate，旋转丢失（横线沿对角平移）。 */
+   组件 inline 的 rotate，旋转丢失（横线沿对角平移）。dinner 天空带保留。 */
 @keyframes picker-scene-meteor {
   0% { opacity: 0; transform: rotate(var(--meteor-angle, 35deg)) translateX(0); }
   4% { opacity: 0.9; }
@@ -592,31 +554,7 @@ body {
 }
 .picker-scene-meteor { will-change: transform, opacity; }
 
-/* 月亮极慢呼吸。 */
-@keyframes picker-scene-moon { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.03); } }
-.picker-scene-moon { transform-origin: center; animation: picker-scene-moon 8s ease-in-out infinite; will-change: transform; }
-
-/* 亮窗暖光呼吸（深夜留的一盏灯）。 */
-@keyframes picker-scene-window { 0%, 100% { opacity: 0.7; } 50% { opacity: 1; } }
-.picker-scene-window { animation: picker-scene-window 7s ease-in-out infinite; }
-
-/* 黑猫主角：呼吸 / 尾巴卷 / 耳朵抖（分属不同 <g>，reduced-motion 全停但猫仍画出）。 */
-@keyframes picker-scene-cat-breathe { 0%, 100% { transform: scaleY(1); } 50% { transform: scaleY(1.035); } }
-.picker-scene-cat-breathe { transform-origin: bottom; animation: picker-scene-cat-breathe 5s ease-in-out infinite; will-change: transform; }
-@keyframes picker-scene-cat-tail { 0%, 88%, 100% { transform: rotate(0deg); } 94% { transform: rotate(-10deg); } }
-.picker-scene-cat-tail { transform-origin: left bottom; animation: picker-scene-cat-tail 11s ease-in-out infinite; }
-@keyframes picker-scene-cat-ear { 0%, 92%, 100% { transform: rotate(0deg); } 96% { transform: rotate(3deg); } }
-.picker-scene-cat-ear { transform-origin: center bottom; animation: picker-scene-cat-ear 15s ease-in-out infinite; }
-
-/* Zzz 上浮渐隐（打盹）。stagger 由内联 animation-delay 定。 */
-@keyframes picker-scene-zzz {
-  0% { opacity: 0; transform: translateY(0) scale(0.8); }
-  30% { opacity: 0.5; }
-  100% { opacity: 0; transform: translateY(-16px) scale(1.1); }
-}
-.picker-scene-zzz { animation: picker-scene-zzz 6s ease-in-out infinite; will-change: transform, opacity; }
-
-/* breakfast 炊烟上升（错峰，内联 delay/duration）。 */
+/* breakfast 炊烟上升（错峰，内联 delay/duration）。叠在底图蒸笼上方，唯一保留的 breakfast 动效。 */
 @keyframes picker-scene-steam {
   0% { opacity: 0; transform: translateY(6px) scaleX(0.8) scaleY(0.9); }
   25% { opacity: 0.55; }
@@ -624,25 +562,11 @@ body {
 }
 .picker-scene-steam { transform-origin: center bottom; will-change: transform, opacity; }
 
-/* breakfast 三角旗轻摆（热闹但不吵）。 */
-@keyframes picker-scene-flag { 0%, 100% { transform: skewX(-4deg); } 50% { transform: skewX(4deg); } }
-.picker-scene-flag { transform-origin: top center; animation: picker-scene-flag 6s ease-in-out infinite; }
-
-/* 飞鸟横穿（breakfast，可选）。 */
-@keyframes picker-scene-bird { 0% { opacity: 0; transform: translate(-10%, 0); } 10%, 80% { opacity: 0.25; } 100% { opacity: 0; transform: translate(110%, -20px); } }
-.picker-scene-bird { will-change: transform, opacity; animation: picker-scene-bird 18s linear infinite; }
-
-/* lunch 太阳极慢自转（正能量 = 看得见太阳在转）。 */
-@keyframes picker-scene-sunspin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-.picker-scene-sunspin { transform-origin: center; animation: picker-scene-sunspin 60s linear infinite; will-change: transform; }
-
-/* lunch 光柱 opacity 呼吸 + 轻移。 */
-@keyframes picker-scene-shaft { 0%, 100% { opacity: 0.5; transform: translateX(0); } 50% { opacity: 1; transform: translateX(10px); } }
-.picker-scene-shaft { animation: picker-scene-shaft 20s ease-in-out infinite; will-change: transform, opacity; }
-
-/* lunch 尘埃微粒上浮闪烁。 */
-@keyframes picker-scene-mote { 0% { opacity: 0; transform: translateY(0); } 50% { opacity: 0.5; } 100% { opacity: 0; transform: translateY(-24px); } }
-.picker-scene-mote { will-change: transform, opacity; }
+/*
+ * V3 退役的场景动效 keyframes（rays / cloudbank / cloud / flicker / neon-pink / moon / window /
+ * cat-breathe / cat-tail / cat-ear / zzz / flag / bird / sunspin / shaft / mote）已随旧 SVG
+ * 几何一并删除——质感改由 /scenes/{meal}.webp 板绘底图承担，只留 kenburns + twinkle + meteor + steam。
+ */
 
 /* 纸底颗粒：极淡噪点感（叠在暖米底上，给 MCM「印刷海报」的纸质，纯静态） */
 .picker-theme .picker-paper-grain {
