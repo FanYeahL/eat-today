@@ -18,15 +18,60 @@ import { spawn, spawnSync, execSync } from "node:child_process";
 import { mkdirSync, writeFileSync, existsSync, cpSync, rmSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import process from "node:process";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const PORT = Number(process.env.PORT || 3100);
 const CDP_PORT = Number(process.env.CDP_PORT || 9222);
 const OUT = process.env.OUT_DIR || "/tmp/picker-verify";
 const URL = `http://localhost:${PORT}/picker`;
-const CHROME =
-  process.env.CHROME_BIN ||
-  "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
+
+/** ① CDP 通道用 Node 全局 WebSocket——Node 22 才默认开启；20.x 需 --experimental-websocket。
+ *  缺失时给出明确提示 + 复跑命令，而不是让后面 `new WebSocket()` 裸崩成看不懂的 ReferenceError。 */
+function assertRuntime() {
+  if (typeof WebSocket === "undefined") {
+    const argv = process.argv.slice(2).join(" ");
+    console.error(
+      [
+        `✗ 运行时缺少全局 WebSocket（当前 Node ${process.version}）。`,
+        `  本脚本走 CDP 需要它——Node ≥22 默认开启；Node 20.x 请加实验旗标复跑：`,
+        `    node --experimental-websocket scripts/shoot-picker.mjs ${argv}`.trimEnd(),
+        `  或升级到 Node 22+。`,
+      ].join("\n"),
+    );
+    process.exit(1);
+  }
+}
+
+/** ② 跨平台定位 Chrome/Chromium 可执行文件：优先 CHROME_BIN，否则按平台探测常见路径。 */
+function resolveChrome() {
+  if (process.env.CHROME_BIN) return process.env.CHROME_BIN;
+  const candidates =
+    process.platform === "darwin"
+      ? [
+          "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+          "/Applications/Chromium.app/Contents/MacOS/Chromium",
+        ]
+      : [
+          "/usr/bin/google-chrome",
+          "/usr/bin/google-chrome-stable",
+          "/usr/bin/chromium",
+          "/usr/bin/chromium-browser",
+          "/snap/bin/chromium",
+        ];
+  const found = candidates.find((p) => existsSync(p));
+  if (found) return found;
+  console.error(
+    [
+      `✗ 未找到 Chrome/Chromium（platform: ${process.platform}）。`,
+      `  显式指定：CHROME_BIN=/path/to/chrome node scripts/shoot-picker.mjs`,
+      `  探测过：\n    ${candidates.join("\n    ")}`,
+    ].join("\n"),
+  );
+  process.exit(1);
+}
+
+const CHROME = resolveChrome();
 
 const args = new Set(process.argv.slice(2));
 const DO_CLEAN = args.has("--clean");
@@ -173,7 +218,7 @@ function cdp(ws) {
     });
 }
 
-/** 读当前 data-meal + 底图加载态（验收断言用）。 */
+/** 读当前 data-meal + 底图加载态（验收断言用）。返回解析后的对象。 */
 async function readState(send) {
   const r = await send("Runtime.evaluate", {
     expression: `(() => {
@@ -184,11 +229,16 @@ async function readState(send) {
         imgSrc: img ? img.getAttribute('src') : null,
         imgComplete: img ? img.complete : null,
         imgNatural: img ? (img.naturalWidth + 'x' + img.naturalHeight) : null,
+        naturalW: img ? img.naturalWidth : 0,
       });
     })()`,
     returnByValue: true,
   });
-  return r.result.value;
+  try {
+    return JSON.parse(r.result.value);
+  } catch {
+    return { dataMeal: null, imgSrc: null, imgComplete: null, imgNatural: null, naturalW: 0 };
+  }
 }
 
 async function clickMeal(send, index) {
@@ -203,7 +253,20 @@ async function shot(send, file) {
   writeFileSync(join(OUT, file), Buffer.from(s.data, "base64"));
 }
 
-/** 单个 {viewport × reduced?} 会话：切五个时段各截一张，dinner 另补早帧。 */
+/** ③ 加载态断言：底图必须 imgComplete===true 且 naturalWidth>0（404 时 complete 可能为 true 但宽为 0），
+ *  且 data-meal 与目标时段一致。返回问题列表（空 = 通过）。 */
+function assertState(tag, vpName, meal, st) {
+  const problems = [];
+  if (st.dataMeal !== meal)
+    problems.push(`${tag}/${vpName}/${meal}: data-meal="${st.dataMeal}"（期望 ${meal}）`);
+  if (st.imgComplete !== true || !st.naturalW || st.naturalW < 1)
+    problems.push(
+      `${tag}/${vpName}/${meal}: 底图未加载（complete=${st.imgComplete}, natural=${st.imgNatural}, src=${st.imgSrc}）`,
+    );
+  return problems;
+}
+
+/** 单个 {viewport × reduced?} 会话：切五个时段各截一张，dinner 另补早帧。返回失败列表。 */
 async function runPass(vp, reduced) {
   const tag = reduced ? "rm" : "normal";
   const profile = `/tmp/picker-chrome-${tag}-${vp.name}`;
@@ -227,6 +290,7 @@ async function runPass(vp, reduced) {
   await sleep(3500); // hydrate + settle
 
   const results = [];
+  const failures = [];
   for (let i = 0; i < MEALS.length; i++) {
     const meal = MEALS[i];
     await clickMeal(send, i);
@@ -236,18 +300,21 @@ async function runPass(vp, reduced) {
       await shot(send, `early-${vp.name}-dinner.png`);
     }
     await sleep(1600); // crossfade + Ken Burns 首帧稳定
-    const state = await readState(send);
-    results.push(`${meal}: ${state}`);
+    const st = await readState(send);
+    results.push(`${meal}: ${JSON.stringify(st)}`);
+    failures.push(...assertState(tag, vp.name, meal, st));
     await shot(send, `${tag}-${vp.name}-${meal}.png`);
   }
   ws.close();
   proc.kill("SIGKILL");
   console.log(`  [${tag} ${vp.name}]`);
   for (const line of results) console.log(`    ${line}`);
+  return failures;
 }
 
 async function main() {
   console.log("=== /picker 验收截图 (V4 S7) ===");
+  assertRuntime();
   mkdirSync(OUT, { recursive: true });
   // rm 掉旧截图，避免和上轮混淆
   try {
@@ -258,10 +325,11 @@ async function main() {
   prepareBuild();
   const server = await startServer();
 
+  const failures = [];
   try {
     for (const vp of VIEWPORTS) {
-      await runPass(vp, false);
-      await runPass(vp, true);
+      failures.push(...(await runPass(vp, false)));
+      failures.push(...(await runPass(vp, true)));
     }
   } finally {
     server.kill("SIGKILL");
@@ -270,8 +338,15 @@ async function main() {
   }
 
   const n = execSync(`ls ${OUT}/*.png 2>/dev/null | wc -l`).toString().trim();
-  console.log(`\n✅ 完成：${n} 张 → ${OUT}`);
+  console.log(`\n${failures.length ? "⚠" : "✅"} 完成：${n} 张 → ${OUT}`);
   console.log("   矩阵：5 时段 × 3 视口 × {常规,reduced-motion} + dinner 早帧 ×3");
+
+  // ③ 加载态断言：任一底图未加载 / data-meal 错位 → 非零退出，成为真正的验收门。
+  if (failures.length) {
+    console.error(`\n✗ 验收门未通过（${failures.length} 项）：`);
+    for (const f of failures) console.error(`  - ${f}`);
+    process.exit(2);
+  }
 }
 
 main().catch((e) => {
