@@ -47,7 +47,7 @@ export default function PickerDock({
   onOpenDiary,
 }: Props) {
   return (
-    <div className="picker-glass meal-transition rounded-t-[28px] px-4 pb-5 pt-4">
+    <div className="picker-glass meal-transition rounded-t-[28px] px-4 pb-5 pt-4 lg:rounded-[28px] lg:pb-6 lg:pt-5">
       {/* 餐段 tab（segmented，选中态见 MealTabs） */}
       <MealTabs value={meal} onChange={onChangeMeal} />
 

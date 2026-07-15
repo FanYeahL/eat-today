@@ -14,6 +14,8 @@
  *   左栏（--gallery-w 宽）留给 z-0 的画廊底图（PickerScene 画），hero 文字浮其天空区；
  *   右栏操作台（≤440px 内容列居中）放 dock：底色 --c-base + 一道 --glow 线性光晕
  *   （「场景给操作台打光」）。根治 DEF-1（宽视口底图被裁成天空）。
+ *   超宽屏（≥ 2xl）：双栏整体封顶居中——封顶在 UniversalFoodPicker 的 stage 壳上做（画廊画 +
+ *   操作台同处 stage，一起居中，不会错位），两侧余白露出 <main> 级的全屏氛围出血层（PickerAmbience）。
  *
  * 本层是 z-10 内容层，落在 PickerScene（z-0）之上；自身透明，画从背后透上来。
  */

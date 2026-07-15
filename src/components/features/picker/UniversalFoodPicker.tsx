@@ -30,6 +30,7 @@ import ShopResults, { type ShopCard } from "./ShopResults";
 import RecipePanelV2 from "./RecipePanelV2";
 import DiaryPanelV2 from "./DiaryPanelV2";
 import PickerScene from "./scenes/PickerScene";
+import PickerAmbience from "./scenes/PickerAmbience";
 import PickerForeground from "./scenes/PickerForeground";
 import PickerChooseScreen from "./PickerChooseScreen";
 import {
@@ -316,12 +317,13 @@ export default function UniversalFoodPicker() {
 
   const basketCount = basket.length + (div.pick ? 1 : 0);
 
-  // isolate：建独立层叠上下文，背景层用正 z（z-0）稳在内容之下、
-  // 又不会被负 z-index 压到 main 背后被父级白底盖住（曾导致「背景没加」）。
+  // isolate：stage 壳建独立层叠上下文，背景层用正 z（z-0）稳在内容之下、
+  // 又不会被负 z-index 压到 stage 背后被父级白底盖住（曾导致「背景没加」）。
+  // <main> 只承载全屏氛围底 + stage 封顶容器，本身 relative + overflow-hidden。
   return (
     <main
       data-meal={div.meal}
-      className="relative isolate min-h-screen overflow-hidden"
+      className="relative min-h-screen overflow-hidden bg-base"
       style={
         {
           // 桌面画廊栏宽（S4）：min(46vw, 满高竖构图所需宽)——PickerScene 画栏与 PickerLayout
@@ -330,11 +332,18 @@ export default function UniversalFoodPicker() {
         } as React.CSSProperties
       }
     >
-      {/* 饭点「场景舞台」背景层（按 meal 换整幕场景，见 PickerScene） */}
-      <PickerScene meal={div.meal} />
+      {/* 氛围出血层（桌面 lg+，全屏出血，不进 stage 封顶）：超宽屏 stage 居中后两侧余白由它托住。
+          放在 stage 之外、z-0 最底——< 2xl 时被 stage 完全盖住。 */}
+      <PickerAmbience meal={div.meal} />
 
-      {/* 前景层（z-[5]，夹在场景 z-0 与内容 z-10 之间；可与标题/盘子交叠但压不住文字） */}
-      <PickerForeground meal={div.meal} />
+      {/* 舞台（stage）：画廊画 + 内容双栏同处此壳，一起 2xl 封顶居中——画与操作台绑定不错位。
+          < 2xl 时 w-full 撑满 = 与旧版逐像素一致（仅 ≥1720px 才收边露出氛围层）。 */}
+      <div className="relative isolate min-h-screen w-full overflow-hidden 2xl:mx-auto 2xl:max-w-[1720px]">
+        {/* 饭点「场景舞台」背景层（按 meal 换整幕场景，见 PickerScene） */}
+        <PickerScene meal={div.meal} />
+
+        {/* 前景层（z-[5]，夹在场景 z-0 与内容 z-10 之间；可与标题/盘子交叠但压不住文字） */}
+        <PickerForeground meal={div.meal} />
 
       {/* ===== 次入口面板（浮层）===== */}
       <AnimatePresence>
@@ -562,6 +571,7 @@ export default function UniversalFoodPicker() {
           </motion.div>
         )}
       </AnimatePresence>
+      </div>
     </main>
   );
 }

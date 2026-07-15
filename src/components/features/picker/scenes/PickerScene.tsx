@@ -78,32 +78,6 @@ function SceneBitmap({ meal, focusY }: { meal: MealType; focusY: number }) {
   );
 }
 
-/**
- * 桌面氛围出血层（S4，desktop-only）：同 webp、blur(40px)+brightness(0.7) 铺满整页，
- * 承接超宽屏双栏外余白，任何宽高比不穿帮（画廊栏是清晰主图，此层只是模糊底衬）。
- * blur 是作用在 <img> 上的静态 filter，属 desktop 代码路径、不进小程序包（方案 §2.3 允许）。
- * onError 时随主图一起隐（此处独立 state，主图挂了它也别单独亮）。
- */
-function AmbienceBlur({ meal }: { meal: MealType }) {
-  const [failed, setFailed] = useState(false);
-  if (failed) return null;
-  return (
-    <div className="absolute inset-0 hidden overflow-hidden lg:block" aria-hidden>
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={`/scenes/${meal}.webp`}
-        alt=""
-        aria-hidden
-        className="h-full w-full scale-110 object-cover"
-        style={{ filter: "blur(40px) brightness(0.7)" }}
-        loading="eager"
-        decoding="async"
-        onError={() => setFailed(true)}
-      />
-    </div>
-  );
-}
-
 export default function PickerScene({ meal }: { meal: MealType }) {
   const reduce = useReducedMotion();
   const scene = mealScene(meal);
@@ -125,21 +99,6 @@ export default function PickerScene({ meal }: { meal: MealType }) {
         }}
       />
 
-      {/* ①.5 桌面氛围出血层（lg+）：模糊同图铺满整页，托住画廊栏两侧余白（超宽屏不穿帮）。
-          手机 hidden。crossfade 随 meal（放在窗口外，覆盖全页）。 */}
-      <AnimatePresence mode="sync">
-        <motion.div
-          key={`amb-${meal}`}
-          className="absolute inset-0"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: reduce ? 0 : 0.8, ease: "easeInOut" }}
-        >
-          <AmbienceBlur meal={meal} />
-        </motion.div>
-      </AnimatePresence>
-
       {/* ② 画框窗口：底图 + 动效薄层同处此有界窗口。
           手机 = 上 66vh（叙事下段顶到坞上）；桌面 = 左画廊栏满高原比例（--gallery-w 宽）。
           动效 frame-% 坐标相对此窗口。随 meal crossfade 切换。 */}
@@ -159,14 +118,24 @@ export default function PickerScene({ meal }: { meal: MealType }) {
 
       {/* ③ 衔接带（手机独有）：叠在画下沿之上，从窗口内 ~6vh 处透明起、到窗口底（66vh）淡到
           实色 dockBlend，再实色铺到页底——「画 → 衔接色 → 坞玻璃」无缝过渡，不露天空渐变接缝。
-          桌面画廊栏满高无下沿窗口，故 lg: 隐藏（桌面靠氛围层 + 操作台底色兜）。 */}
-      <div
-        className="meal-transition absolute inset-x-0 bottom-0 lg:hidden"
-        style={{
-          top: `${ART_WINDOW_VH - 6}vh`,
-          background: `linear-gradient(180deg, transparent 0%, ${meta.dockBlend} 6vh, ${meta.dockBlend} 100%)`,
-        }}
-      />
+          桌面画廊栏满高无下沿窗口，故 lg: 隐藏（桌面靠氛围层 + 操作台底色兜）。
+          衔接色随 meal crossfade（key=meal，与画同拍 0.8s）——inline gradient 不吃 meal-transition
+          的 background-color 过渡，若不 crossfade 会瞬跳（画淡入、色块硬切）。 */}
+      <div className="absolute inset-x-0 bottom-0 lg:hidden" style={{ top: `${ART_WINDOW_VH - 6}vh` }}>
+        <AnimatePresence mode="sync">
+          <motion.div
+            key={meal}
+            className="absolute inset-0"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: reduce ? 0 : 0.8, ease: "easeInOut" }}
+            style={{
+              background: `linear-gradient(180deg, transparent 0%, ${meta.dockBlend} 6vh, ${meta.dockBlend} 100%)`,
+            }}
+          />
+        </AnimatePresence>
+      </div>
     </div>
   );
 }
