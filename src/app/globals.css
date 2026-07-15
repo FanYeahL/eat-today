@@ -523,6 +523,21 @@ body {
  * 具体各 @keyframes 见下。
  */
 
+/* 画框窗口（V4）：底图 + 动效薄层的有界容器。
+   手机：宽满屏、高 66vh——画压上 2/3，叙事下段顶到坞上缘之上（见 PickerScene ART_WINDOW_VH）。
+   桌面（lg+）：左画廊栏，满高 100vh、宽 --gallery-w（≈满高竖构图所需宽）——画原比例完整展出、
+   近乎无裁无放大糊化，根治 DEF-1（宽视口底图只剩天空）。--gallery-w 在 <main> 上定义。 */
+.picker-art-window {
+  width: 100%;
+  height: 66vh;
+}
+@media (min-width: 1024px) {
+  .picker-art-window {
+    width: var(--gallery-w, 46vw);
+    height: 100vh;
+  }
+}
+
 /* 底图 Ken Burns 呼吸（V3 动态感 Tier 1，必做，零资产成本）：板绘底图极慢缩放漂移，
    scale 基准 1 起步（不缩小免露边），55s alternate。挂在 img 包裹 div 上，mask 层在外不参与。
    reduced-motion 下由 [class*="picker-scene-"] catch-all 停。 */

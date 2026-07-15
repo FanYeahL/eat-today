@@ -49,8 +49,9 @@ const SCENE: Record<SceneKey, () => JSX.Element | null> = {
 /**
  * 板绘底图（V4）：约定路径 /scenes/{meal}.webp。图不存在或加载失败时 onError 自隐，
  * 露出下方 --sky 渐变兜底——「没有任何图」时页面仍成立（不白屏不破相）。
- * 铺满所属「画框窗口」（父容器，见 render 里的 ART_WINDOW_VH）：object-cover + object-position
- * 保焦点带；窗口有界（非满屏），画的叙事下段随之上移到坞上缘之上。
+ * 铺满所属容器（手机 = 66vh 画框窗口；桌面 = 画廊栏满高）：object-cover + object-position
+ * 保焦点带。桌面画廊栏宽 = --gallery-w（≈满高竖构图所需宽），object-cover 近乎无裁、无放大糊化，
+ * 根治 DEF-1（宽视口底图只剩天空）。
  * 动态感 Tier 1：图层包裹挂 Ken Burns 呼吸（picker-scene-kenburns）。
  */
 function SceneBitmap({ meal, focusY }: { meal: MealType; focusY: number }) {
@@ -77,6 +78,32 @@ function SceneBitmap({ meal, focusY }: { meal: MealType; focusY: number }) {
   );
 }
 
+/**
+ * 桌面氛围出血层（S4，desktop-only）：同 webp、blur(40px)+brightness(0.7) 铺满整页，
+ * 承接超宽屏双栏外余白，任何宽高比不穿帮（画廊栏是清晰主图，此层只是模糊底衬）。
+ * blur 是作用在 <img> 上的静态 filter，属 desktop 代码路径、不进小程序包（方案 §2.3 允许）。
+ * onError 时随主图一起隐（此处独立 state，主图挂了它也别单独亮）。
+ */
+function AmbienceBlur({ meal }: { meal: MealType }) {
+  const [failed, setFailed] = useState(false);
+  if (failed) return null;
+  return (
+    <div className="absolute inset-0 hidden overflow-hidden lg:block" aria-hidden>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={`/scenes/${meal}.webp`}
+        alt=""
+        aria-hidden
+        className="h-full w-full scale-110 object-cover"
+        style={{ filter: "blur(40px) brightness(0.7)" }}
+        loading="eager"
+        decoding="async"
+        onError={() => setFailed(true)}
+      />
+    </div>
+  );
+}
+
 export default function PickerScene({ meal }: { meal: MealType }) {
   const reduce = useReducedMotion();
   const scene = mealScene(meal);
@@ -89,7 +116,7 @@ export default function PickerScene({ meal }: { meal: MealType }) {
       className="pointer-events-none absolute inset-0 z-0 overflow-hidden"
     >
       {/* ① 天空渐变兜底：三段 --sky（顶→中→地平线），铺满整个背景层。
-          底图加载前 / 失败时的底色，永远在最底层。 */}
+          底图加载前 / 失败时的底色，永远在最底层。桌面画廊栏外区域也靠它 + 氛围层兜。 */}
       <div
         className="absolute inset-0"
         style={{
@@ -98,13 +125,28 @@ export default function PickerScene({ meal }: { meal: MealType }) {
         }}
       />
 
-      {/* ② 画框窗口：底图 + 动效薄层同处此有界窗口（上 66vh），动效 frame-% 坐标相对它。
-          随 meal crossfade 切换。 */}
+      {/* ①.5 桌面氛围出血层（lg+）：模糊同图铺满整页，托住画廊栏两侧余白（超宽屏不穿帮）。
+          手机 hidden。crossfade 随 meal（放在窗口外，覆盖全页）。 */}
+      <AnimatePresence mode="sync">
+        <motion.div
+          key={`amb-${meal}`}
+          className="absolute inset-0"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: reduce ? 0 : 0.8, ease: "easeInOut" }}
+        >
+          <AmbienceBlur meal={meal} />
+        </motion.div>
+      </AnimatePresence>
+
+      {/* ② 画框窗口：底图 + 动效薄层同处此有界窗口。
+          手机 = 上 66vh（叙事下段顶到坞上）；桌面 = 左画廊栏满高原比例（--gallery-w 宽）。
+          动效 frame-% 坐标相对此窗口。随 meal crossfade 切换。 */}
       <AnimatePresence mode="sync">
         <motion.div
           key={meal}
-          className="absolute inset-x-0 top-0 overflow-hidden"
-          style={{ height: `${ART_WINDOW_VH}vh` }}
+          className="picker-art-window absolute left-0 top-0 overflow-hidden"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -115,12 +157,11 @@ export default function PickerScene({ meal }: { meal: MealType }) {
         </motion.div>
       </AnimatePresence>
 
-      {/* ③ 衔接带：叠在画下沿之上（DOM 末位 = 画之上），从窗口内 ~6vh 处透明起、到窗口底
-          （66vh）淡到实色 dockBlend，再实色铺到页底——把画下缘化进衔接色、不留硬线，也不
-          露兜底天空渐变形成接缝，形成「画 → 衔接色 → 坞玻璃」过渡。dockBlend 取画底缘主色，
-          跨 meal 变色走 meal-transition 平滑。筛选展开时坞变高、窗口不跟随，此实色区伸缩兜底。 */}
+      {/* ③ 衔接带（手机独有）：叠在画下沿之上，从窗口内 ~6vh 处透明起、到窗口底（66vh）淡到
+          实色 dockBlend，再实色铺到页底——「画 → 衔接色 → 坞玻璃」无缝过渡，不露天空渐变接缝。
+          桌面画廊栏满高无下沿窗口，故 lg: 隐藏（桌面靠氛围层 + 操作台底色兜）。 */}
       <div
-        className="meal-transition absolute inset-x-0 bottom-0"
+        className="meal-transition absolute inset-x-0 bottom-0 lg:hidden"
         style={{
           top: `${ART_WINDOW_VH - 6}vh`,
           background: `linear-gradient(180deg, transparent 0%, ${meta.dockBlend} 6vh, ${meta.dockBlend} 100%)`,

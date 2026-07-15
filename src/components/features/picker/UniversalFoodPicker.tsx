@@ -319,7 +319,17 @@ export default function UniversalFoodPicker() {
   // isolate：建独立层叠上下文，背景层用正 z（z-0）稳在内容之下、
   // 又不会被负 z-index 压到 main 背后被父级白底盖住（曾导致「背景没加」）。
   return (
-    <main data-meal={div.meal} className="relative isolate min-h-screen overflow-hidden">
+    <main
+      data-meal={div.meal}
+      className="relative isolate min-h-screen overflow-hidden"
+      style={
+        {
+          // 桌面画廊栏宽（S4）：min(46vw, 满高竖构图所需宽)——PickerScene 画栏与 PickerLayout
+          // hero 列共用此值保持同步。仅 lg: 类消费；手机忽略。0.671 = 底图宽高比 780/1163。
+          "--gallery-w": "min(46vw, calc(100vh * 0.671))",
+        } as React.CSSProperties
+      }
+    >
       {/* 饭点「场景舞台」背景层（按 meal 换整幕场景，见 PickerScene） */}
       <PickerScene meal={div.meal} />
 

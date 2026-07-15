@@ -76,7 +76,7 @@ const ART_META: Record<SceneKey, ArtMeta> = {
     anchors: { meteorBand: [0, 40] },
   },
   midnight: {
-    focusY: 34,
+    focusY: 50,
     focalBand: [55, 90],
     heroAlign: "right",
     dockBlend: "rgb(16 14 20)",
