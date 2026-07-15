@@ -33,6 +33,7 @@ import PickerScene from "./scenes/PickerScene";
 import PickerAmbience from "./scenes/PickerAmbience";
 import PickerForeground from "./scenes/PickerForeground";
 import PickerChooseScreen from "./PickerChooseScreen";
+import PickerConsole from "./PickerConsole";
 import {
   PICKING_LINES,
   RESULT_LINES,
@@ -391,8 +392,8 @@ export default function UniversalFoodPicker() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="relative z-10 mx-auto flex min-h-screen w-full max-w-md flex-col items-center justify-center gap-8 px-5"
           >
+            <PickerConsole align="center" className="items-center gap-8 px-5">
             {/* 三张小菜单卡从下方错峰滑入归位（一次性，transform/opacity）。
                 flex 行 + gap 排开，卡间有真实间距不重叠；各卡轻微倾斜给一点手摊开的活泼。
                 像在餐桌上把几张候选菜卡摊开——菜单板隐喻，克制不喧闹。 */}
@@ -417,6 +418,7 @@ export default function UniversalFoodPicker() {
               ))}
             </div>
             <p className="picker-brand text-xl text-ink/90">{pickingLine}</p>
+            </PickerConsole>
           </motion.div>
         )}
 
@@ -428,8 +430,8 @@ export default function UniversalFoodPicker() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -12 }}
             transition={{ duration: 0.35, ease: "easeOut" }}
-            className="relative z-10 mx-auto flex min-h-screen w-full max-w-md flex-col px-5 pb-6 pt-5"
           >
+            <PickerConsole align="start" className="px-5 pb-6 pt-5">
             {/* 顶栏：返回（左）+ 今天这桌计数（右，非游戏分数） */}
             <div className="flex items-center justify-between">
               <button
@@ -445,8 +447,9 @@ export default function UniversalFoodPicker() {
               )}
             </div>
 
-            {/* 海报主视觉：顶部留 ≥18vh 天空带，让当前时段光源（太阳/月亮）在卡片上方完整可见 */}
-            <div className="mt-[13vh]">
+            {/* 海报主视觉：手机顶部留天空带，让当前时段光源在卡片上方完整可见；
+                桌面画在左画廊栏、内容在右操作台，无需让天空，lg:mt-0。 */}
+            <div className="mt-[13vh] lg:mt-4">
               <DishReveal food={div.pick} line={resultLine} />
             </div>
 
@@ -539,6 +542,7 @@ export default function UniversalFoodPicker() {
                 </div>
               </div>
             )}
+            </PickerConsole>
           </motion.div>
         )}
 
@@ -550,8 +554,8 @@ export default function UniversalFoodPicker() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
-            className="relative z-10 mx-auto flex min-h-screen w-full max-w-md flex-col px-5 pb-6 pt-5"
           >
+            <PickerConsole align="start" className="px-5 pb-6 pt-5">
             <ShopResults
               cards={shopCards}
               strictCount={shops.length}
@@ -568,6 +572,7 @@ export default function UniversalFoodPicker() {
               onBack={onBackToResult}
               onHome={onHome}
             />
+            </PickerConsole>
           </motion.div>
         )}
       </AnimatePresence>
