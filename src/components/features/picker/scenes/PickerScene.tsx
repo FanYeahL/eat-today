@@ -13,7 +13,7 @@
  * crossfade 过渡（AnimatePresence key=meal），reduced-motion 下瞬切（duration 0）。
  *
  * focusY：object-position 纵向锚（%）——竖构图在较矮的 art 区里裁切时保住哪一段。
- * 方案 §4.2 初值，S3 会迁进 picker-art-meta.ts 统一管理，这里先内联。
+ * 值读自 picker-art-meta.ts 的构图档案（S3 起统一管理，换画只改档案）。
  *
  * 硬约束：动画只 transform/opacity 的 CSS keyframes；reduced-motion 全停但静态场景/底图保留；
  * 场景不抢主内容；无 backdrop-filter；底图有渐变兜底（图挂了也不白屏不破相）。
@@ -23,6 +23,7 @@ import { useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import type { MealType } from "@/types/food";
 import { mealScene, type SceneKey } from "../picker-meal-scenes";
+import { artMeta } from "../picker-art-meta";
 import SceneBreakfast from "./SceneBreakfast";
 import SceneLunch from "./SceneLunch";
 import SceneTea from "./SceneTea";
@@ -37,17 +38,6 @@ const SCENE: Record<SceneKey, () => JSX.Element | null> = {
   tea: SceneTea,
   dinner: SceneDinner,
   midnight: SceneMidnight,
-};
-
-/** per-meal object-position 纵向锚（%）：竖构图在较矮 art 区裁切时保住焦点带。
- *  方案 §4.2 初值（S3 迁 art-meta）：lunch 焦点高（太阳/风筝）→ 靠上；dinner/midnight
- *  焦点低（天际线/汤面猫）→ 但 art 区顶部要留天空给 hero，故取中段偏上的折中值。 */
-const FOCUS_Y: Record<SceneKey, number> = {
-  breakfast: 35,
-  lunch: 20,
-  tea: 42,
-  dinner: 40,
-  midnight: 34,
 };
 
 /**
@@ -84,7 +74,7 @@ export default function PickerScene({ meal }: { meal: MealType }) {
   const reduce = useReducedMotion();
   const scene = mealScene(meal);
   const Scene = SCENE[scene.scene];
-  const focusY = FOCUS_Y[scene.scene];
+  const focusY = artMeta(meal).focusY;
 
   return (
     <div

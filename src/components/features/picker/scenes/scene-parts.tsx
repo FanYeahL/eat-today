@@ -12,14 +12,22 @@ import type { CSSProperties } from "react";
 
 /** 星野：一层 div 里若干正圆小点，三档 twinkle 错峰。
  *  用 div + border-radius:50% 而非 SVG 缩放——SVG viewBox 铺满非等比容器会把圆点拉成椭圆。
- *  x/y 直接当百分比用（相对 38vh 星空带），点径 = 2r px（1–2px）。 */
+ *  x/y 直接当百分比用（相对星空带容器），点径 = 2r px（1–2px）。
+ *  V4：星空带高度改用 bandBottomPct（画框百分比，来自 art-meta 的 meteorBand[1]），
+ *  不再写死 38vh——底图铺满 art 区、桌面栏与视口解耦后跟画框走才不飘。 */
 export function Stars({
   points,
+  bandBottomPct = 38,
 }: {
   points: { x: number; y: number; r: number; speed: "a" | "b" | "c" }[];
+  /** 星空带底边占画框高的百分比（默认 38）。 */
+  bandBottomPct?: number;
 }) {
   return (
-    <div className="absolute inset-x-0 top-0 h-[38vh]">
+    <div
+      className="absolute inset-x-0 top-0"
+      style={{ height: `${bandBottomPct}%` }}
+    >
       {points.map((p, i) => (
         <div
           key={i}
