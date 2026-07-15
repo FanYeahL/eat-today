@@ -27,8 +27,9 @@ export interface ArtMeta {
   dockBlend: string;
   /** 动效锚点：占画框的百分比坐标（替代一切 vh 定位）。 */
   anchors?: {
-    /** 炊烟锚点（breakfast）：每缕的 x/y（画框 %）。 */
-    steam?: Array<{ x: number; y: number }>;
+    /** 炊烟锚点（breakfast）：每缕的 x/y（画框 %）+ 自己的时长/延迟（秒，错峰）。
+     *  dur/delay 随条目走，加第三缕不用改组件（不再靠下标 i===0?8:11 硬编码）。 */
+    steam?: Array<{ x: number; y: number; dur: number; delay: number }>;
     /** 流星 / 星带纵向区间（dinner）：[顶, 底]（画框 %），只在此带内起手。 */
     meteorBand?: [number, number];
   };
@@ -48,7 +49,12 @@ const ART_META: Record<SceneKey, ArtMeta> = {
     focalBand: [45, 85],
     heroAlign: "center",
     dockBlend: "rgb(90 62 40)",
-    anchors: { steam: [{ x: 8, y: 60 }, { x: 14, y: 62 }] },
+    anchors: {
+      steam: [
+        { x: 8, y: 60, dur: 8, delay: 0 },
+        { x: 14, y: 62, dur: 11, delay: -5 },
+      ],
+    },
   },
   lunch: {
     focusY: 20,

@@ -28,8 +28,20 @@ type Props = {
 export default function PickerLayout({ topbar, hero, dock }: Props) {
   return (
     <div className="relative z-10 mx-auto flex min-h-screen w-full max-w-md flex-col">
+      {/* 文字立足层 scrim（方案 §4.4）：整宽、从视口顶 y=0 起、同时段 --sky-0 色顶→透渐变。
+          盖住顶栏 + hero 文字块（约上 34vh），给压画文字一个隐形立足层——不再是缩在 px-5
+          里四边硬边的贴纸。pointer-events-none 不挡交互；渐变到底部完全透明，无可见硬边。 */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 top-0 h-[34vh]"
+        style={{
+          background:
+            "linear-gradient(180deg, rgb(var(--sky-0) / 0.92) 0%, rgb(var(--sky-0) / 0.55) 45%, transparent 100%)",
+        }}
+      />
+
       {/* 顶栏 + 天空区 hero：靠上排布，坐在画的天空负空间 */}
-      <div className="px-5 pt-6">
+      <div className="relative px-5 pt-6">
         {topbar}
         <div className="mt-4">{hero}</div>
       </div>

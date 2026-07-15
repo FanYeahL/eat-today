@@ -17,13 +17,14 @@ export default function SceneBreakfast() {
   const steam = artMeta("breakfast").anchors?.steam ?? [];
   return (
     <div className="absolute inset-0">
-      {/* 炊烟 ×2：对位底图蒸笼区（画框 % 坐标，来自 art-meta），错峰上升淡出。 */}
+      {/* 炊烟：对位底图蒸笼区（画框 % 坐标 + 各自 dur/delay，全来自 art-meta），错峰上升淡出。
+          加第三缕只改档案，组件不动。 */}
       {steam.map((p, i) => (
         <SteamWisp
           key={i}
           style={{ left: `${p.x}%`, top: `${p.y}%` }}
-          duration={i === 0 ? 8 : 11}
-          delay={i === 0 ? 0 : -5}
+          duration={p.dur}
+          delay={p.delay}
         />
       ))}
     </div>

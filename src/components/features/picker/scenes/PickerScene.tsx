@@ -30,6 +30,12 @@ import SceneTea from "./SceneTea";
 import SceneDinner from "./SceneDinner";
 import SceneMidnight from "./SceneMidnight";
 
+/** 底图可视窗口高度（vh）：画压进上 66vh、下沿接住坞上缘（~70vh）——让画的叙事下段
+ *  （夜宵碗猫、晚饭人影窗）露在坞之上而非沉坞后。手机上源图纵向铺满无溢出、focusY 空转，
+ *  唯有收窗口才能把焦点带顶上来；窗口变矮后 object-cover 从「纵满横裁 31%」变「横满纵裁 4%」，
+ *  顺带治横裁和月亮左切。见 [[picker-art-meta]] focalBand 语义。 */
+const ART_WINDOW_VH = 66;
+
 /** 场景选层 map（SceneKey → 场景组件 | null），不写 if 链。
  *  V3 起，纯底图接管的时段（如 tea/lunch/midnight）返回 null——底图 + Ken Burns 即完整画面。 */
 const SCENE: Record<SceneKey, () => JSX.Element | null> = {
@@ -43,7 +49,8 @@ const SCENE: Record<SceneKey, () => JSX.Element | null> = {
 /**
  * 板绘底图（V4）：约定路径 /scenes/{meal}.webp。图不存在或加载失败时 onError 自隐，
  * 露出下方 --sky 渐变兜底——「没有任何图」时页面仍成立（不白屏不破相）。
- * 铺满整个 art 区（inset-0），object-cover + object-position 保焦点带；不再定高/不再 mask。
+ * 铺满所属「画框窗口」（父容器，见 render 里的 ART_WINDOW_VH）：object-cover + object-position
+ * 保焦点带；窗口有界（非满屏），画的叙事下段随之上移到坞上缘之上。
  * 动态感 Tier 1：图层包裹挂 Ken Burns 呼吸（picker-scene-kenburns）。
  */
 function SceneBitmap({ meal, focusY }: { meal: MealType; focusY: number }) {
@@ -74,7 +81,7 @@ export default function PickerScene({ meal }: { meal: MealType }) {
   const reduce = useReducedMotion();
   const scene = mealScene(meal);
   const Scene = SCENE[scene.scene];
-  const focusY = artMeta(meal).focusY;
+  const meta = artMeta(meal);
 
   return (
     <div
@@ -91,20 +98,34 @@ export default function PickerScene({ meal }: { meal: MealType }) {
         }}
       />
 
-      {/* 当前 meal：底图 ② + 动效薄层 ③，一起 crossfade 切换 */}
+      {/* ② 画框窗口：底图 + 动效薄层同处此有界窗口（上 66vh），动效 frame-% 坐标相对它。
+          随 meal crossfade 切换。 */}
       <AnimatePresence mode="sync">
         <motion.div
           key={meal}
-          className="absolute inset-0"
+          className="absolute inset-x-0 top-0 overflow-hidden"
+          style={{ height: `${ART_WINDOW_VH}vh` }}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: reduce ? 0 : 0.8, ease: "easeInOut" }}
         >
-          <SceneBitmap meal={meal} focusY={focusY} />
+          <SceneBitmap meal={meal} focusY={meta.focusY} />
           {Scene && <Scene />}
         </motion.div>
       </AnimatePresence>
+
+      {/* ③ 衔接带：叠在画下沿之上（DOM 末位 = 画之上），从窗口内 ~6vh 处透明起、到窗口底
+          （66vh）淡到实色 dockBlend，再实色铺到页底——把画下缘化进衔接色、不留硬线，也不
+          露兜底天空渐变形成接缝，形成「画 → 衔接色 → 坞玻璃」过渡。dockBlend 取画底缘主色，
+          跨 meal 变色走 meal-transition 平滑。筛选展开时坞变高、窗口不跟随，此实色区伸缩兜底。 */}
+      <div
+        className="meal-transition absolute inset-x-0 bottom-0"
+        style={{
+          top: `${ART_WINDOW_VH - 6}vh`,
+          background: `linear-gradient(180deg, transparent 0%, ${meta.dockBlend} 6vh, ${meta.dockBlend} 100%)`,
+        }}
+      />
     </div>
   );
 }

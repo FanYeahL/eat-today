@@ -7,9 +7,10 @@
  * 只留「餐段徽章 + 大标题 + 一句关心话」，整体锚在画作天空负空间（art 区顶部）。
  * tagline 从画面中部上移至此（修 DEF-4），与徽章/标题紧凑成一块。
  *
- * 文字立足层 scrim（方案 §4.4）：文字块背后挂一层同时段色系顶→透渐变，保证压画可读；
- * 深色时段（dinner/midnight）另加 text-shadow 双保险。文字走 --c-ink（深色时段自动翻暖白）。
- * 硬约束：无 backdrop-filter；对比度 ≥4.5:1（scrim + 时段 ink 保证）。
+ * 文字立足层 scrim（方案 §4.4）：已上移到 PickerLayout 壳层——整宽、从视口顶 y=0 起渐出，
+ * 顺带盖住顶栏（避免旧版「缩在 px-5 内边距里、四边硬边的贴纸」问题）。本组件只管文字，
+ * 深色时段加 text-shadow 双保险。文字走 --c-ink（深色时段自动翻暖白）。
+ * 硬约束：无 backdrop-filter；对比度 ≥4.5:1（壳层 scrim + 时段 ink 保证）。
  */
 
 import type { MealType } from "@/types/food";
@@ -35,17 +36,8 @@ export default function PickerHeroText({ meal, tagline }: Props) {
   const dark = mealScene(meal).dark;
   return (
     <div className="relative">
-      {/* scrim：文字块背后同时段色系顶→透渐变，给压画文字一个立足层。
-          浅色时段用 --sky-0 顶色，深色时段本就深、渐变同样成立。高度盖住文字块 + 余量。 */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-x-0 -top-6 bottom-[-2.5rem]"
-        style={{
-          background:
-            "linear-gradient(180deg, rgb(var(--sky-0) / 0.9) 0%, rgb(var(--sky-0) / 0.5) 55%, transparent 100%)",
-        }}
-      />
-
+      {/* scrim 已上移到 PickerLayout 壳层（整宽、从视口顶起、盖顶栏）——这里不再挂局部渐变，
+          避免旧版缩在 px-5 内边距里的硬边贴纸。本块只放文字。 */}
       <div
         className={`relative flex flex-col items-center text-center ${
           dark ? "[text-shadow:0_1px_24px_rgb(0_0_0_/_0.35)]" : ""
