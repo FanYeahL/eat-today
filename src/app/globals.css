@@ -552,7 +552,15 @@ body {
   9% { opacity: 0; transform: rotate(var(--meteor-angle, 35deg)) translateX(280px); }
   100% { opacity: 0; transform: rotate(var(--meteor-angle, 35deg)) translateX(280px); }
 }
-.picker-scene-meteor { will-change: transform, opacity; }
+.picker-scene-meteor {
+  /* DEF-2a：基态必须不可见——可见性全靠 keyframe，delay 期间由 fill-mode: backwards
+     兜住取 0% 帧（opacity:0、未 translate）。否则第二颗流星 delay 期间裸露成静止横线。
+     组件 inline 只设 animation-name/duration/delay/iteration/timing 五个 longhand，
+     不含 fill-mode，此处补全不冲突。 */
+  opacity: 0;
+  animation-fill-mode: backwards;
+  will-change: transform, opacity;
+}
 
 /* breakfast 炊烟上升（错峰，内联 delay/duration）。叠在底图蒸笼上方，唯一保留的 breakfast 动效。 */
 @keyframes picker-scene-steam {
@@ -560,7 +568,13 @@ body {
   25% { opacity: 0.55; }
   100% { opacity: 0; transform: translateY(-72px) scaleX(1.4) scaleY(1.2); }
 }
-.picker-scene-steam { transform-origin: center bottom; will-change: transform, opacity; }
+.picker-scene-steam {
+  /* DEF-2 同源：基态不可见 + fill-mode backwards，避免 delay 期间/首帧裸露成静止白斑。 */
+  opacity: 0;
+  transform-origin: center bottom;
+  animation-fill-mode: backwards;
+  will-change: transform, opacity;
+}
 
 /*
  * V3 退役的场景动效 keyframes（rays / cloudbank / cloud / flicker / neon-pink / moon / window /
@@ -589,6 +603,13 @@ body {
   [class*="picker-scene-"] {
     /* catch-all：所有场景动效类（Phase 2 陆续加）自动覆盖，静态场景 DOM 仍保留 */
     animation: none !important;
+  }
+  /* DEF-2b：纯运动元素（流星、炊烟）静止形态无意义——直接隐藏，不留静止横线/白斑。
+     这是对 V3「静态场景完整」条款的修正：底图、星空、剪影等可静止元素仍完整保留，
+     只有靠运动才成立的元素才隐藏。 */
+  .picker-scene-meteor,
+  .picker-scene-steam {
+    display: none !important;
   }
   .picker-serve-up,
   .picker-card-land {
