@@ -17,8 +17,9 @@ import type { MealType } from "@/types/food";
 import { Plate } from "./PickerPlate";
 
 /** 餐段 → 盘心食物 emoji（与 MealTabs 图标同源口径：食物系，非时段图标）。
- *  注：midnight 不走此组件（底图自带碗+猫，整个食物焦点在 PickerMenuPoster 撤掉），
- *  这里保留 midnight 键仅为类型完整。 */
+ *  注：midnight 不走此组件（底图自带碗+猫，choose 屏食物焦点整个撤掉），
+ *  这里保留 midnight 键仅为类型完整。V4 起 choose 屏不再用食物圆盘（见 PickerHeroText），
+ *  本组件留作 picking 悬念屏复用。 */
 const STAGE_EMOJI: Record<MealType, string> = {
   breakfast: "🥐",
   lunch: "🍚",
