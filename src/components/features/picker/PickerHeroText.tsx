@@ -15,6 +15,7 @@
 
 import type { MealType } from "@/types/food";
 import { mealScene } from "./picker-meal-scenes";
+import { artMeta } from "./picker-art-meta";
 import { HERO } from "./picker-copy";
 
 /** 餐段 → 徽章文案（不复用顶部品牌「今日菜单板」，避免重复）。 */
@@ -26,6 +27,13 @@ const MEAL_MENU_LABEL: Record<MealType, string> = {
   midnight: "夜宵菜单",
 };
 
+/** heroAlign（art-meta）→ 桌面对齐类：字往画的负空间那侧靠。手机恒居中（天空顶部中段成立）。 */
+const HERO_ALIGN_LG: Record<"center" | "left" | "right", string> = {
+  center: "lg:items-center lg:text-center",
+  left: "lg:items-start lg:text-left",
+  right: "lg:items-end lg:text-right",
+};
+
 type Props = {
   meal: MealType;
   /** 当前餐段的一句关心话（tagline）；空时回落 HERO.lede。 */
@@ -34,12 +42,15 @@ type Props = {
 
 export default function PickerHeroText({ meal, tagline }: Props) {
   const dark = mealScene(meal).dark;
+  const align = artMeta(meal).heroAlign;
   return (
     <div className="relative">
       {/* scrim 已上移到 PickerLayout 壳层（整宽、从视口顶起、盖顶栏）——这里不再挂局部渐变，
-          避免旧版缩在 px-5 内边距里的硬边贴纸。本块只放文字。 */}
+          避免旧版缩在 px-5 内边距里的硬边贴纸。本块只放文字。
+          对齐：手机恒居中；桌面按 art-meta heroAlign 往画的负空间侧靠（如 midnight 右对齐
+          避开左上满月）。 */}
       <div
-        className={`relative flex flex-col items-center text-center ${
+        className={`relative flex flex-col items-center text-center ${HERO_ALIGN_LG[align]} ${
           dark ? "[text-shadow:0_1px_24px_rgb(0_0_0_/_0.35)]" : ""
         }`}
       >

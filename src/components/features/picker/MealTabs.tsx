@@ -49,12 +49,18 @@ export default function MealTabs({ value, onChange }: MealTabsProps) {
             onClick={() => onChange(m.type)}
             className="relative flex flex-1 flex-col items-center gap-0.5 rounded-xl px-1 py-2 text-xs font-semibold transition-transform duration-100 active:scale-[0.94]"
           >
-            {/* 选中滑块：用同一 layoutId 在选项间平移 + 轻回弹 */}
+            {/* 选中滑块：用同一 layoutId 在选项间平移 + 轻回弹。
+                底色用时段光源色 --glow 半透（非纯白 pill）——夜景（dinner/midnight）暖橙而非
+                刺眼白（修 DEF-5），浅色时段则是柔和暖光，随 meal 自动变色。 */}
             {selected && (
               <motion.span
                 layoutId="meal-tab-slider"
                 aria-hidden
-                className="absolute inset-0 -z-0 rounded-xl bg-surface shadow-[0_4px_12px_rgb(var(--c-info)_/_0.16)]"
+                className="absolute inset-0 -z-0 rounded-xl"
+                style={{
+                  background: "rgb(var(--glow) / 0.22)",
+                  boxShadow: "0 4px 12px rgb(var(--glow) / 0.2)",
+                }}
                 transition={{ type: "spring", stiffness: 480, damping: 34 }}
               />
             )}
@@ -67,7 +73,7 @@ export default function MealTabs({ value, onChange }: MealTabsProps) {
             </span>
             <span
               className={`relative z-10 leading-none transition-colors duration-200 ${
-                selected ? "text-info" : "text-ink-muted/70"
+                selected ? "font-bold text-ink" : "text-ink-muted/70"
               }`}
             >
               {m.label}
