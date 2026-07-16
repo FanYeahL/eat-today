@@ -64,8 +64,11 @@ export default function PickerHeroText({ meal, tagline }: Props) {
           {HERO.title}
         </h1>
 
-        {/* 一句关心话：紧跟标题下（上移到天空区，不再压画面中部） */}
-        <p className="meal-transition mt-2 max-w-[18rem] text-sm leading-relaxed text-ink-muted">
+        {/* 一句关心话：紧跟标题下（上移到天空区，不再压画面中部）。
+            色用 text-ink（非 ink-muted）——mid-gray muted 在浅色天空上对比度天花板才 ~3.7，
+            够不到 4.5:1（§8.2-6）；ink charcoal 在浅天空 ~10:1、深色时段自动翻暖白也达标。
+            层级靠字号（text-sm vs 标题 2.9rem）+ 不加粗保持，不靠调淡颜色。 */}
+        <p className="meal-transition mt-2 max-w-[18rem] text-sm leading-relaxed text-ink">
           {tagline || HERO.lede}
         </p>
       </div>

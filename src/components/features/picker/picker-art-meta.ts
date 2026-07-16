@@ -19,7 +19,9 @@ import { mealScene, type SceneKey } from "./picker-meal-scenes";
 export interface ArtMeta {
   /** object-position 纵向锚（%）：竖构图在较矮容器里裁切时保住哪一段。 */
   focusY: number;
-  /** 焦点带（画高百分比区间）：验收用——此区间禁止 UI 遮挡。 */
+  /** 焦点带（画高百分比区间）：验收用——此区间应在画芯窗口内可见、禁止 UI 遮挡。
+   *  测量口径：最坏视口 m667 下 dock 上缘 ≈56vh、画框窗口 66vh → 窗口 ~85% 以下沉坞后，
+   *  故焦点带底边一律 ≤85（画的叙事核心必须落在 0–85% 才保证短屏不被坞盖）。 */
   focalBand: [number, number];
   /** hero 文字块水平对齐（画的负空间在哪，字就往哪靠）。 */
   heroAlign: "center" | "left" | "right";
@@ -46,7 +48,7 @@ export interface ArtMeta {
 const ART_META: Record<SceneKey, ArtMeta> = {
   breakfast: {
     focusY: 35,
-    focalBand: [45, 85],
+    focalBand: [45, 83], // 原 [45,85] 压 m667 界，留 2 点余量
     heroAlign: "center",
     dockBlend: "rgb(90 62 40)",
     anchors: {
@@ -70,14 +72,14 @@ const ART_META: Record<SceneKey, ArtMeta> = {
   },
   dinner: {
     focusY: 40,
-    focalBand: [45, 100],
+    focalBand: [45, 85], // 收窄：原 [45,100] 下段沉 m667 坞后（见 focalBand 测量口径）
     heroAlign: "center",
     dockBlend: "rgb(18 22 34)",
     anchors: { meteorBand: [0, 40] },
   },
   midnight: {
     focusY: 50,
-    focalBand: [55, 90],
+    focalBand: [55, 85], // 收窄：原 [55,90] 超 m667 可见界
     heroAlign: "right",
     dockBlend: "rgb(16 14 20)",
   },

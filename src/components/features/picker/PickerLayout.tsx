@@ -35,14 +35,15 @@ export default function PickerLayout({ topbar, hero, dock }: Props) {
   return (
     <div className="relative z-10 flex min-h-screen w-full flex-col lg:flex-row">
       {/* 文字立足层 scrim（方案 §4.4）：整宽、从视口顶 y=0 起、同时段 --sky-0 色顶→透渐变。
-          盖住顶栏 + hero 文字块（约上 34vh），给压画文字一个隐形立足层——不再是缩在 px-5
-          里四边硬边的贴纸。桌面只需盖左画廊栏顶（lg:w-[--gallery-w]）。 */}
+          高度带 px 下限（max(40vh,360px)）——667 短屏上 34vh 只有 227px，tagline 会掉出 scrim 外
+          （修 m667 惨案）；中段 stop 提浓（0.78@50% / 0.42@72%）压住亮落日/城市光透上来（修
+          dinner/tea 强度不足）。桌面只需盖左画廊栏顶（lg:w-[--gallery-w]）。 */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-0 h-[34vh] lg:w-[var(--gallery-w,46vw)]"
+        className="pointer-events-none absolute inset-x-0 top-0 h-[max(40vh,360px)] lg:w-[var(--gallery-w,46vw)]"
         style={{
           background:
-            "linear-gradient(180deg, rgb(var(--sky-0) / 0.92) 0%, rgb(var(--sky-0) / 0.55) 45%, transparent 100%)",
+            "linear-gradient(180deg, rgb(var(--sky-0) / 0.95) 0%, rgb(var(--sky-0) / 0.78) 50%, rgb(var(--sky-0) / 0.42) 72%, transparent 100%)",
         }}
       />
 
