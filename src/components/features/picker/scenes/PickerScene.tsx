@@ -30,11 +30,11 @@ import SceneTea from "./SceneTea";
 import SceneDinner from "./SceneDinner";
 import SceneMidnight from "./SceneMidnight";
 
-/** 底图可视窗口高度（vh）：画压进上 66vh、下沿接住坞上缘（~70vh）——让画的叙事下段
- *  （夜宵碗猫、晚饭人影窗）露在坞之上而非沉坞后。手机上源图纵向铺满无溢出、focusY 空转，
- *  唯有收窗口才能把焦点带顶上来；窗口变矮后 object-cover 从「纵满横裁 31%」变「横满纵裁 4%」，
- *  顺带治横裁和月亮左切。见 [[picker-art-meta]] focalBand 语义。 */
-const ART_WINDOW_VH = 66;
+/* 底图可视窗口高度单一可信源 = CSS 变量 --art-window-vh（定义于 .picker-theme，globals.css）。
+ * .picker-art-window 的高度、以及下方衔接带的 top 都读它——改一处两处同步。
+ * 语义：画压进上 ~66vh、下沿接住坞上缘——让画的叙事下段（夜宵碗猫、晚饭人影窗）露在坞之上
+ * 而非沉坞后。手机源图纵向铺满无溢出、focusY 空转，唯有收窗口才能把焦点带顶上来；窗口变矮后
+ * object-cover 从「纵满横裁 31%」变「横满纵裁 4%」，顺带治横裁和月亮左切。见 [[picker-art-meta]]。 */
 
 /** 场景选层 map（SceneKey → 场景组件 | null），不写 if 链。
  *  V3 起，纯底图接管的时段（如 tea/lunch/midnight）返回 null——底图 + Ken Burns 即完整画面。 */
@@ -121,7 +121,10 @@ export default function PickerScene({ meal }: { meal: MealType }) {
           桌面画廊栏满高无下沿窗口，故 lg: 隐藏（桌面靠氛围层 + 操作台底色兜）。
           衔接色随 meal crossfade（key=meal，与画同拍 0.8s）——inline gradient 不吃 meal-transition
           的 background-color 过渡，若不 crossfade 会瞬跳（画淡入、色块硬切）。 */}
-      <div className="absolute inset-x-0 bottom-0 lg:hidden" style={{ top: `${ART_WINDOW_VH - 6}vh` }}>
+      <div
+        className="absolute inset-x-0 bottom-0 lg:hidden"
+        style={{ top: "calc((var(--art-window-vh) - 6) * 1vh)" }}
+      >
         <AnimatePresence mode="sync">
           <motion.div
             key={meal}

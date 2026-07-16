@@ -23,7 +23,7 @@
 import type { ReactNode } from "react";
 
 type Props = {
-  /** 顶栏（品牌行，跨 phase 常驻）。 */
+  /** 顶栏（品牌行）。目前仅 choose 屏传入；picking/result/shops 走 PickerConsole，无此栏。 */
   topbar?: ReactNode;
   /** A 天空区：hero 文字块。 */
   hero: ReactNode;

@@ -47,7 +47,14 @@ export default function PickerDock({
   onOpenDiary,
 }: Props) {
   return (
-    <div className="picker-glass meal-transition rounded-t-[28px] px-4 pb-5 pt-4 lg:rounded-[28px] lg:pb-6 lg:pt-5">
+    <div
+      className="picker-glass meal-transition rounded-t-[28px] px-4 pb-5 pt-4 lg:rounded-[28px] lg:pb-6 lg:pt-5"
+      style={{
+        // 方案 §4.5：坞上缘描边用时段光源色 --glow/0.12（而非通用 .picker-glass 的 ink 描边），
+        // 让坞上缘与画的下沿光色呼应；inline 覆盖 .picker-glass 的 border-top-color。
+        borderTopColor: "rgb(var(--glow) / 0.12)",
+      }}
+    >
       {/* 餐段 tab（segmented，选中态见 MealTabs） */}
       <MealTabs value={meal} onChange={onChangeMeal} />
 

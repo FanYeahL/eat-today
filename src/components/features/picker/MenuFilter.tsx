@@ -64,14 +64,14 @@ function Slot({
     <button
       onClick={onClick}
       aria-expanded={active}
-      className={`mx-0.5 inline-flex items-center gap-1 rounded-xl border px-2.5 py-1 text-base font-bold transition-all duration-200 active:scale-[0.95] ${
+      className={`mx-0.5 inline-flex items-center gap-0.5 rounded-lg border px-2 py-1 text-sm font-bold transition-all duration-200 active:scale-[0.95] ${
         active
           ? "border-transparent bg-brand text-white"
           : "border-ink/12 bg-surface text-ink"
       }`}
     >
       {text}
-      <span aria-hidden className="text-xs opacity-70">
+      <span aria-hidden className="text-[10px] opacity-70">
         ▾
       </span>
     </button>
@@ -138,9 +138,11 @@ export default function MenuFilter({
 
   return (
     <div className="flex w-full flex-col gap-3">
-      {/* 填空句：左对齐、允许换行——但每个「词 + Slot」用 inline-flex whitespace-nowrap
-          绑成一个不可拆的短语 token，保证「预算」等中文词不会被断成「预/算」。 */}
-      <p className="flex flex-wrap items-center gap-x-1 gap-y-2 text-lg font-semibold leading-relaxed text-ink">
+      {/* 填空句一行化（方案 §4.5 字面形态：「我想吃 [口味▾] [心情▾] [预算▾]」）——
+          去掉「，今天」「，预算」「。」连接词（它们是换行的元凶，约 70px 前缀）：
+          一句「我想吃」引子 + 三个 pill，句式趣味保留在 pill 占位文案里（不挑心情 / 不限预算…）。
+          flex-wrap 仍兜底极窄屏；nowrap 短语 token 防中文断字。 */}
+      <p className="flex flex-wrap items-center gap-x-1 gap-y-2 text-sm font-semibold leading-relaxed text-ink">
         <span className="inline-flex items-center whitespace-nowrap">
           我想吃
           <Slot
@@ -150,7 +152,6 @@ export default function MenuFilter({
           />
         </span>
         <span className="inline-flex items-center whitespace-nowrap">
-          ，今天
           <Slot
             text={moodLabel}
             active={open === "mood"}
@@ -158,13 +159,11 @@ export default function MenuFilter({
           />
         </span>
         <span className="inline-flex items-center whitespace-nowrap">
-          ，预算
           <Slot
             text={budgetLabel}
             active={open === "budget"}
             onClick={() => toggle("budget")}
           />
-          。
         </span>
       </p>
 

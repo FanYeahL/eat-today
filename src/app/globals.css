@@ -232,6 +232,10 @@ body {
   --glow: 255 193 99;
   --sil: 122 82 54;
 
+  /* 画框窗口高度（vh，无单位数值）单一可信源：.picker-art-window 高度 + PickerScene 衔接带 top
+     都读它，改一处两处同步（旧版 66 在 JS const 和 CSS 双处硬编码，改一漏一会错位）。 */
+  --art-window-vh: 66;
+
   background: var(--background);
   color: var(--foreground);
   /* 覆盖旧变量指针，保证容器内背景/前景取暖色（不影响 :root） */
@@ -523,13 +527,14 @@ body {
  * 具体各 @keyframes 见下。
  */
 
-/* 画框窗口（V4）：底图 + 动效薄层的有界容器。
-   手机：宽满屏、高 66vh——画压上 2/3，叙事下段顶到坞上缘之上（见 PickerScene ART_WINDOW_VH）。
+/* 画框窗口（V4）：底图 + 动效薄层的有界容器。高度单一可信源 = --art-window-vh（定义于
+   .picker-theme，见上）。PickerScene 的衔接带 top 也读同一 var——改一处不漏。
+   手机：宽满屏、高 --art-window-vh——画压上 2/3，叙事下段顶到坞上缘之上。
    桌面（lg+）：左画廊栏，满高 100vh、宽 --gallery-w（≈满高竖构图所需宽）——画原比例完整展出、
    近乎无裁无放大糊化，根治 DEF-1（宽视口底图只剩天空）。--gallery-w 在 <main> 上定义。 */
 .picker-art-window {
   width: 100%;
-  height: 66vh;
+  height: calc(var(--art-window-vh) * 1vh);
 }
 @media (min-width: 1024px) {
   .picker-art-window {
