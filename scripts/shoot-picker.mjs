@@ -7,6 +7,10 @@
 //   = 30 张，外加 dinner 切入后 1s「早帧」× 3 视口（抓 delay 窗口内的裸露动效）。
 // 产物：/tmp/picker-verify/{normal|rm}-{viewport}-{meal}.png + early-{viewport}-dinner.png
 //
+// 验收门（任一失败 → 非零退出）：
+//   ① 加载态断言：data-meal 对、底图 imgComplete && naturalW>0（堵 404 白图）；
+//   ② hero 对比度门（§8.2-6）：h1/tagline 对合成背景最坏像素对比度 ≥4.5:1（裸 CDP + canvas WCAG）。
+//
 // 用法：
 //   node scripts/shoot-picker.mjs            # 用现有 .next standalone 构建（没有则自动 build）
 //   node scripts/shoot-picker.mjs --clean    # 先 rm -rf .next 再 build（根治缓存类事故）
@@ -253,6 +257,102 @@ async function shot(send, file) {
   writeFileSync(join(OUT, file), Buffer.from(s.data, "base64"));
 }
 
+/** WCAG 相对亮度（sRGB 线性化）：单通道 0–255 → 线性。 */
+// 说明见 heroContrast 内联注入的页内脚本；此处仅 Node 侧无需重复。
+
+/**
+ * §8.2-6 hero 对比度验收门：量 h1 标题 + tagline p 文字色 对「隐藏文字后的真实合成背景」
+ * （scrim + 天空渐变 + 底图）的最坏像素对比度。<4.5:1 视为不达标。
+ * 全在裸 CDP 会话里做，无依赖：
+ *  1) 取 h1 / tagline 的 rect + color；2) 把两者 visibility:hidden 露出纯背景；
+ *  3) Page.captureScreenshot 带 clip 截各自文字区（CSS px；dsf 由 clip.scale 归一）；
+ *  4) 截图 base64 塞回页面，new Image().decode() → canvas → getImageData，3px 步进遍历，
+ *     按 WCAG 取该区最坏（对文字色对比最低）像素的对比度；5) 恢复 visibility。
+ * 返回 { h1, tagline } 两个对比度数值（保留两位）。
+ */
+async function heroContrast(send, vp) {
+  // 1) 量 rect + color，并把文字藏起来（露出背景）。
+  const meta = await send("Runtime.evaluate", {
+    expression: `(() => {
+      const h1 = document.querySelector('h1');
+      const p = h1 && h1.parentElement
+        ? [...h1.parentElement.querySelectorAll('p')][0] : null;
+      const pack = (el) => {
+        if (!el) return null;
+        const r = el.getBoundingClientRect();
+        const c = getComputedStyle(el).color;
+        return { x: Math.round(r.left), y: Math.round(r.top),
+                 w: Math.round(r.width), h: Math.round(r.height), color: c };
+      };
+      const out = { h1: pack(h1), tagline: pack(p) };
+      // 藏文字：只留背景（scrim + 天空 + 底图）供采样
+      if (h1) h1.style.visibility = 'hidden';
+      if (p) p.style.visibility = 'hidden';
+      return JSON.stringify(out);
+    })()`,
+    returnByValue: true,
+  });
+  const rects = JSON.parse(meta.result.value);
+
+  const measure = async (box) => {
+    if (!box || box.w < 2 || box.h < 2) return null;
+    // 3) 截该区（clip 用 CSS px + scale:1 → 返回 CSS 分辨率图，与 rect 同尺度）
+    const cap = await send("Page.captureScreenshot", {
+      format: "png",
+      clip: { x: box.x, y: box.y, width: box.w, height: box.h, scale: 1 },
+    });
+    // 4) 塞回页面解码 + WCAG 最坏对比度
+    const r = await send("Runtime.evaluate", {
+      awaitPromise: true,
+      returnByValue: true,
+      expression: `(async () => {
+        const dataUrl = 'data:image/png;base64,${cap.data}';
+        const img = new Image();
+        img.src = dataUrl;
+        await img.decode();
+        const cv = document.createElement('canvas');
+        cv.width = img.naturalWidth; cv.height = img.naturalHeight;
+        const ctx = cv.getContext('2d');
+        ctx.drawImage(img, 0, 0);
+        const { data, width, height } = ctx.getImageData(0, 0, cv.width, cv.height);
+        const lin = (v) => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); };
+        const lum = (r, g, b) => 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
+        // 文字色
+        const m = ${JSON.stringify(box.color)}.match(/\\d+(\\.\\d+)?/g).map(Number);
+        const Ltext = lum(m[0], m[1], m[2]);
+        let worst = Infinity;
+        for (let y = 0; y < height; y += 3) {
+          for (let x = 0; x < width; x += 3) {
+            const i = (y * width + x) * 4;
+            const Lbg = lum(data[i], data[i + 1], data[i + 2]);
+            const hi = Math.max(Ltext, Lbg), lo = Math.min(Ltext, Lbg);
+            const cr = (hi + 0.05) / (lo + 0.05);
+            if (cr < worst) worst = cr;
+          }
+        }
+        return Math.round(worst * 100) / 100;
+      })()`,
+    });
+    return r.result.value;
+  };
+
+  const h1c = await measure(rects.h1);
+  const tagc = await measure(rects.tagline);
+
+  // 5) 恢复 visibility（后续截图/切时段不受影响）
+  await send("Runtime.evaluate", {
+    expression: `(() => {
+      const h1 = document.querySelector('h1');
+      const p = h1 && h1.parentElement ? [...h1.parentElement.querySelectorAll('p')][0] : null;
+      if (h1) h1.style.visibility = '';
+      if (p) p.style.visibility = '';
+    })()`,
+    returnByValue: true,
+  });
+
+  return { h1: h1c, tagline: tagc };
+}
+
 /** ③ 加载态断言：底图必须 imgComplete===true 且 naturalWidth>0（404 时 complete 可能为 true 但宽为 0），
  *  且 data-meal 与目标时段一致。返回问题列表（空 = 通过）。 */
 function assertState(tag, vpName, meal, st) {
@@ -304,6 +404,17 @@ async function runPass(vp, reduced) {
     results.push(`${meal}: ${JSON.stringify(st)}`);
     failures.push(...assertState(tag, vp.name, meal, st));
     await shot(send, `${tag}-${vp.name}-${meal}.png`);
+
+    // §8.2-6 hero 对比度门：只在 normal 态量（rm 视觉相同，不重复）。归档截图后做，
+    // 因为它会临时藏文字——放最后不影响上面的归档图。
+    if (!reduced) {
+      const c = await heroContrast(send, vp);
+      results.push(`  contrast: h1=${c.h1} tagline=${c.tagline}`);
+      if (c.h1 != null && c.h1 < 4.5)
+        failures.push(`${tag}/${vp.name}/${meal}: hero h1 对比度 ${c.h1} < 4.5`);
+      if (c.tagline != null && c.tagline < 4.5)
+        failures.push(`${tag}/${vp.name}/${meal}: hero tagline 对比度 ${c.tagline} < 4.5`);
+    }
   }
   ws.close();
   proc.kill("SIGKILL");
