@@ -1,0 +1,28 @@
+name: verify
+
+# 上线前的回归门。三段：
+#   verify —— 等价本地 `npm run verify`：lint:mojibake → lint:data（全库 §7 硬门槛）
+#             → test:run（vitest）→ typecheck（tsc）→ lint（next lint）。
+#   build  —— 跑真实 `next build`（standalone 产物），确保能构建、不只过类型。
+#   audit  —— 安全门（scripts/audit-ci.mjs）：critical 零容忍 + 挡新引入的 high；
+#             已知、只能靠大版本升级消除的漏洞登记在 BASELINE，不让 CI 假绿也不长期假红。
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run verify
+      - run: npm run build
+      - run: npm run audit:ci

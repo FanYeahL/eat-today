@@ -1,0 +1,641 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /*
+   * 配色 token（单一可信源）。
+   * 值以「R G B」通道形式存放，配合 tailwind 的 rgb(var(--x) / <alpha>) 用法。
+   * 换肤只改这里的通道值，组件不用动。
+   * 当前主题：简约 ins · 通透浅蓝（清新自然）。
+   */
+  --c-base: 247 251 255; /* #f7fbff 极淡天空白，通透底色 */
+  --c-surface: 255 255 255; /* #ffffff 卡片/面板（纯白） */
+  --c-surface-2: 238 246 253; /* #eef6fd 卡片悬浮态（极淡蓝） */
+  --c-brand: 111 177 227; /* #6fb1e3 淡天空蓝（主色：边框/重点） */
+  --c-brand-soft: 124 146 168; /* #7c92a8 蓝灰（次要文字/链接） */
+  --c-accent: 47 161 122; /* #2fa17a 草木绿（高亮/选中/hover，浅底可读） */
+  --c-accent-hot: 63 143 208; /* #3f8fd0 天空蓝（渐变端/按钮，白字可读） */
+  --c-accent-pink: 224 99 76; /* #e0634c 珊瑚红（错误/提示） */
+  --c-info: 45 150 168; /* #2d96a8 青色（距离/金额/数字） */
+  --c-gold: 224 168 60; /* #e0a83c 琥珀金（评分） */
+  --c-ink: 38 60 78; /* #263c4e 主文字（深蓝灰，高对比） */
+  --c-ink-muted: 108 130 150; /* #6c8296 次文字（蓝灰） */
+  --c-paper: 38 60 78; /* #263c4e 中性前景 */
+
+  /* 玻璃质感通道（水占页面的玻璃层单一可信源，收敛原本散落的硬编码 rgba）。
+   * sage = 绿灰玻璃底色（事实上的第三主色，此前游离在 token 外）；
+   * edge = 玻璃高光边；depth = 玻璃投影/水底蓝影。 */
+  --c-sage: 150 179 170; /* #96b3aa 绿灰（玻璃底 / 主行动） */
+  --glass-edge: 255 255 255; /* 玻璃高光描边 */
+  --glass-depth: 63 143 208; /* 玻璃投影 + 水底渐变蓝 */
+
+  /* 旧变量名沿用，指向通道，保持 body 背景/前景一致 */
+  --background: rgb(var(--c-base));
+  --foreground: rgb(var(--c-ink));
+
+  /* 正文字体栈（系统无衬线，单一可信源）。品牌字体 --font-brand 由 next/font
+   * 在 /picker 的 .picker-theme 容器上注入（见 picker/page.tsx），不在此定义，
+   * 避免手写字体名与 next/font 生成名不一致。 */
+  --font-ui: -apple-system, BlinkMacSystemFont, "PingFang SC",
+    "HarmonyOS Sans SC", "Microsoft YaHei", system-ui, sans-serif;
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+  /* 关掉移动端点击高亮的灰/紫色块（点标题、按钮时残留的方框） */
+  -webkit-tap-highlight-color: transparent;
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  /* 隐藏滚动条（滚轮选择器用） */
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+/*
+ * 水占页面玻璃层（单一可信源）
+ * ─────────────────────────────────────────────
+ * 收敛此前散落在 page.tsx / 面板 / DriftCards 里的硬编码 rgba glass。
+ * 参数取现有众数（blur 8px、白底 0.5、白边 0.5），只统一、不加重——
+ * 不加大 blur、不加深阴影，目标是更轻更同源。透明度从 10 档收敛到 2~3 档。
+ * 全部 water- 前缀，避免污染全局 class 空间。
+ */
+@layer components {
+  /* 普通玻璃：控制条按钮 / 卡片 / tag。最轻的一档。 */
+  .water-glass-panel {
+    background: rgb(var(--glass-edge) / 0.5);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgb(var(--glass-edge) / 0.5);
+    box-shadow: 0 4px 14px rgb(var(--glass-depth) / 0.12);
+  }
+
+  /* 主行动按钮：开始投签 / 投签入水 / 定了 / 循此而去 / 就按这个。
+   * 各屏的主行动点，sage 0.34 最实一档。多个 CTA 共用此类，不再各写 inline。 */
+  .water-action-primary {
+    background: rgb(var(--c-sage) / 0.34);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgb(var(--glass-edge) / 0.55);
+    box-shadow: 0 6px 20px rgb(var(--c-sage) / 0.2);
+  }
+
+  /* 次级动作：调好了 / 留下，再占。sage 0.18 低一档、无 shadow，不抢主行动。 */
+  .water-glass-strong {
+    background: rgb(var(--c-sage) / 0.18);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgb(var(--glass-edge) / 0.5);
+  }
+
+  /* 更轻的三级动作：换一道。sage 0.12 最轻、白边更淡、无 shadow。 */
+  .water-glass-subtle {
+    background: rgb(var(--c-sage) / 0.12);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgb(var(--glass-edge) / 0.35);
+  }
+
+  /* 全屏面板底：自己做 / 干饭日记。竖向浅绿渐变 + 稍强 blur。 */
+  .water-panel-overlay {
+    background: linear-gradient(
+      180deg,
+      rgb(240 247 244 / 0.92) 0%,
+      rgb(227 239 234 / 0.96) 100%
+    );
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+
+  /* 水底深度渐变层（非玻璃：是水感光晕，不含实体边框/卡片）。 */
+  .water-depth-overlay {
+    background: linear-gradient(
+      180deg,
+      transparent 0%,
+      rgb(var(--glass-depth) / 0.08) 60%,
+      rgb(var(--glass-depth) / 0.16) 100%
+    );
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+  }
+}
+
+/*
+ * 水底氛围动画（WaterAmbience 用）
+ * ─────────────────────────────────────────────
+ * 全部只跑 transform/opacity，走合成层不重排。组件用内联 style 注入
+ * 时长/延迟做随机错峰，所以这里只定义"运动形状"，不写时长。
+ */
+
+/* 锦鲤横游：从左侧外缓游到右侧外，配合极缓上下摆与轻微俯仰 */
+@keyframes koi-swim {
+  0% { transform: translateX(-24vw) translateY(0) rotate(2deg); }
+  25% { transform: translateX(12vw) translateY(-14px) rotate(-3deg); }
+  50% { transform: translateX(48vw) translateY(8px) rotate(2deg); }
+  75% { transform: translateX(84vw) translateY(-10px) rotate(-2deg); }
+  100% { transform: translateX(124vw) translateY(0) rotate(2deg); }
+}
+
+/* 锦鲤尾鳍轻摆（套在内层元素上，与横游解耦） */
+@keyframes koi-tail {
+  0%, 100% { transform: rotate(-4deg); }
+  50% { transform: rotate(5deg); }
+}
+
+/* 气泡上升：从底部升到顶部，带左右轻摆 + 涨缩呼吸 + 渐隐 */
+@keyframes bubble-rise {
+  0% { transform: translateY(0) translateX(0) scale(0.7); opacity: 0; }
+  12% { opacity: 0.7; }
+  50% { transform: translateY(-46vh) translateX(10px) scale(1.05); }
+  85% { opacity: 0.5; }
+  100% { transform: translateY(-92vh) translateX(-6px) scale(0.85); opacity: 0; }
+}
+
+/* 阳光光柱：极缓地左右摇曳 + 明暗呼吸 */
+@keyframes light-shaft {
+  0%, 100% { transform: translateX(-50%) rotate(8deg) scaleY(1); opacity: 0.35; }
+  50% { transform: translateX(-46%) rotate(6deg) scaleY(1.08); opacity: 0.55; }
+}
+
+/*
+ * 细雨平湖涟漪（RippleLayer 的 splash 用）
+ * ─────────────────────────────────────────────
+ * 1px 极细线条，从 0 缓缓扩散到全屏 ~70%，透明度 0.4→0 平滑递减。
+ * 曲线 cubic-bezier(0.1,0.8,0.3,1) 先快后慢的极强阻尼，像丝线在水面荡漾。
+ * 多圈靠组件注入不同 animation-delay 做时差重叠。
+ */
+@keyframes pond-ripple {
+  0% { transform: translate(-50%, -50%) scale(0.04); opacity: 0; }
+  10% { opacity: 0.9; }
+  100% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
+}
+
+/* 尊重减少动效偏好：关掉氛围层的持续动画 */
+@media (prefers-reduced-motion: reduce) {
+  .ambience-anim {
+    animation: none !important;
+  }
+}
+
+/*
+ * ═══════════════════════════════════════════════
+ *  Universal Food Picker / 全民今日吃啥机（/picker 实验主题）
+ * ═══════════════════════════════════════════════
+ * 作用域换肤：只在 .picker-theme 容器内覆盖同名 --c-* 通道，
+ * 换成「clean food utility」现代盘：干净暖白 + 中性 charcoal + 清爽食欲暖色（tomato/橙）
+ * + 一点 retro-blue 冷色点缀。目标比例 90% 暖白中性 / 8% 暖色 / 2% 冷色。
+ * 旧 :root（清冷蓝绿）完全不动，/water-concept 继续走原色，方便新旧对照、零回归。
+ *
+ * 复用的 FunnelFilter / MealSwitcher / DiaryView / RecipeLibrary 全走
+ * 这些 token class（border-accent、bg-accent-hot/15、text-ink…），
+ * 在这个作用域内自动跟随现代盘，不用改一行组件代码。
+ */
+.picker-theme {
+  --c-base: 255 248 240; /* #FFF8F0 干净暖白（页面底，不发黄旧） */
+  --c-surface: 255 252 247; /* #FFFCF7 近白卡 */
+  --c-surface-2: 251 246 240; /* #FBF6F0 极浅暖灰白（悬浮态） */
+  --c-brand: 222 90 22; /* #DE5A16 清爽食欲橙（重点/主暖，白字达 AA-large 3.76:1） */
+  --c-brand-soft: 138 130 123; /* #8A827B 中性暖灰（次要文字/链接，去木棕相） */
+  --c-accent: 240 113 104; /* #F07168 亮珊瑚（与 tomato 同族） */
+  --c-accent-hot: 240 86 60; /* #F0563C 清爽 tomato（主 CTA/重点，白字达 AA 大字） */
+  --c-accent-pink: 214 69 56; /* #d64538 珊瑚红（错误/提示） */
+  --c-info: 125 155 168; /* #7d9ba8 retro blue（唯一冷色点缀） */
+  --c-olive: 74 124 89; /* #4a7c59 olive（留通道，无 live 消费） */
+  --c-mustard: 212 165 116; /* #d4a574 mustard（留通道，无 live 消费） */
+  --c-gold: 224 158 62; /* #e09e3e 琥珀金（评分星 / DishReveal 辣度 chip 仍用） */
+  --c-ink: 31 26 23; /* #1F1A17 中性 charcoal 主文字（几乎无棕相，高对比） */
+  --c-ink-muted: 107 101 96; /* #6B6560 中性暖灰（次文字） */
+  --c-paper: 31 26 23; /* #1F1A17 中性前景 */
+
+  /* 固定 CTA 色对：所有 meal 不变，钉死在白字达 AA-large 的 tomato→orange。
+   * 三处白字渐变主按钮指到这对（见 PickerBottomAction / UniversalFoodPicker / ShopResults），
+   * 这样 per-meal accent 可随意变色而 CTA 白字始终达标、且五时段共用一套按钮结构。 */
+  --c-cta-a: 240 86 60; /* #F0563C tomato（渐变起，白字 AA-large 3.44:1） */
+  --c-cta-b: 222 90 22; /* #DE5A16 orange（渐变止，白字 AA-large 3.76:1） */
+
+  /* 场景 token 兜底（各 data-meal 会覆盖；这里给安全默认，避免初次绘制取到 undefined）。 */
+  --sky-0: 234 244 247;
+  --sky-1: 255 236 201;
+  --sky-2: 255 217 162;
+  --glow: 255 193 99;
+  --sil: 122 82 54;
+
+  /* 画框窗口高度（vh，无单位数值）单一可信源：.picker-art-window 高度 + PickerScene 衔接带 top
+     都读它，改一处两处同步（旧版 66 在 JS const 和 CSS 双处硬编码，改一漏一会错位）。 */
+  --art-window-vh: 66;
+
+  background: var(--background);
+  color: var(--foreground);
+  /* 覆盖旧变量指针，保证容器内背景/前景取暖色（不影响 :root） */
+  --background: rgb(var(--c-base));
+  --foreground: rgb(var(--c-ink));
+}
+
+/*
+ * 半透 solid 卡（替代 backdrop-filter 玻璃）——两端一致、无脏玻璃、小程序可迁移。
+ * 内容卡半透，透出下方场景氛围色；投影用场景光源色 --glow 给内容「打光」。
+ * 透明度区间：浅色 0.72–0.82 / 深色 0.62–0.72，以「卡上文字 ≥4.5:1」为下限往透里调。
+ */
+.picker-theme .picker-glass {
+  background: rgb(var(--c-surface) / 0.82);
+  border: 1px solid rgb(var(--c-ink) / 0.08);
+  box-shadow: 0 12px 32px rgb(var(--glow) / 0.14);
+}
+.picker-theme [data-meal="dinner"] .picker-glass,
+.picker-theme [data-meal="midnight"] .picker-glass {
+  background: rgb(var(--c-surface) / 0.72);
+  border-color: rgb(255 255 255 / 0.1);
+}
+/* 切时段颜色平滑（含 box-shadow：--glow 逐时段变，不加会瞬跳）。挂具体组件，不用通配符。 */
+.meal-transition {
+  transition: background-color 0.6s, color 0.6s, border-color 0.6s, box-shadow 0.6s;
+}
+
+/*
+ * ── 饭点氛围主题：五时段 token 覆盖（data-meal 在 UniversalFoodPicker 的 <main>）──
+ * 后代选择器命中 main 及全部子树 = 全 phase（choose/picking/result/shops + 面板）一致换气质。
+ * 组件零改：整路由的 bg-surface/text-ink/bg-accent-hot 经 tailwind 解析 rgb(var(--c-*)/α)，
+ * 覆盖同名通道即全跟随。light 三时段保 charcoal ink；dark 两时段 solid 深色翻转（不用半透明脏玻璃）。
+ * CTA 走固定 --c-cta-*，不随 meal 变（白字始终达标）。
+ */
+
+/* 早餐：清晨暖黄 + 少量番茄橙（浅） */
+.picker-theme [data-meal="breakfast"] {
+  --c-base: 255 245 224; /* #FFF5E0 清晨暖黄 */
+  --c-surface: 255 251 242; /* #FFFBF2 暖白卡 */
+  --c-surface-2: 253 244 227; /* #FDF4E3 悬浮态 */
+  --c-brand: 232 122 40; /* #E87A28 番茄橙（暖，重点） */
+  --c-accent: 240 138 92; /* #F08A5C 柔橙 */
+  --c-accent-hot: 240 96 56; /* #F06038 番茄红重点 */
+  /* 场景（天空 3 段 + 光源 + 剪影）：清晨市集 */
+  --sky-0: 234 244 247; /* #EAF4F7 淡青白天顶 */
+  --sky-1: 255 236 201; /* #FFECC9 暖杏中段 */
+  --sky-2: 255 217 162; /* #FFD9A2 晨金地平线 */
+  --glow: 255 193 99; /* #FFC163 晨光光源 */
+  --sil: 122 82 54; /* #7A5236 市集剪影（用 α0.16） */
+}
+
+/* 午餐：干净暖白 + 鲜明橙/阳光黄（浅） */
+.picker-theme [data-meal="lunch"] {
+  --c-base: 255 250 236; /* #FFFAEC 干净暖白偏阳光 */
+  --c-surface: 255 253 247; /* #FFFDF7 近白卡 */
+  --c-surface-2: 253 246 230; /* #FDF6E6 悬浮态 */
+  --c-brand: 240 138 24; /* #F08A18 阳光橙黄 */
+  --c-accent: 245 176 40; /* #F5B028 阳光黄 */
+  --c-accent-hot: 240 96 48; /* #F06030 明亮橙 */
+  /* 场景：正午通透（剪影极浅或无） */
+  --sky-0: 255 254 248; /* #FFFEF8 近白天顶 */
+  --sky-1: 255 244 214; /* #FFF4D6 暖白中段 */
+  --sky-2: 255 233 184; /* #FFE9B8 暖金地平线 */
+  --glow: 255 211 77; /* #FFD34D 正午太阳 */
+  --sil: 201 183 154; /* #C9B79A 极浅远山（α0.06） */
+}
+
+/* 下午茶：蜜桃/杏橙 + 一点淡紫灰（浅） */
+.picker-theme [data-meal="tea"] {
+  --c-base: 252 238 228; /* #FCEEE4 蜜桃暖 */
+  --c-surface: 255 246 240; /* #FFF6F0 蜜桃白卡 */
+  --c-surface-2: 249 235 226; /* #F9EBE2 悬浮态 */
+  --c-brand: 226 122 92; /* #E27A5C 杏橙 */
+  --c-accent: 176 150 168; /* #B096A8 一点淡紫灰 */
+  --c-accent-hot: 232 108 84; /* #E86C54 夕阳橙红 */
+  --c-ink: 42 33 30; /* #2A211E 暖 charcoal（配蜜桃底更暖，仍高对比） */
+  /* 场景：夕阳（三段最出氛围，淡紫→橘粉→橙金） */
+  --sky-0: 217 201 224; /* #D9C9E0 淡紫天顶 */
+  --sky-1: 255 197 160; /* #FFC5A0 橘粉中段 */
+  --sky-2: 255 158 96; /* #FF9E60 橙金地平线 */
+  --glow: 255 140 66; /* #FF8C42 落日光源 */
+  --sil: 90 64 88; /* #5A4058 屋顶/树剪影（α0.35 逆光） */
+}
+
+/* 晚饭：夜蓝深暖灰底 + tomato（深，solid 翻转） */
+.picker-theme [data-meal="dinner"] {
+  --c-base: 30 32 40; /* #1E2028 夜蓝深底 */
+  --c-surface: 42 44 54; /* #2A2C36 solid 暖黑卡（不透明，非脏玻璃） */
+  --c-surface-2: 52 54 66; /* #343642 稍浅卡 */
+  --c-brand: 240 118 66; /* #F07642 暖橙（夜色光源） */
+  --c-accent: 122 142 168; /* #7A8EA8 夜蓝灰点缀 */
+  --c-accent-hot: 240 96 60; /* #F0603C tomato（夜色主光源） */
+  --c-ink: 244 238 230; /* #F4EEE6 暖白主文字 */
+  --c-ink-muted: 178 170 160; /* #B2AAA0 低亮暖灰次文字 */
+  --c-paper: 244 238 230;
+  --foreground: rgb(var(--c-ink));
+  /* 场景：都市夜（天际线 + 亮窗 + 流星） */
+  --sky-0: 15 20 32; /* #0F1420 夜空顶 */
+  --sky-1: 26 35 56; /* #1A2338 中段 */
+  --sky-2: 51 65 94; /* #33415E 地平线光污染微亮 */
+  --glow: 240 118 66; /* #F07642 城市暖光 */
+  --sil: 11 14 22; /* #0B0E16 天际线近黑 */
+}
+
+/* 夜宵：深蓝黑/墨色 + 暖橙小光（深，solid 翻转，更暗） */
+.picker-theme [data-meal="midnight"] {
+  --c-base: 20 22 32; /* #141620 深蓝黑墨底 */
+  --c-surface: 30 33 44; /* #1E212C solid 墨黑卡（不透明） */
+  --c-surface-2: 40 43 56; /* #282B38 稍浅卡 */
+  --c-brand: 240 132 76; /* #F0844C 暖橙小光 */
+  --c-accent: 108 122 150; /* #6C7A96 墨蓝点缀 */
+  --c-accent-hot: 240 112 68; /* #F07044 暖橙主光源 */
+  --c-ink: 240 234 226; /* #F0EAE2 暖白主文字 */
+  --c-ink-muted: 168 160 152; /* #A8A098 低亮暖灰次文字 */
+  --c-paper: 240 234 226;
+  --foreground: rgb(var(--c-ink));
+  /* 场景：月夜（满月 + 屋顶亮窗 + 黑猫） */
+  --sky-0: 7 9 15; /* #07090F 最暗天顶 */
+  --sky-1: 14 17 28; /* #0E111C 中段 */
+  --sky-2: 22 26 40; /* #161A28 地平线 */
+  --glow: 240 132 76; /* #F0844C 暖橙小光/亮窗 */
+  --sil: 10 12 18; /* #0A0C12 屋顶近黑 */
+}
+
+/*
+ * 品牌展示字体（得意黑 / Smiley Sans 子集，仅 /picker）。
+ * --font-brand 由 next/font 在 .picker-theme 容器上注入；这里只引用变量 +
+ * 系统字体兜底，绝不手写字体名（避免与 next/font 生成名不一致）。
+ * 只三类文本挂 .picker-brand：品牌标题 / result 菜名 / loading 重点词。
+ * 得意黑本身是斜体(Oblique)字形，故不再叠加 font-style；单字重，不 fake bold，
+ * 靠字号/色/布局突出（组件里已给足字号）。正文/店铺/按钮/chip 一律不挂此类。
+ */
+.picker-brand {
+  font-family: var(--font-brand), var(--font-ui);
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
+/*
+ * picker 动效层 —— 按微信小程序可落地设计（非 Web 炫技）。
+ * 原则：只做轻量、短促、可中断的反馈；仅 transform / opacity（走合成层，
+ * 小程序 animation/transition 也能直接实现）；不做 SVG morph / 大面积 blur /
+ * filter / 粒子 / canvas / 持续高频动画。动效服务「点了→有反应→出结果」。
+ * 命名全 picker- 前缀。时长档位：tap 80–140ms / chip·tab 160–240ms /
+ * reveal 300–600ms / loading 600–800ms。
+ */
+
+/* 主按钮 tap 后「亮一次」（reveal 时也用）：一次性，非无限呼吸 */
+@keyframes picker-pop-once {
+  0% { transform: translateZ(0) scale(1); box-shadow: 0 8px 22px rgb(var(--c-accent-hot) / 0.3); }
+  45% { transform: translateZ(0) scale(1.03); box-shadow: 0 12px 30px rgb(var(--c-accent-hot) / 0.42); }
+  100% { transform: translateZ(0) scale(1); box-shadow: 0 8px 22px rgb(var(--c-accent-hot) / 0.3); }
+}
+
+/* picking 载入：餐盘轻转一圈（600–800ms，一次，非老虎机滚动） */
+@keyframes picker-plate-spin {
+  0% { transform: rotate(0deg) scale(0.94); }
+  100% { transform: rotate(360deg) scale(1); }
+}
+
+/* result「端上桌」：内容从下方轻推上来（纯 translate + opacity） */
+@keyframes picker-serve-up {
+  0% { opacity: 0; transform: translateY(16px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* 主按钮：tap 触发一次高亮（class 由 JS 短暂挂上，animationend 卸下） */
+.picker-pop-once {
+  animation: picker-pop-once 0.5s ease-out;
+}
+/* picking 餐盘转一圈 */
+.picker-plate-spin {
+  animation: picker-plate-spin 0.75s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+/* 「端上桌」分层出现：容器加此类，子项用 --i 控制 stagger 延迟 */
+.picker-serve-up {
+  animation: picker-serve-up 0.42s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: calc(var(--i, 0) * 80ms);
+}
+
+/*
+ * Ben-Day 点阵（借 popArt 的明快点阵纹理，静态，不动）。
+ * 用 ::before 覆盖层承载点阵，不占宿主的 background-image —— 否则会覆盖掉
+ * 按钮自己的 bg-gradient（曾导致主按钮渐变消失、白字看不见）。
+ * 白色极淡圆点叠在橙色主按钮上，做一点流行艺术活力，不喧宾夺主。
+ */
+.picker-dots {
+  position: relative;
+}
+.picker-dots::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background-image: radial-gradient(
+    rgb(255 255 255 / 0.18) 1.5px,
+    transparent 1.6px
+  );
+  background-size: 12px 12px;
+}
+
+/*
+ * 语义背景层：餐垫点阵、暖色 band、桌面色带、idle 漂移均已随「删到高级」重构删除
+ * （CHOOSE 屏零环境循环 / 零装饰底纹；背景收敛为纸底 + 纸纹 + 一处极轻暖光晕）。
+ */
+
+/* 主按钮 tap 触发：一次 press 下压 + glow 亮起（由 JS 加 class，animationend 卸下）。
+ * 非常驻闪、非仅 active:scale —— 点击有明确「按下去 + 发光」的反馈再进 picking。 */
+@keyframes picker-press-glow {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 10px 28px rgb(var(--c-accent-hot) / 0.36);
+  }
+  35% {
+    transform: scale(0.96);
+    box-shadow: 0 6px 18px rgb(var(--c-accent-hot) / 0.3);
+  }
+  70% {
+    transform: scale(1.02);
+    box-shadow: 0 16px 40px rgb(var(--c-accent-hot) / 0.55),
+      0 0 26px rgb(var(--c-accent-hot) / 0.4);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 10px 28px rgb(var(--c-accent-hot) / 0.36);
+  }
+}
+.picker-press-glow {
+  animation: picker-press-glow 0.42s cubic-bezier(0.34, 1.4, 0.64, 1);
+}
+
+/* picking「菜单卡片归位」：小卡从偏移位滑入定位 + 轻微回正（一次性）。
+ * 每张卡用内联 --i 错峰。只动 transform/opacity，小程序可落地。 */
+@keyframes picker-card-land {
+  0% {
+    opacity: 0;
+    transform: translateY(18px) rotate(var(--r, 0deg)) scale(0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) rotate(var(--r, 0deg)) scale(1);
+  }
+}
+.picker-card-land {
+  animation: picker-card-land 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: calc(var(--i, 0) * 120ms);
+}
+
+/*
+ * ── CHOOSE 屏动效收敛（「删到高级」重构）──
+ * 环境循环动效（食物浮动 / 背景漂移 / 极缓自转 / CTA idle 高光）全部删除：
+ * CHOOSE 屏零环境循环。核心动效只留切餐段的 picker-stage-pop（下）+ CTA tap 的
+ * picker-press-glow（上）；产品交互（MealTabs layoutId 滑块 / MenuFilter 展开）由组件自带。
+ * 全部 transform/opacity + reduced-motion 降级。
+ */
+
+/* meal 切换时，hero 食物焦点做一次 spring pop（一次性，由 key 变化触发重挂） */
+@keyframes picker-stage-pop {
+  0% { opacity: 0; transform: scale(0.6) translateY(10px); }
+  60% { opacity: 1; transform: scale(1.12) translateY(-2px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+.picker-stage-pop {
+  animation: picker-stage-pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+/* 食物焦点 idle：整只盘连食物极轻起伏（上下浮 + 极轻呼吸缩放），4.5s，只 transform、
+ * 低频、克制。CHOOSE 屏唯一 idle 循环——只作用于食物焦点，不碰背景/贴纸/扫光。
+ * 用户不操作时也能感知「页面是活的」；reduced-motion 下关闭（见下方 @media）。
+ * 注：与切餐段的一次性 picker-stage-pop 分属不同元素（pop 在 emoji span，idle 在外层
+ * 浮动包裹），避免 animation 属性打架。 */
+@keyframes picker-food-idle {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-5px) scale(1.03); }
+}
+.picker-food-idle {
+  animation: picker-food-idle 4.5s ease-in-out infinite;
+  will-change: transform;
+}
+
+/*
+ * ══════════════════════════════════════════════
+ *  饭点氛围「场景舞台」动效（picker-scene-*）
+ * ══════════════════════════════════════════════
+ * 全屏场景:天空渐变 + 光源 + 粒子 + 地平线剪影,内容浮其上。每个场景静止帧本身就是一幅画,
+ * 动效只让它活。全 .picker-scene-* 前缀、只 transform/opacity 的 CSS keyframes(无 canvas/JS 逐帧,
+ * 保小程序可迁移)。reduced-motion 下由下方 [class*="picker-scene-"] catch-all 全停,但静态场景 DOM 保留。
+ * 具体各 @keyframes 见下。
+ */
+
+/* 画框窗口（V4）：底图 + 动效薄层的有界容器。高度单一可信源 = --art-window-vh（定义于
+   .picker-theme，见上）。PickerScene 的衔接带 top 也读同一 var——改一处不漏。
+   手机：宽满屏、高 --art-window-vh——画压上 2/3，叙事下段顶到坞上缘之上。
+   桌面（lg+）：左画廊栏，满高 100vh、宽 --gallery-w（≈满高竖构图所需宽）——画原比例完整展出、
+   近乎无裁无放大糊化，根治 DEF-1（宽视口底图只剩天空）。--gallery-w 在 <main> 上定义。 */
+.picker-art-window {
+  width: 100%;
+  height: calc(var(--art-window-vh) * 1vh);
+}
+@media (min-width: 1024px) {
+  .picker-art-window {
+    width: var(--gallery-w, 46vw);
+    height: 100vh;
+  }
+}
+
+/* 底图 Ken Burns 呼吸（V3 动态感 Tier 1，必做，零资产成本）：板绘底图极慢缩放漂移，
+   scale 基准 1 起步（不缩小免露边），55s alternate。挂在 img 包裹 div 上，mask 层在外不参与。
+   reduced-motion 下由 [class*="picker-scene-"] catch-all 停。 */
+@keyframes picker-scene-kenburns {
+  0% { transform: scale(1) translateY(0); }
+  100% { transform: scale(1.045) translateY(-6px); }
+}
+.picker-scene-kenburns {
+  animation: picker-scene-kenburns 55s ease-in-out infinite alternate;
+  transform-origin: center top;
+  will-change: transform;
+}
+
+/* 星星三档 twinkle（错峰）。dinner 天空带保留。 */
+@keyframes picker-scene-twinkle { 0%, 100% { opacity: 0.2; } 50% { opacity: 0.9; } }
+.picker-scene-twinkle-a { animation: picker-scene-twinkle 4s ease-in-out infinite; }
+.picker-scene-twinkle-b { animation: picker-scene-twinkle 6s ease-in-out infinite; }
+.picker-scene-twinkle-c { animation: picker-scene-twinkle 8s ease-in-out infinite; }
+
+/* 流星：快速划过（尾迹 ≤1s 内完成），其余时间不可见。周期由内联 animation-duration 定。
+   角度经 --meteor-angle 进 keyframe，沿旋转后的自身轴 translateX 滑行——尾迹与轨迹共线，
+   斜下坠（正角度 30–40° 向右下、~145° 向左下）。旧写法 translate(140,92) 会整体替换
+   组件 inline 的 rotate，旋转丢失（横线沿对角平移）。dinner 天空带保留。 */
+@keyframes picker-scene-meteor {
+  0% { opacity: 0; transform: rotate(var(--meteor-angle, 35deg)) translateX(0); }
+  4% { opacity: 0.9; }
+  9% { opacity: 0; transform: rotate(var(--meteor-angle, 35deg)) translateX(280px); }
+  100% { opacity: 0; transform: rotate(var(--meteor-angle, 35deg)) translateX(280px); }
+}
+.picker-scene-meteor {
+  /* DEF-2a：基态必须不可见——可见性全靠 keyframe，delay 期间由 fill-mode: backwards
+     兜住取 0% 帧（opacity:0、未 translate）。否则第二颗流星 delay 期间裸露成静止横线。
+     组件 inline 只设 animation-name/duration/delay/iteration/timing 五个 longhand，
+     不含 fill-mode，此处补全不冲突。 */
+  opacity: 0;
+  animation-fill-mode: backwards;
+  will-change: transform, opacity;
+}
+
+/* breakfast 炊烟上升（错峰，内联 delay/duration）。叠在底图蒸笼上方，唯一保留的 breakfast 动效。 */
+@keyframes picker-scene-steam {
+  0% { opacity: 0; transform: translateY(6px) scaleX(0.8) scaleY(0.9); }
+  25% { opacity: 0.55; }
+  100% { opacity: 0; transform: translateY(-72px) scaleX(1.4) scaleY(1.2); }
+}
+.picker-scene-steam {
+  /* DEF-2 同源：基态不可见 + fill-mode backwards，避免 delay 期间/首帧裸露成静止白斑。 */
+  opacity: 0;
+  transform-origin: center bottom;
+  animation-fill-mode: backwards;
+  will-change: transform, opacity;
+}
+
+/*
+ * V3 退役的场景动效 keyframes（rays / cloudbank / cloud / flicker / neon-pink / moon / window /
+ * cat-breathe / cat-tail / cat-ear / zzz / flag / bird / sunspin / shaft / mote）已随旧 SVG
+ * 几何一并删除——质感改由 /scenes/{meal}.webp 板绘底图承担，只留 kenburns + twinkle + meteor + steam。
+ */
+
+/* 纸底颗粒：极淡噪点感（叠在暖米底上，给 MCM「印刷海报」的纸质，纯静态） */
+.picker-theme .picker-paper-grain {
+  background-image: radial-gradient(
+      rgb(var(--c-ink) / 0.05) 0.5px,
+      transparent 0.6px
+    ),
+    radial-gradient(rgb(var(--c-ink) / 0.04) 0.5px, transparent 0.6px);
+  background-size: 7px 7px, 11px 11px;
+  background-position: 0 0, 4px 6px;
+}
+
+/* 降级：低端机 / reduced motion 时，只保留最终态（无位移无缩放） */
+@media (prefers-reduced-motion: reduce) {
+  .picker-pop-once,
+  .picker-plate-spin,
+  .picker-press-glow,
+  .picker-food-idle,
+  .picker-stage-pop,
+  [class*="picker-scene-"] {
+    /* catch-all：所有场景动效类（Phase 2 陆续加）自动覆盖，静态场景 DOM 仍保留 */
+    animation: none !important;
+  }
+  /* DEF-2b：纯运动元素（流星、炊烟）静止形态无意义——直接隐藏，不留静止横线/白斑。
+     这是对 V3「静态场景完整」条款的修正：底图、星空、剪影等可静止元素仍完整保留，
+     只有靠运动才成立的元素才隐藏。 */
+  .picker-scene-meteor,
+  .picker-scene-steam {
+    display: none !important;
+  }
+  .picker-serve-up,
+  .picker-card-land {
+    animation: none !important;
+    opacity: 1;
+    transform: none;
+  }
+}
+

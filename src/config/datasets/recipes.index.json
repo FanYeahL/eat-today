@@ -1,0 +1,2413 @@
+{
+  "count": 344,
+  "recipes": [
+    {
+      "id": "htc-b52轰炸机-72",
+      "name": "B52轰炸机",
+      "kind": "drink",
+      "category": "drink",
+      "emoji": "🥤"
+    },
+    {
+      "id": "htc-mojito莫吉托-73",
+      "name": "Mojito莫吉托",
+      "kind": "drink",
+      "category": "drink",
+      "emoji": "🥤"
+    },
+    {
+      "id": "htc-上汤娃娃菜-283",
+      "name": "上汤娃娃菜",
+      "kind": "main",
+      "category": "vegetable_dish",
+      "emoji": "🍲"
+    },
+    {
+      "id": "htc-中式馅饼-225",
+      "name": "中式馅饼",
+      "kind": "main",
+      "category": "staple",
+      "emoji": "🍚"
+    },
+    {
+      "id": "htc-乾隆白菜-284",
+      "name": "乾隆白菜",
+      "kind": "main",
+      "category": "vegetable_dish",
+      "emoji": "🥬"
+    },
+    {
+      "id": "htc-冬瓜茶-74",
+      "name": "冬瓜茶",
+      "kind": "drink",
+      "category": "drink",
+      "emoji": "🧋"
+    },
+    {
+      "id": "htc-冬瓜酿肉-96",
+      "name": "冬瓜酿肉",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🍖"
+    },
+    {
+      "id": "htc-冰粉-75",
+      "name": "冰粉",
+      "kind": "drink",
+      "category": "drink",
+      "emoji": "🥤"
+    },
+    {
+      "id": "htc-冷吃兔-97",
+      "name": "冷吃兔",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🍖"
+    },
+    {
+      "id": "htc-凉拌木耳-285",
+      "name": "凉拌木耳",
+      "kind": "main",
+      "category": "vegetable_dish",
+      "emoji": "🥬"
+    },
+    {
+      "id": "htc-凉拌油麦菜-286",
+      "name": "凉拌油麦菜",
+      "kind": "main",
+      "category": "vegetable_dish",
+      "emoji": "🥬"
+    },
+    {
+      "id": "htc-凉拌莴笋-287",
+      "name": "凉拌莴笋",
+      "kind": "main",
+      "category": "vegetable_dish",
+      "emoji": "🥬"
+    },
+    {
+      "id": "htc-凉拌豆腐-288",
+      "name": "凉拌豆腐",
+      "kind": "main",
+      "category": "vegetable_dish",
+      "emoji": "🍢"
+    },
+    {
+      "id": "htc-凉拌金针菇-289",
+      "name": "凉拌金针菇",
+      "kind": "main",
+      "category": "vegetable_dish",
+      "emoji": "🥬"
+    },
+    {
+      "id": "htc-凉拌鸡丝-98",
+      "name": "凉拌鸡丝",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🍗"
+    },
+    {
+      "id": "htc-凉拌黄瓜-290",
+      "name": "凉拌黄瓜",
+      "kind": "main",
+      "category": "vegetable_dish",
+      "emoji": "🥬"
+    },
+    {
+      "id": "htc-凉粉-226",
+      "name": "凉粉",
+      "kind": "main",
+      "category": "staple",
+      "emoji": "🍜"
+    },
+    {
+      "id": "htc-利提巧卡-227",
+      "name": "利提巧卡",
+      "kind": "main",
+      "category": "staple",
+      "emoji": "🍚"
+    },
+    {
+      "id": "htc-勾芡香菇汤-202",
+      "name": "勾芡香菇汤",
+      "kind": "main",
+      "category": "soup",
+      "emoji": "🍲"
+    },
+    {
+      "id": "htc-包菜炒鸡蛋粉丝-291",
+      "name": "包菜炒鸡蛋粉丝",
+      "kind": "main",
+      "category": "vegetable_dish",
+      "emoji": "🍜"
+    },
+    {
+      "id": "htc-南派红烧肉-159",
+      "name": "南派红烧肉",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🍖"
+    },
+    {
+      "id": "htc-卤菜-99",
+      "name": "卤菜",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🍖"
+    },
+    {
+      "id": "htc-印度土豆花菜-292",
+      "name": "印度土豆花菜",
+      "kind": "main",
+      "category": "vegetable_dish",
+      "emoji": "🥔"
+    },
+    {
+      "id": "htc-印度奶茶-76",
+      "name": "印度奶茶",
+      "kind": "drink",
+      "category": "drink",
+      "emoji": "🧋"
+    },
+    {
+      "id": "htc-印度烤饼-228",
+      "name": "印度烤饼",
+      "kind": "main",
+      "category": "staple",
+      "emoji": "🍚"
+    },
+    {
+      "id": "htc-印度焖饭-229",
+      "name": "印度焖饭",
+      "kind": "main",
+      "category": "staple",
+      "emoji": "🍚"
+    },
+    {
+      "id": "htc-印度葫芦丸子-293",
+      "name": "印度葫芦丸子",
+      "kind": "main",
+      "category": "vegetable_dish",
+      "emoji": "🥬"
+    },
+    {
+      "id": "htc-反沙芋头-53",
+      "name": "反沙芋头",
+      "kind": "main",
+      "category": "dessert",
+      "emoji": "🍰"
+    },
+    {
+      "id": "htc-口水鸡-100",
+      "name": "口水鸡",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🍗"
+    },
+    {
+      "id": "htc-可乐桶-77",
+      "name": "可乐桶",
+      "kind": "drink",
+      "category": "drink",
+      "emoji": "🥤"
+    },
+    {
+      "id": "htc-可乐炒饭-230",
+      "name": "可乐炒饭",
+      "kind": "main",
+      "category": "staple",
+      "emoji": "🍚"
+    },
+    {
+      "id": "htc-可乐鸡翅-101",
+      "name": "可乐鸡翅",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🍗"
+    },
+    {
+      "id": "htc-台式卤肉饭-102",
+      "name": "台式卤肉饭",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🍚"
+    },
+    {
+      "id": "htc-吐司果酱-28",
+      "name": "吐司果酱",
+      "kind": "main",
+      "category": "breakfast",
+      "emoji": "🥢"
+    },
+    {
+      "id": "htc-咕噜肉-103",
+      "name": "咕噜肉",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🍖"
+    },
+    {
+      "id": "htc-咖啡椰奶冻-54",
+      "name": "咖啡椰奶冻",
+      "kind": "main",
+      "category": "dessert",
+      "emoji": "☕"
+    },
+    {
+      "id": "htc-咖喱炒蟹-0",
+      "name": "咖喱炒蟹",
+      "kind": "main",
+      "category": "aquatic",
+      "emoji": "🦐"
+    },
+    {
+      "id": "htc-咖喱肥牛-104",
+      "name": "咖喱肥牛",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🍖"
+    },
+    {
+      "id": "htc-咸肉菜饭-231",
+      "name": "咸肉菜饭",
+      "kind": "main",
+      "category": "staple",
+      "emoji": "🍚"
+    },
+    {
+      "id": "htc-响油鳝丝-1",
+      "name": "响油鳝丝",
+      "kind": "main",
+      "category": "aquatic",
+      "emoji": "🐟"
+    },
+    {
+      "id": "htc-商芝肉-105",
+      "name": "商芝肉",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🍖"
+    },
+    {
+      "id": "htc-啤酒鸭-106",
+      "name": "啤酒鸭",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🍗"
+    },
+    {
+      "id": "htc-回锅肉-107",
+      "name": "回锅肉",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🍖"
+    },
+    {
+      "id": "htc-土豆炖排骨-108",
+      "name": "土豆炖排骨",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🍖"
+    },
+    {
+      "id": "htc-地三鲜-294",
+      "name": "地三鲜",
+      "kind": "main",
+      "category": "vegetable_dish",
+      "emoji": "🥬"
+    },
+    {
+      "id": "htc-基础牛奶面包-232",
+      "name": "基础牛奶面包",
+      "kind": "main",
+      "category": "staple",
+      "emoji": "🍜"
+    },
+    {
+      "id": "htc-太阳蛋-29",
+      "name": "太阳蛋",
+      "kind": "main",
+      "category": "breakfast",
+      "emoji": "🥢"
+    },
+    {
+      "id": "htc-奇异果菠菜特调-78",
+      "name": "奇异果菠菜特调",
+      "kind": "drink",
+      "category": "drink",
+      "emoji": "🥤"
+    },
+    {
+      "id": "htc-奥利奥冰淇淋-55",
+      "name": "奥利奥冰淇淋",
+      "kind": "main",
+      "category": "dessert",
+      "emoji": "🍰"
+    },
+    {
+      "id": "htc-奶油蘑菇汤-203",
+      "name": "奶油蘑菇汤",
+      "kind": "main",
+      "category": "soup",
+      "emoji": "🍲"
+    },
+    {
+      "id": "htc-奶茶-79",
+      "name": "奶茶",
+      "kind": "drink",
+      "category": "drink",
+      "emoji": "🧋"
+    },
+    {
+      "id": "htc-奶酪培根通心粉-109",
+      "name": "奶酪培根通心粉",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🍜"
+    },
+    {
+      "id": "htc-姜炒鸡-110",
+      "name": "姜炒鸡",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🍗"
+    },
+    {
+      "id": "htc-姜葱捞鸡-111",
+      "name": "姜葱捞鸡",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🍗"
+    },
+    {
+      "id": "htc-孜然牛肉-112",
+      "name": "孜然牛肉",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🍖"
+    },
+    {
+      "id": "htc-完美水煮蛋-30",
+      "name": "完美水煮蛋",
+      "kind": "main",
+      "category": "breakfast",
+      "emoji": "🥢"
+    },
+    {
+      "id": "htc-宫保鸡丁-113",
+      "name": "宫保鸡丁",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🍗"
+    },
+    {
+      "id": "htc-家常日本豆腐-295",
+      "name": "家常日本豆腐",
+      "kind": "main",
+      "category": "vegetable_dish",
+      "emoji": "🍢"
+    },
+    {
+      "id": "htc-小炒肉-114",
+      "name": "小炒肉",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🍖"
+    },
+    {
+      "id": "htc-小炒藕丁-296",
+      "name": "小炒藕丁",
+      "kind": "main",
+      "category": "vegetable_dish",
+      "emoji": "🥬"
+    },
+    {
+      "id": "htc-小炒鸡肝-115",
+      "name": "小炒鸡肝",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🍗"
+    },
+    {
+      "id": "htc-小炒黄牛肉-116",
+      "name": "小炒黄牛肉",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🍖"
+    },
+    {
+      "id": "htc-小米粥-204",
+      "name": "小米粥",
+      "kind": "main",
+      "category": "soup",
+      "emoji": "🥣"
+    },
+    {
+      "id": "htc-小米辣炒肉-117",
+      "name": "小米辣炒肉",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🍖"
+    },
+    {
+      "id": "htc-小酥肉-118",
+      "name": "小酥肉",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🍖"
+    },
+    {
+      "id": "htc-小龙虾-2",
+      "name": "小龙虾",
+      "kind": "main",
+      "category": "aquatic",
+      "emoji": "🦐"
+    },
+    {
+      "id": "htc-尖叫牛蛙-119",
+      "name": "尖叫牛蛙",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🍖"
+    },
+    {
+      "id": "htc-尖椒炒牛肉-120",
+      "name": "尖椒炒牛肉",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🍖"
+    },
+    {
+      "id": "htc-山西过油肉-121",
+      "name": "山西过油肉",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🍖"
+    },
+    {
+      "id": "htc-巴基斯坦牛肉咖喱-122",
+      "name": "巴基斯坦牛肉咖喱",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🍖"
+    },
+    {
+      "id": "htc-带把肘子-123",
+      "name": "带把肘子",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🍖"
+    },
+    {
+      "id": "htc-干煎阿根廷红虾-3",
+      "name": "干煎阿根廷红虾",
+      "kind": "main",
+      "category": "aquatic",
+      "emoji": "🦐"
+    },
+    {
+      "id": "htc-干煸仔鸡-124",
+      "name": "干煸仔鸡",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🍗"
+    },
+    {
+      "id": "htc-干锅花菜-297",
+      "name": "干锅花菜",
+      "kind": "main",
+      "category": "vegetable_dish",
+      "emoji": "🥬"
+    },
+    {
+      "id": "htc-乡村啤酒鸭-95",
+      "name": "乡村啤酒鸭",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🍗"
+    },
+    {
+      "id": "htc-广式萝卜牛腩-125",
+      "name": "广式萝卜牛腩",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🍖"
+    },
+    {
+      "id": "htc-微波炉蒸蛋-32",
+      "name": "微波炉蒸蛋",
+      "kind": "main",
+      "category": "breakfast",
+      "emoji": "🥢"
+    },
+    {
+      "id": "htc-微波炉腊肠煲仔饭-233",
+      "name": "微波炉腊肠煲仔饭",
+      "kind": "main",
+      "category": "staple",
+      "emoji": "🍚"
+    },
+    {
+      "id": "htc-微波炉荷包蛋-31",
+      "name": "微波炉荷包蛋",
+      "kind": "main",
+      "category": "breakfast",
+      "emoji": "🥟"
+    },
+    {
+      "id": "htc-微波炉蛋糕-33",
+      "name": "微波炉蛋糕",
+      "kind": "main",
+      "category": "breakfast",
+      "emoji": "🍰"
+    },
+    {
+      "id": "htc-微波炉鸡蛋羹-340",
+      "name": "微波炉鸡蛋羹",
+      "kind": "main",
+      "category": "vegetable_dish",
+      "emoji": "🥣"
+    },
+    {
+      "id": "htc-微波葱姜黑鳕鱼-4",
+      "name": "微波葱姜黑鳕鱼",
+      "kind": "main",
+      "category": "aquatic",
+      "emoji": "🦐"
+    },
+    {
+      "id": "htc-徽派红烧肉-126",
+      "name": "徽派红烧肉",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🍖"
+    },
+    {
+      "id": "htc-意式烤鸡-127",
+      "name": "意式烤鸡",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🍗"
+    },
+    {
+      "id": "htc-意式肉酱面-234",
+      "name": "意式肉酱面",
+      "kind": "main",
+      "category": "staple",
+      "emoji": "🍜"
+    },
+    {
+      "id": "htc-意式香肠北非蛋-34",
+      "name": "意式香肠北非蛋",
+      "kind": "main",
+      "category": "breakfast",
+      "emoji": "🍖"
+    },
+    {
+      "id": "htc-戚风蛋糕-56",
+      "name": "戚风蛋糕",
+      "kind": "main",
+      "category": "dessert",
+      "emoji": "🍰"
+    },
+    {
+      "id": "htc-手工水饺-235",
+      "name": "手工水饺",
+      "kind": "main",
+      "category": "staple",
+      "emoji": "🥟"
+    },
+    {
+      "id": "htc-手抓饼-35",
+      "name": "手抓饼",
+      "kind": "main",
+      "category": "breakfast",
+      "emoji": "🥢"
+    },
+    {
+      "id": "htc-手撕包菜-298",
+      "name": "手撕包菜",
+      "kind": "main",
+      "category": "vegetable_dish",
+      "emoji": "🥟"
+    },
+    {
+      "id": "htc-扬州炒饭-236",
+      "name": "扬州炒饭",
+      "kind": "main",
+      "category": "staple",
+      "emoji": "🍚"
+    },
+    {
+      "id": "htc-披萨饼皮-237",
+      "name": "披萨饼皮",
+      "kind": "main",
+      "category": "staple",
+      "emoji": "🍚"
+    },
+    {
+      "id": "htc-拔丝土豆-299",
+      "name": "拔丝土豆",
+      "kind": "main",
+      "category": "vegetable_dish",
+      "emoji": "🥔"
+    },
+    {
+      "id": "htc-排骨山药玉米汤-205",
+      "name": "排骨山药玉米汤",
+      "kind": "main",
+      "category": "soup",
+      "emoji": "🍖"
+    },
+    {
+      "id": "htc-排骨苦瓜汤-206",
+      "name": "排骨苦瓜汤",
+      "kind": "main",
+      "category": "soup",
+      "emoji": "🍖"
+    },
+    {
+      "id": "htc-提拉米苏-57",
+      "name": "提拉米苏",
+      "kind": "main",
+      "category": "dessert",
+      "emoji": "🍰"
+    },
+    {
+      "id": "htc-新疆大盘鸡-128",
+      "name": "新疆大盘鸡",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🍗"
+    },
+    {
+      "id": "htc-无厨师机蜂蜜面包-58",
+      "name": "无厨师机蜂蜜面包",
+      "kind": "main",
+      "category": "dessert",
+      "emoji": "🍜"
+    },
+    {
+      "id": "htc-无骨鸡爪-129",
+      "name": "无骨鸡爪",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🍗"
+    },
+    {
+      "id": "htc-日式咖喱饭-238",
+      "name": "日式咖喱饭",
+      "kind": "main",
+      "category": "staple",
+      "emoji": "🍚"
+    },
+    {
+      "id": "htc-日式肥牛丼饭-239",
+      "name": "日式肥牛丼饭",
+      "kind": "main",
+      "category": "staple",
+      "emoji": "🍚"
+    },
+    {
+      "id": "htc-昂刺鱼豆腐汤-207",
+      "name": "昂刺鱼豆腐汤",
+      "kind": "main",
+      "category": "soup",
+      "emoji": "🦐"
+    },
+    {
+      "id": "htc-朱雀汤-208",
+      "name": "朱雀汤",
+      "kind": "main",
+      "category": "soup",
+      "emoji": "🍲"
+    },
+    {
+      "id": "htc-杀猪菜-130",
+      "name": "杀猪菜",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🍖"
+    },
+    {
+      "id": "htc-杨枝甘露-80",
+      "name": "杨枝甘露",
+      "kind": "drink",
+      "category": "drink",
+      "emoji": "🥤"
+    },
+    {
+      "id": "htc-松仁玉米-300",
+      "name": "松仁玉米",
+      "kind": "main",
+      "category": "vegetable_dish",
+      "emoji": "🥬"
+    },
+    {
+      "id": "htc-枝竹羊腩煲-131",
+      "name": "枝竹羊腩煲",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🍖"
+    },
+    {
+      "id": "htc-柠檬水-81",
+      "name": "柠檬水",
+      "kind": "drink",
+      "category": "drink",
+      "emoji": "🧋"
+    },
+    {
+      "id": "htc-柱候牛腩-132",
+      "name": "柱候牛腩",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🍖"
+    },
+    {
+      "id": "htc-桂圆红枣粥-36",
+      "name": "桂圆红枣粥",
+      "kind": "main",
+      "category": "breakfast",
+      "emoji": "🥣"
+    },
+    {
+      "id": "htc-桂林十八酿-133",
+      "name": "桂林十八酿",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🍖"
+    },
+    {
+      "id": "htc-梅菜扣肉-134",
+      "name": "梅菜扣肉",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🍖"
+    },
+    {
+      "id": "htc-椒盐排条-135",
+      "name": "椒盐排条",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🍖"
+    },
+    {
+      "id": "htc-椒盐玉米-301",
+      "name": "椒盐玉米",
+      "kind": "main",
+      "category": "vegetable_dish",
+      "emoji": "🥬"
+    },
+    {
+      "id": "htc-榄菜肉末四季豆-302",
+      "name": "榄菜肉末四季豆",
+      "kind": "main",
+      "category": "vegetable_dish",
+      "emoji": "🍖"
+    },
+    {
+      "id": "htc-水油焖蔬菜-303",
+      "name": "水油焖蔬菜",
+      "kind": "main",
+      "category": "vegetable_dish",
+      "emoji": "🥗"
+    },
+    {
+      "id": "htc-水煮牛肉-136",
+      "name": "水煮牛肉",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🍖"
+    },
+    {
+      "id": "htc-水煮玉米-37",
+      "name": "水煮玉米",
+      "kind": "main",
+      "category": "breakfast",
+      "emoji": "🥢"
+    },
+    {
+      "id": "htc-水煮肉片-137",
+      "name": "水煮肉片",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🍖"
+    },
+    {
+      "id": "htc-水煮鱼-5",
+      "name": "水煮鱼",
+      "kind": "main",
+      "category": "aquatic",
+      "emoji": "🦐"
+    },
+    {
+      "id": "htc-汤面-240",
+      "name": "汤面",
+      "kind": "main",
+      "category": "staple",
+      "emoji": "🍜"
+    },
+    {
+      "id": "htc-河南蒸面条-241",
+      "name": "河南蒸面条",
+      "kind": "main",
+      "category": "staple",
+      "emoji": "🍜"
+    },
+    {
+      "id": "htc-油焖大虾-6",
+      "name": "油焖大虾",
+      "kind": "main",
+      "category": "aquatic",
+      "emoji": "🦐"
+    },
+    {
+      "id": "htc-油醋爆蛋-304",
+      "name": "油醋爆蛋",
+      "kind": "main",
+      "category": "vegetable_dish",
+      "emoji": "🥬"
+    },
+    {
+      "id": "htc-泰国手标红茶-82",
+      "name": "泰国手标红茶",
+      "kind": "drink",
+      "category": "drink",
+      "emoji": "🧋"
+    },
+    {
+      "id": "htc-洋葱炒猪肉-138",
+      "name": "洋葱炒猪肉",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🍖"
+    },
+    {
+      "id": "htc-洋葱炒鸡蛋-305",
+      "name": "洋葱炒鸡蛋",
+      "kind": "main",
+      "category": "vegetable_dish",
+      "emoji": "🍗"
+    },
+    {
+      "id": "htc-海边落日-83",
+      "name": "海边落日",
+      "kind": "drink",
+      "category": "drink",
+      "emoji": "🥤"
+    },
+    {
+      "id": "htc-淄博烧烤-139",
+      "name": "淄博烧烤",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🍖"
+    },
+    {
+      "id": "htc-清炒花菜-306",
+      "name": "清炒花菜",
+      "kind": "main",
+      "category": "vegetable_dish",
+      "emoji": "🥬"
+    },
+    {
+      "id": "htc-清蒸南瓜-307",
+      "name": "清蒸南瓜",
+      "kind": "main",
+      "category": "vegetable_dish",
+      "emoji": "🥬"
+    },
+    {
+      "id": "htc-清蒸生蚝-8",
+      "name": "清蒸生蚝",
+      "kind": "main",
+      "category": "aquatic",
+      "emoji": "🐟"
+    },
+    {
+      "id": "htc-清蒸鲈鱼-9",
+      "name": "清蒸鲈鱼",
+      "kind": "main",
+      "category": "aquatic",
+      "emoji": "🦐"
+    },
+    {
+      "id": "htc-清蒸鳜鱼-140",
+      "name": "清蒸鳜鱼",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🦐"
+    },
+    {
+      "id": "htc-温泉蛋-38",
+      "name": "温泉蛋",
+      "kind": "main",
+      "category": "breakfast",
+      "emoji": "🥢"
+    },
+    {
+      "id": "htc-湖南家常红烧肉-141",
+      "name": "湖南家常红烧肉",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🍖"
+    },
+    {
+      "id": "htc-湘祁米夫鸭-142",
+      "name": "湘祁米夫鸭",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🍗"
+    },
+    {
+      "id": "htc-溏心蛋-39",
+      "name": "溏心蛋",
+      "kind": "main",
+      "category": "breakfast",
+      "emoji": "🥢"
+    },
+    {
+      "id": "htc-澳门湿版免治牛肉饭-143",
+      "name": "澳门湿版免治牛肉饭",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🍚"
+    },
+    {
+      "id": "htc-火腿饭团-242",
+      "name": "火腿饭团",
+      "kind": "main",
+      "category": "staple",
+      "emoji": "🍚"
+    },
+    {
+      "id": "htc-炒凉粉-243",
+      "name": "炒凉粉",
+      "kind": "main",
+      "category": "staple",
+      "emoji": "🍜"
+    },
+    {
+      "id": "htc-炒年糕-244",
+      "name": "炒年糕",
+      "kind": "main",
+      "category": "staple",
+      "emoji": "🍚"
+    },
+    {
+      "id": "htc-炒意大利面-245",
+      "name": "炒意大利面",
+      "kind": "main",
+      "category": "staple",
+      "emoji": "🍜"
+    },
+    {
+      "id": "htc-炒方便面-246",
+      "name": "炒方便面",
+      "kind": "main",
+      "category": "staple",
+      "emoji": "🍜"
+    },
+    {
+      "id": "htc-炒河粉-247",
+      "name": "炒河粉",
+      "kind": "main",
+      "category": "staple",
+      "emoji": "🍜"
+    },
+    {
+      "id": "htc-炒滑蛋-308",
+      "name": "炒滑蛋",
+      "kind": "main",
+      "category": "vegetable_dish",
+      "emoji": "🥬"
+    },
+    {
+      "id": "htc-炒茄子-309",
+      "name": "炒茄子",
+      "kind": "main",
+      "category": "vegetable_dish",
+      "emoji": "🥬"
+    },
+    {
+      "id": "htc-炒青菜-310",
+      "name": "炒青菜",
+      "kind": "main",
+      "category": "vegetable_dish",
+      "emoji": "🥗"
+    },
+    {
+      "id": "htc-炒馍-248",
+      "name": "炒馍",
+      "kind": "main",
+      "category": "staple",
+      "emoji": "🍚"
+    },
+    {
+      "id": "htc-炸酱面-249",
+      "name": "炸酱面",
+      "kind": "main",
+      "category": "staple",
+      "emoji": "🍜"
+    },
+    {
+      "id": "htc-炸鲜奶-59",
+      "name": "炸鲜奶",
+      "kind": "main",
+      "category": "dessert",
+      "emoji": "🍰"
+    },
+    {
+      "id": "htc-烙饼-250",
+      "name": "烙饼",
+      "kind": "main",
+      "category": "staple",
+      "emoji": "🍚"
+    },
+    {
+      "id": "htc-烤箱版巴斯克芝士蛋糕-60",
+      "name": "烤箱版巴斯克芝士蛋糕",
+      "kind": "main",
+      "category": "dessert",
+      "emoji": "🍰"
+    },
+    {
+      "id": "htc-烤茄子-311",
+      "name": "烤茄子",
+      "kind": "main",
+      "category": "vegetable_dish",
+      "emoji": "🥬"
+    },
+    {
+      "id": "htc-烤蛋挞-61",
+      "name": "烤蛋挞",
+      "kind": "main",
+      "category": "dessert",
+      "emoji": "🍰"
+    },
+    {
+      "id": "htc-烤鱼-7",
+      "name": "烤鱼",
+      "kind": "main",
+      "category": "aquatic",
+      "emoji": "🦐"
+    },
+    {
+      "id": "htc-烤鸡翅-144",
+      "name": "烤鸡翅",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🍗"
+    },
+    {
+      "id": "htc-热干面-252",
+      "name": "热干面",
+      "kind": "main",
+      "category": "staple",
+      "emoji": "🍜"
+    },
+    {
+      "id": "htc-煮泡面加蛋-254",
+      "name": "煮泡面加蛋",
+      "kind": "main",
+      "category": "staple",
+      "emoji": "🍜"
+    },
+    {
+      "id": "htc-煮锅蒸米饭-258",
+      "name": "煮锅蒸米饭",
+      "kind": "main",
+      "category": "staple",
+      "emoji": "🍚"
+    },
+    {
+      "id": "htc-煎烤羊排-145",
+      "name": "煎烤羊排",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🍖"
+    },
+    {
+      "id": "htc-煎饺-40",
+      "name": "煎饺",
+      "kind": "main",
+      "category": "breakfast",
+      "emoji": "🥟"
+    },
+    {
+      "id": "htc-照烧鸡腿饭-253",
+      "name": "照烧鸡腿饭",
+      "kind": "main",
+      "category": "staple",
+      "emoji": "🍚"
+    },
+    {
+      "id": "htc-蒸卤面-266",
+      "name": "蒸卤面",
+      "kind": "main",
+      "category": "staple",
+      "emoji": "🍜"
+    },
+    {
+      "id": "htc-蒸水蛋-47",
+      "name": "蒸水蛋",
+      "kind": "main",
+      "category": "breakfast",
+      "emoji": "🥢"
+    },
+    {
+      "id": "htc-蒸箱鸡蛋羹-341",
+      "name": "蒸箱鸡蛋羹",
+      "kind": "main",
+      "category": "vegetable_dish",
+      "emoji": "🥣"
+    },
+    {
+      "id": "htc-蒸花卷-48",
+      "name": "蒸花卷",
+      "kind": "main",
+      "category": "breakfast",
+      "emoji": "🥟"
+    },
+    {
+      "id": "htc-燕麦鸡蛋饼-41",
+      "name": "燕麦鸡蛋饼",
+      "kind": "main",
+      "category": "breakfast",
+      "emoji": "🍗"
+    },
+    {
+      "id": "htc-牛奶燕麦-42",
+      "name": "牛奶燕麦",
+      "kind": "main",
+      "category": "breakfast",
+      "emoji": "🍖"
+    },
+    {
+      "id": "htc-牛排-146",
+      "name": "牛排",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🍖"
+    },
+    {
+      "id": "htc-牛油果拉西-84",
+      "name": "牛油果拉西",
+      "kind": "drink",
+      "category": "drink",
+      "emoji": "🥛"
+    },
+    {
+      "id": "htc-猪油拌饭-255",
+      "name": "猪油拌饭",
+      "kind": "main",
+      "category": "staple",
+      "emoji": "🍚"
+    },
+    {
+      "id": "htc-猪皮冻-147",
+      "name": "猪皮冻",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🍖"
+    },
+    {
+      "id": "htc-猪肉烩酸菜-148",
+      "name": "猪肉烩酸菜",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🍖"
+    },
+    {
+      "id": "htc-玉米排骨汤-209",
+      "name": "玉米排骨汤",
+      "kind": "main",
+      "category": "soup",
+      "emoji": "🍖"
+    },
+    {
+      "id": "htc-玛格丽特饼干-62",
+      "name": "玛格丽特饼干",
+      "kind": "main",
+      "category": "dessert",
+      "emoji": "🍰"
+    },
+    {
+      "id": "htc-甜辣烤全翅-149",
+      "name": "甜辣烤全翅",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🍖"
+    },
+    {
+      "id": "htc-生汆丸子汤-210",
+      "name": "生汆丸子汤",
+      "kind": "main",
+      "category": "soup",
+      "emoji": "🍲"
+    },
+    {
+      "id": "htc-田螺酿-150",
+      "name": "田螺酿",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🍖"
+    },
+    {
+      "id": "htc-电饭煲三文鱼炊饭-256",
+      "name": "电饭煲三文鱼炊饭",
+      "kind": "main",
+      "category": "staple",
+      "emoji": "🍚"
+    },
+    {
+      "id": "htc-电饭煲蒸米饭-259",
+      "name": "电饭煲蒸米饭",
+      "kind": "main",
+      "category": "staple",
+      "emoji": "🍚"
+    },
+    {
+      "id": "htc-番茄牛肉蛋花汤-211",
+      "name": "番茄牛肉蛋花汤",
+      "kind": "main",
+      "category": "soup",
+      "emoji": "🍖"
+    },
+    {
+      "id": "htc-番茄红酱-151",
+      "name": "番茄红酱",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🍖"
+    },
+    {
+      "id": "htc-瘦肉土豆片-152",
+      "name": "瘦肉土豆片",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🍖"
+    },
+    {
+      "id": "htc-白灼菜心-312",
+      "name": "白灼菜心",
+      "kind": "main",
+      "category": "vegetable_dish",
+      "emoji": "🥬"
+    },
+    {
+      "id": "htc-白灼虾-10",
+      "name": "白灼虾",
+      "kind": "main",
+      "category": "aquatic",
+      "emoji": "🦐"
+    },
+    {
+      "id": "htc-白菜猪肉炖粉条-153",
+      "name": "白菜猪肉炖粉条",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🍜"
+    },
+    {
+      "id": "htc-百香果橙子特调-85",
+      "name": "百香果橙子特调",
+      "kind": "drink",
+      "category": "drink",
+      "emoji": "🥤"
+    },
+    {
+      "id": "htc-皮蛋瘦肉粥-212",
+      "name": "皮蛋瘦肉粥",
+      "kind": "main",
+      "category": "soup",
+      "emoji": "🥣"
+    },
+    {
+      "id": "htc-皮蛋豆腐-313",
+      "name": "皮蛋豆腐",
+      "kind": "main",
+      "category": "vegetable_dish",
+      "emoji": "🍢"
+    },
+    {
+      "id": "htc-砂糖椰子冰沙-86",
+      "name": "砂糖椰子冰沙",
+      "kind": "drink",
+      "category": "drink",
+      "emoji": "🥤"
+    },
+    {
+      "id": "htc-空气炸锅照烧鸡饭-257",
+      "name": "空气炸锅照烧鸡饭",
+      "kind": "main",
+      "category": "staple",
+      "emoji": "🍚"
+    },
+    {
+      "id": "htc-空气炸锅脆皮现腌炸鸡-154",
+      "name": "空气炸锅脆皮现腌炸鸡",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🍗"
+    },
+    {
+      "id": "htc-空气炸锅面包片-43",
+      "name": "空气炸锅面包片",
+      "kind": "main",
+      "category": "breakfast",
+      "emoji": "🍜"
+    },
+    {
+      "id": "htc-简易红烧肉-160",
+      "name": "简易红烧肉",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🍖"
+    },
+    {
+      "id": "htc-米粥-213",
+      "name": "米粥",
+      "kind": "main",
+      "category": "soup",
+      "emoji": "🥣"
+    },
+    {
+      "id": "htc-粉蒸肉-155",
+      "name": "粉蒸肉",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🍜"
+    },
+    {
+      "id": "htc-糖拌西红柿-314",
+      "name": "糖拌西红柿",
+      "kind": "main",
+      "category": "vegetable_dish",
+      "emoji": "🥬"
+    },
+    {
+      "id": "htc-糖醋排骨-156",
+      "name": "糖醋排骨",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🍖"
+    },
+    {
+      "id": "htc-糖醋里脊-157",
+      "name": "糖醋里脊",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🍖"
+    },
+    {
+      "id": "htc-糖醋鲤鱼-11",
+      "name": "糖醋鲤鱼",
+      "kind": "main",
+      "category": "aquatic",
+      "emoji": "🦐"
+    },
+    {
+      "id": "htc-红柚蛋糕-63",
+      "name": "红柚蛋糕",
+      "kind": "main",
+      "category": "dessert",
+      "emoji": "🍰"
+    },
+    {
+      "id": "htc-红烧冬瓜-316",
+      "name": "红烧冬瓜",
+      "kind": "main",
+      "category": "vegetable_dish",
+      "emoji": "🥬"
+    },
+    {
+      "id": "htc-红烧猪蹄-158",
+      "name": "红烧猪蹄",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🍖"
+    },
+    {
+      "id": "htc-红烧茄子-317",
+      "name": "红烧茄子",
+      "kind": "main",
+      "category": "vegetable_dish",
+      "emoji": "🥬"
+    },
+    {
+      "id": "htc-红烧鱼-12",
+      "name": "红烧鱼",
+      "kind": "main",
+      "category": "aquatic",
+      "emoji": "🦐"
+    },
+    {
+      "id": "htc-红烧鱼头-13",
+      "name": "红烧鱼头",
+      "kind": "main",
+      "category": "aquatic",
+      "emoji": "🦐"
+    },
+    {
+      "id": "htc-红烧鲤鱼-14",
+      "name": "红烧鲤鱼",
+      "kind": "main",
+      "category": "aquatic",
+      "emoji": "🦐"
+    },
+    {
+      "id": "htc-红烧鸡翅-161",
+      "name": "红烧鸡翅",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🍗"
+    },
+    {
+      "id": "htc-红芸豆拌饭-260",
+      "name": "红芸豆拌饭",
+      "kind": "main",
+      "category": "staple",
+      "emoji": "🍚"
+    },
+    {
+      "id": "htc-素炒豆角-315",
+      "name": "素炒豆角",
+      "kind": "main",
+      "category": "vegetable_dish",
+      "emoji": "🥬"
+    },
+    {
+      "id": "htc-紫菜蛋花汤-214",
+      "name": "紫菜蛋花汤",
+      "kind": "main",
+      "category": "soup",
+      "emoji": "🍲"
+    },
+    {
+      "id": "htc-罗宋汤-215",
+      "name": "罗宋汤",
+      "kind": "main",
+      "category": "soup",
+      "emoji": "🍲"
+    },
+    {
+      "id": "htc-羊排焖面-162",
+      "name": "羊排焖面",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🍜"
+    },
+    {
+      "id": "htc-羊肉汤-216",
+      "name": "羊肉汤",
+      "kind": "main",
+      "category": "soup",
+      "emoji": "🍖"
+    },
+    {
+      "id": "htc-美式炒蛋-44",
+      "name": "美式炒蛋",
+      "kind": "main",
+      "category": "breakfast",
+      "emoji": "☕"
+    },
+    {
+      "id": "htc-老友猪肉粉-261",
+      "name": "老友猪肉粉",
+      "kind": "main",
+      "category": "staple",
+      "emoji": "🍜"
+    },
+    {
+      "id": "htc-老妈蹄花-163",
+      "name": "老妈蹄花",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🍖"
+    },
+    {
+      "id": "htc-老干妈拌面-262",
+      "name": "老干妈拌面",
+      "kind": "main",
+      "category": "staple",
+      "emoji": "🍜"
+    },
+    {
+      "id": "htc-老式锅包肉-164",
+      "name": "老式锅包肉",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🥟"
+    },
+    {
+      "id": "htc-耙耙柑茶-87",
+      "name": "耙耙柑茶",
+      "kind": "drink",
+      "category": "drink",
+      "emoji": "🧋"
+    },
+    {
+      "id": "htc-肉蛋盖饭-263",
+      "name": "肉蛋盖饭",
+      "kind": "main",
+      "category": "staple",
+      "emoji": "🍚"
+    },
+    {
+      "id": "htc-肉蟹煲-15",
+      "name": "肉蟹煲",
+      "kind": "main",
+      "category": "aquatic",
+      "emoji": "🦐"
+    },
+    {
+      "id": "htc-肉饼炖蛋-165",
+      "name": "肉饼炖蛋",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🍖"
+    },
+    {
+      "id": "htc-胡萝卜甜糕-64",
+      "name": "胡萝卜甜糕",
+      "kind": "main",
+      "category": "dessert",
+      "emoji": "🍰"
+    },
+    {
+      "id": "htc-脆皮豆腐-318",
+      "name": "脆皮豆腐",
+      "kind": "main",
+      "category": "vegetable_dish",
+      "emoji": "🍢"
+    },
+    {
+      "id": "htc-腊八粥-217",
+      "name": "腊八粥",
+      "kind": "main",
+      "category": "soup",
+      "emoji": "🥣"
+    },
+    {
+      "id": "htc-腐乳肉-166",
+      "name": "腐乳肉",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🍖"
+    },
+    {
+      "id": "htc-芋泥雪媚娘-65",
+      "name": "芋泥雪媚娘",
+      "kind": "main",
+      "category": "dessert",
+      "emoji": "🍰"
+    },
+    {
+      "id": "htc-芝麻烧饼-251",
+      "name": "芝麻烧饼",
+      "kind": "main",
+      "category": "staple",
+      "emoji": "🍚"
+    },
+    {
+      "id": "htc-芥末罗氏虾-167",
+      "name": "芥末罗氏虾",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🦐"
+    },
+    {
+      "id": "htc-芥末黄油罗氏虾-16",
+      "name": "芥末黄油罗氏虾",
+      "kind": "main",
+      "category": "aquatic",
+      "emoji": "🦐"
+    },
+    {
+      "id": "htc-芹菜拌茶树菇-319",
+      "name": "芹菜拌茶树菇",
+      "kind": "main",
+      "category": "vegetable_dish",
+      "emoji": "🧋"
+    },
+    {
+      "id": "htc-苏格兰蛋-45",
+      "name": "苏格兰蛋",
+      "kind": "main",
+      "category": "breakfast",
+      "emoji": "🥢"
+    },
+    {
+      "id": "htc-英式司康-66",
+      "name": "英式司康",
+      "kind": "main",
+      "category": "dessert",
+      "emoji": "🍰"
+    },
+    {
+      "id": "htc-茄子炖土豆-320",
+      "name": "茄子炖土豆",
+      "kind": "main",
+      "category": "vegetable_dish",
+      "emoji": "🥔"
+    },
+    {
+      "id": "htc-茄子肉煎饼-264",
+      "name": "茄子肉煎饼",
+      "kind": "main",
+      "category": "staple",
+      "emoji": "🍖"
+    },
+    {
+      "id": "htc-茭白炒肉-168",
+      "name": "茭白炒肉",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🍖"
+    },
+    {
+      "id": "htc-茶叶蛋-46",
+      "name": "茶叶蛋",
+      "kind": "main",
+      "category": "breakfast",
+      "emoji": "🧋"
+    },
+    {
+      "id": "htc-草莓冰淇淋-67",
+      "name": "草莓冰淇淋",
+      "kind": "main",
+      "category": "dessert",
+      "emoji": "🍰"
+    },
+    {
+      "id": "htc-荔枝肉-169",
+      "name": "荔枝肉",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🍖"
+    },
+    {
+      "id": "htc-荷兰豆炒腊肠-170",
+      "name": "荷兰豆炒腊肠",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🍖"
+    },
+    {
+      "id": "htc-莴笋叶煎饼-321",
+      "name": "莴笋叶煎饼",
+      "kind": "main",
+      "category": "vegetable_dish",
+      "emoji": "🥬"
+    },
+    {
+      "id": "htc-菌菇炖乳鸽-218",
+      "name": "菌菇炖乳鸽",
+      "kind": "main",
+      "category": "soup",
+      "emoji": "🍄"
+    },
+    {
+      "id": "htc-菠菜炒鸡蛋-322",
+      "name": "菠菜炒鸡蛋",
+      "kind": "main",
+      "category": "vegetable_dish",
+      "emoji": "🍗"
+    },
+    {
+      "id": "htc-菠萝咖啡特调-88",
+      "name": "菠萝咖啡特调",
+      "kind": "drink",
+      "category": "drink",
+      "emoji": "☕"
+    },
+    {
+      "id": "htc-萝卜炖羊排-171",
+      "name": "萝卜炖羊排",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🍖"
+    },
+    {
+      "id": "htc-葱油拌面-265",
+      "name": "葱油拌面",
+      "kind": "main",
+      "category": "staple",
+      "emoji": "🍜"
+    },
+    {
+      "id": "htc-葱油桂鱼-17",
+      "name": "葱油桂鱼",
+      "kind": "main",
+      "category": "aquatic",
+      "emoji": "🦐"
+    },
+    {
+      "id": "htc-葱烧海参-18",
+      "name": "葱烧海参",
+      "kind": "main",
+      "category": "aquatic",
+      "emoji": "🐟"
+    },
+    {
+      "id": "htc-葱煎豆腐-323",
+      "name": "葱煎豆腐",
+      "kind": "main",
+      "category": "vegetable_dish",
+      "emoji": "🍢"
+    },
+    {
+      "id": "htc-蒜苔炒肉末-172",
+      "name": "蒜苔炒肉末",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🍖"
+    },
+    {
+      "id": "htc-蒜蓉空心菜-324",
+      "name": "蒜蓉空心菜",
+      "kind": "main",
+      "category": "vegetable_dish",
+      "emoji": "🥬"
+    },
+    {
+      "id": "htc-蒜蓉虾-19",
+      "name": "蒜蓉虾",
+      "kind": "main",
+      "category": "aquatic",
+      "emoji": "🦐"
+    },
+    {
+      "id": "htc-蒜蓉西兰花-325",
+      "name": "蒜蓉西兰花",
+      "kind": "main",
+      "category": "vegetable_dish",
+      "emoji": "🥗"
+    },
+    {
+      "id": "htc-蒜香黄油虾-20",
+      "name": "蒜香黄油虾",
+      "kind": "main",
+      "category": "aquatic",
+      "emoji": "🦐"
+    },
+    {
+      "id": "htc-蒲烧茄子-326",
+      "name": "蒲烧茄子",
+      "kind": "main",
+      "category": "vegetable_dish",
+      "emoji": "🥬"
+    },
+    {
+      "id": "htc-虎皮肘子-173",
+      "name": "虎皮肘子",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🍖"
+    },
+    {
+      "id": "htc-虎皮青椒-327",
+      "name": "虎皮青椒",
+      "kind": "main",
+      "category": "vegetable_dish",
+      "emoji": "🥬"
+    },
+    {
+      "id": "htc-蚂蚁上树-174",
+      "name": "蚂蚁上树",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🍖"
+    },
+    {
+      "id": "htc-蚝油三鲜菇-328",
+      "name": "蚝油三鲜菇",
+      "kind": "main",
+      "category": "vegetable_dish",
+      "emoji": "🥬"
+    },
+    {
+      "id": "htc-蚝油生菜-329",
+      "name": "蚝油生菜",
+      "kind": "main",
+      "category": "vegetable_dish",
+      "emoji": "🥗"
+    },
+    {
+      "id": "htc-蛋包饭-267",
+      "name": "蛋包饭",
+      "kind": "main",
+      "category": "staple",
+      "emoji": "🥟"
+    },
+    {
+      "id": "htc-蛋炒饭-268",
+      "name": "蛋炒饭",
+      "kind": "main",
+      "category": "staple",
+      "emoji": "🍚"
+    },
+    {
+      "id": "htc-蛋煎糍粑-49",
+      "name": "蛋煎糍粑",
+      "kind": "main",
+      "category": "breakfast",
+      "emoji": "🥢"
+    },
+    {
+      "id": "htc-蛏抱蛋-21",
+      "name": "蛏抱蛋",
+      "kind": "main",
+      "category": "aquatic",
+      "emoji": "🐟"
+    },
+    {
+      "id": "htc-螺蛳粉-269",
+      "name": "螺蛳粉",
+      "kind": "main",
+      "category": "staple",
+      "emoji": "🍜"
+    },
+    {
+      "id": "htc-血浆鸭-175",
+      "name": "血浆鸭",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🍗"
+    },
+    {
+      "id": "htc-西红柿土豆炖牛肉-176",
+      "name": "西红柿土豆炖牛肉",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🍖"
+    },
+    {
+      "id": "htc-西红柿炒鸡蛋-330",
+      "name": "西红柿炒鸡蛋",
+      "kind": "main",
+      "category": "vegetable_dish",
+      "emoji": "🍗"
+    },
+    {
+      "id": "htc-西红柿牛腩-177",
+      "name": "西红柿牛腩",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🍖"
+    },
+    {
+      "id": "htc-西红柿豆腐汤羹-331",
+      "name": "西红柿豆腐汤羹",
+      "kind": "main",
+      "category": "vegetable_dish",
+      "emoji": "🥣"
+    },
+    {
+      "id": "htc-西红柿鸡蛋挂面-270",
+      "name": "西红柿鸡蛋挂面",
+      "kind": "main",
+      "category": "staple",
+      "emoji": "🍜"
+    },
+    {
+      "id": "htc-西红柿鸡蛋汤-219",
+      "name": "西红柿鸡蛋汤",
+      "kind": "main",
+      "category": "soup",
+      "emoji": "🍗"
+    },
+    {
+      "id": "htc-西葫芦炒鸡蛋-332",
+      "name": "西葫芦炒鸡蛋",
+      "kind": "main",
+      "category": "vegetable_dish",
+      "emoji": "🍗"
+    },
+    {
+      "id": "htc-话梅煮毛豆-333",
+      "name": "话梅煮毛豆",
+      "kind": "main",
+      "category": "vegetable_dish",
+      "emoji": "🥬"
+    },
+    {
+      "id": "htc-豆角焖面-271",
+      "name": "豆角焖面",
+      "kind": "main",
+      "category": "staple",
+      "emoji": "🍜"
+    },
+    {
+      "id": "htc-豆豉鲮鱼油麦菜-178",
+      "name": "豆豉鲮鱼油麦菜",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🦐"
+    },
+    {
+      "id": "htc-豉汁排骨-179",
+      "name": "豉汁排骨",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🍖"
+    },
+    {
+      "id": "htc-豉汁蒸白鱔-180",
+      "name": "豉汁蒸白鱔",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🧃"
+    },
+    {
+      "id": "htc-贵州辣子鸡-181",
+      "name": "贵州辣子鸡",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🍗"
+    },
+    {
+      "id": "htc-辣椒炒肉-182",
+      "name": "辣椒炒肉",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🍖"
+    },
+    {
+      "id": "htc-酒酿醪糟-89",
+      "name": "酒酿醪糟",
+      "kind": "drink",
+      "category": "drink",
+      "emoji": "🥤"
+    },
+    {
+      "id": "htc-酱拌荞麦面-272",
+      "name": "酱拌荞麦面",
+      "kind": "main",
+      "category": "staple",
+      "emoji": "🍜"
+    },
+    {
+      "id": "htc-酱排骨-183",
+      "name": "酱排骨",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🍖"
+    },
+    {
+      "id": "htc-酱炖蟹-22",
+      "name": "酱炖蟹",
+      "kind": "main",
+      "category": "aquatic",
+      "emoji": "🦐"
+    },
+    {
+      "id": "htc-酱牛肉-184",
+      "name": "酱牛肉",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🍖"
+    },
+    {
+      "id": "htc-酸奶意式奶冻-68",
+      "name": "酸奶意式奶冻",
+      "kind": "main",
+      "category": "dessert",
+      "emoji": "🥛"
+    },
+    {
+      "id": "htc-酸梅汤-90",
+      "name": "酸梅汤",
+      "kind": "drink",
+      "category": "drink",
+      "emoji": "🥤"
+    },
+    {
+      "id": "htc-酸梅汤半成品加工-91",
+      "name": "酸梅汤（半成品加工）",
+      "kind": "drink",
+      "category": "drink",
+      "emoji": "🥤"
+    },
+    {
+      "id": "htc-酸辣土豆丝-334",
+      "name": "酸辣土豆丝",
+      "kind": "main",
+      "category": "vegetable_dish",
+      "emoji": "🥔"
+    },
+    {
+      "id": "htc-酸辣蕨根粉-273",
+      "name": "酸辣蕨根粉",
+      "kind": "main",
+      "category": "staple",
+      "emoji": "🍜"
+    },
+    {
+      "id": "htc-醉排骨-185",
+      "name": "醉排骨",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🍖"
+    },
+    {
+      "id": "htc-醪糟小汤圆-274",
+      "name": "醪糟小汤圆",
+      "kind": "main",
+      "category": "staple",
+      "emoji": "🍲"
+    },
+    {
+      "id": "htc-金枪鱼酱三明治-50",
+      "name": "金枪鱼酱三明治",
+      "kind": "main",
+      "category": "breakfast",
+      "emoji": "🦐"
+    },
+    {
+      "id": "htc-金汤力-92",
+      "name": "金汤力",
+      "kind": "drink",
+      "category": "drink",
+      "emoji": "🥤"
+    },
+    {
+      "id": "htc-金菲士-93",
+      "name": "金菲士",
+      "kind": "drink",
+      "category": "drink",
+      "emoji": "🥤"
+    },
+    {
+      "id": "htc-金针菇日本豆腐煲-335",
+      "name": "金针菇日本豆腐煲",
+      "kind": "main",
+      "category": "vegetable_dish",
+      "emoji": "🍲"
+    },
+    {
+      "id": "htc-金针菇汤-220",
+      "name": "金针菇汤",
+      "kind": "main",
+      "category": "soup",
+      "emoji": "🍲"
+    },
+    {
+      "id": "htc-金钱蛋-336",
+      "name": "金钱蛋",
+      "kind": "main",
+      "category": "vegetable_dish",
+      "emoji": "🥬"
+    },
+    {
+      "id": "htc-银耳莲子粥-221",
+      "name": "银耳莲子粥",
+      "kind": "main",
+      "category": "soup",
+      "emoji": "🥣"
+    },
+    {
+      "id": "htc-长岛冰茶-94",
+      "name": "长岛冰茶",
+      "kind": "drink",
+      "category": "drink",
+      "emoji": "🧋"
+    },
+    {
+      "id": "htc-阳朔啤酒鱼-23",
+      "name": "阳朔啤酒鱼",
+      "kind": "main",
+      "category": "aquatic",
+      "emoji": "🦐"
+    },
+    {
+      "id": "htc-陈皮排骨汤-222",
+      "name": "陈皮排骨汤",
+      "kind": "main",
+      "category": "soup",
+      "emoji": "🍖"
+    },
+    {
+      "id": "htc-陈皮排骨汤-223",
+      "name": "陈皮排骨汤",
+      "kind": "main",
+      "category": "soup",
+      "emoji": "🍖"
+    },
+    {
+      "id": "htc-陕北熬豆角-337",
+      "name": "陕北熬豆角",
+      "kind": "main",
+      "category": "vegetable_dish",
+      "emoji": "🥬"
+    },
+    {
+      "id": "htc-陕西油泼面-275",
+      "name": "陕西油泼面",
+      "kind": "main",
+      "category": "staple",
+      "emoji": "🍜"
+    },
+    {
+      "id": "htc-雪花酥-69",
+      "name": "雪花酥",
+      "kind": "main",
+      "category": "dessert",
+      "emoji": "🍰"
+    },
+    {
+      "id": "htc-雷椒皮蛋-338",
+      "name": "雷椒皮蛋",
+      "kind": "main",
+      "category": "vegetable_dish",
+      "emoji": "🥬"
+    },
+    {
+      "id": "htc-青椒土豆炒肉-186",
+      "name": "青椒土豆炒肉",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🍖"
+    },
+    {
+      "id": "htc-青椒酿-187",
+      "name": "青椒酿",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🍖"
+    },
+    {
+      "id": "htc-韩国麻药鸡蛋-51",
+      "name": "韩国麻药鸡蛋",
+      "kind": "main",
+      "category": "breakfast",
+      "emoji": "🍗"
+    },
+    {
+      "id": "htc-韩式拌饭-276",
+      "name": "韩式拌饭",
+      "kind": "main",
+      "category": "staple",
+      "emoji": "🍚"
+    },
+    {
+      "id": "htc-韭菜盒子-277",
+      "name": "韭菜盒子",
+      "kind": "main",
+      "category": "staple",
+      "emoji": "🍚"
+    },
+    {
+      "id": "htc-香干肉丝-188",
+      "name": "香干肉丝",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🍖"
+    },
+    {
+      "id": "htc-香干芹菜炒肉-189",
+      "name": "香干芹菜炒肉",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🍖"
+    },
+    {
+      "id": "htc-香煎五花肉-190",
+      "name": "香煎五花肉",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🍖"
+    },
+    {
+      "id": "htc-香煎翘嘴鱼-24",
+      "name": "香煎翘嘴鱼",
+      "kind": "main",
+      "category": "aquatic",
+      "emoji": "🦐"
+    },
+    {
+      "id": "htc-香菇滑鸡-191",
+      "name": "香菇滑鸡",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🍗"
+    },
+    {
+      "id": "htc-香辣鸡爪煲-192",
+      "name": "香辣鸡爪煲",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🍗"
+    },
+    {
+      "id": "htc-魔芋蛋糕-70",
+      "name": "魔芋蛋糕",
+      "kind": "main",
+      "category": "dessert",
+      "emoji": "🍰"
+    },
+    {
+      "id": "htc-鱼香肉丝-193",
+      "name": "鱼香肉丝",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🦐"
+    },
+    {
+      "id": "htc-鱼香茄子-194",
+      "name": "鱼香茄子",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🦐"
+    },
+    {
+      "id": "htc-鲜肉烧卖-278",
+      "name": "鲜肉烧卖",
+      "kind": "main",
+      "category": "staple",
+      "emoji": "🍖"
+    },
+    {
+      "id": "htc-鲣鱼海苔玉米饭-279",
+      "name": "鲣鱼海苔玉米饭",
+      "kind": "main",
+      "category": "staple",
+      "emoji": "🍚"
+    },
+    {
+      "id": "htc-鲤鱼炖白菜-25",
+      "name": "鲤鱼炖白菜",
+      "kind": "main",
+      "category": "aquatic",
+      "emoji": "🦐"
+    },
+    {
+      "id": "htc-鳊鱼炖豆腐-26",
+      "name": "鳊鱼炖豆腐",
+      "kind": "main",
+      "category": "aquatic",
+      "emoji": "🦐"
+    },
+    {
+      "id": "htc-鸡蛋三明治-52",
+      "name": "鸡蛋三明治",
+      "kind": "main",
+      "category": "breakfast",
+      "emoji": "🍗"
+    },
+    {
+      "id": "htc-鸡蛋火腿炒黄瓜-339",
+      "name": "鸡蛋火腿炒黄瓜",
+      "kind": "main",
+      "category": "vegetable_dish",
+      "emoji": "🍗"
+    },
+    {
+      "id": "htc-鸡蛋羹-342",
+      "name": "鸡蛋羹",
+      "kind": "main",
+      "category": "vegetable_dish",
+      "emoji": "🥣"
+    },
+    {
+      "id": "htc-鸡蛋花-343",
+      "name": "鸡蛋花",
+      "kind": "main",
+      "category": "vegetable_dish",
+      "emoji": "🍗"
+    },
+    {
+      "id": "htc-鹰嘴豆炸饼-280",
+      "name": "鹰嘴豆炸饼",
+      "kind": "main",
+      "category": "staple",
+      "emoji": "🍚"
+    },
+    {
+      "id": "htc-麻婆豆腐-195",
+      "name": "麻婆豆腐",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🍢"
+    },
+    {
+      "id": "htc-麻油拌面-281",
+      "name": "麻油拌面",
+      "kind": "main",
+      "category": "staple",
+      "emoji": "🍜"
+    },
+    {
+      "id": "htc-麻辣减脂荞麦面-282",
+      "name": "麻辣减脂荞麦面",
+      "kind": "main",
+      "category": "staple",
+      "emoji": "🍜"
+    },
+    {
+      "id": "htc-麻辣香锅-196",
+      "name": "麻辣香锅",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🍖"
+    },
+    {
+      "id": "htc-黄油煎虾-27",
+      "name": "黄油煎虾",
+      "kind": "main",
+      "category": "aquatic",
+      "emoji": "🦐"
+    },
+    {
+      "id": "htc-黄油鸡-197",
+      "name": "黄油鸡",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🍗"
+    },
+    {
+      "id": "htc-黄焖鸡-198",
+      "name": "黄焖鸡",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🍗"
+    },
+    {
+      "id": "htc-黄瓜炒肉-199",
+      "name": "黄瓜炒肉",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🍖"
+    },
+    {
+      "id": "htc-黄瓜皮蛋汤-224",
+      "name": "黄瓜皮蛋汤",
+      "kind": "main",
+      "category": "soup",
+      "emoji": "🍲"
+    },
+    {
+      "id": "htc-黑椒牛柳-200",
+      "name": "黑椒牛柳",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🍖"
+    },
+    {
+      "id": "htc-黔式腊肠娃娃菜-201",
+      "name": "黔式腊肠娃娃菜",
+      "kind": "main",
+      "category": "meat_dish",
+      "emoji": "🍖"
+    },
+    {
+      "id": "htc-龟苓膏-71",
+      "name": "龟苓膏",
+      "kind": "main",
+      "category": "dessert",
+      "emoji": "🍰"
+    }
+  ]
+}

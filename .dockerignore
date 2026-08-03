@@ -1,0 +1,11 @@
+node_modules
+.next
+.git
+certificates
+*.pem
+.env*.local
+.DS_Store
+npm-debug.log*
+.vercel
+coverage
+README*.md
