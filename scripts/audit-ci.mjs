@@ -7,9 +7,9 @@
 //   3. BASELINE 里的 high、以及 moderate/low → 只打印、不阻断。
 //
 // 为什么要 BASELINE 而不是直接 `--audit-level=high`：
-//   当前剩余的 high/moderate 全部只能靠跨大版本升级消除（Next 16 / eslint-config-next 16），
-//   盲升会破坏项目（见 README「依赖安全」）。直接卡 high 会让 CI 长期假红、失去意义；
-//   完全不卡又会放过「新引入」的高危。折中：把「已知、已评估、只能等大版本」的具体 GHSA
+//   历史上为需要框架升级的风险建立了显式例外（见 README「依赖安全」）。
+//   例外不代表当前全部漏洞都需跨大版本修复，也不随新公告自动扩大；
+//   完全不卡会放过新增高危。折中：把「已知、已评估、暂缓升级」的具体 GHSA
 //   显式登记进 BASELINE（带原因+复核动作），其余 high 一律挡。清单是「明知故放」的白名单，
 //   不是「一律忽略」——升级 Next/eslint-config-next 后必须回来删对应条目。
 //
@@ -49,8 +49,21 @@ function main() {
     process.exit(1);
   }
 
-  const report = JSON.parse(raw);
-  const vulns = report.vulnerabilities ?? {};
+  let report;
+  try {
+    report = JSON.parse(raw);
+  } catch {
+    console.error("audit:ci 收到无法解析的报告，判为失败。");
+    process.exit(1);
+  }
+  // npm 联网失败也会输出合法 JSON（含 error），绝不能把缺失的漏洞表当成零漏洞。
+  if (!report || report.error || !report.vulnerabilities || !report.metadata?.vulnerabilities
+      || typeof report.vulnerabilities !== "object" || Array.isArray(report.vulnerabilities)
+      || typeof report.metadata.vulnerabilities.total !== "number") {
+    console.error("audit:ci 未获取到完整安全报告（可能是网络错误），判为失败。");
+    process.exit(1);
+  }
+  const vulns = report.vulnerabilities;
 
   const criticals = [];
   const blockedHighs = [];

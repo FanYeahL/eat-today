@@ -1,5 +1,7 @@
 "use client";
 
+import { safeGetList, safeSetList } from "./storage-safe";
+
 /**
  * 常客信号（隐式个性化）
  * 不让用户填表单，让 app 自己学：你在结果里点进哪家店（ShopCard 跳高德那下），
@@ -17,6 +19,7 @@
  */
 
 import type { CuisineKey, FoodKind } from "@/types/food";
+import { isRecord, isText, isTimestamp, isCuisine } from "./food-validation";
 
 const STORAGE_KEY = "foodie:visits";
 const MAX_EVENTS = 300; // 事件上限，超了丢最旧
@@ -44,38 +47,38 @@ export interface VisitEvent {
 
 /** 读全部事件（升序）。任何异常退化为空。 */
 function getEvents(): VisitEvent[] {
-  if (typeof window === "undefined") return [];
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return [];
-    const parsed = JSON.parse(raw) as unknown;
-    if (!Array.isArray(parsed)) return [];
-    return parsed.filter(
-      (e): e is VisitEvent =>
-        !!e &&
-        typeof (e as VisitEvent).shopId === "string" &&
-        typeof (e as VisitEvent).ts === "number",
-    );
-  } catch {
-    return [];
-  }
+  return safeGetList(STORAGE_KEY, (e): VisitEvent | null => {
+    if (
+      isRecord(e) &&
+      isText(e.shopId) &&
+      isText(e.shopName) &&
+      isText(e.foodId) &&
+      isCuisine(e.cuisine) &&
+      (e.kind === "main" || e.kind === "drink") &&
+      isTimestamp(e.ts)
+    ) {
+      return {
+        shopId: e.shopId,
+        shopName: e.shopName,
+        foodId: e.foodId,
+        cuisine: e.cuisine,
+        kind: e.kind,
+        ts: e.ts,
+      };
+    }
+    return null;
+  });
 }
 
 /** 记一次点店。now 由调用方传入。带裁剪：丢超 30 天的、超 300 条的最旧。 */
-export function recordVisit(
-  ev: Omit<VisitEvent, "ts">,
-  now: number,
-): void {
-  if (typeof window === "undefined") return;
-  try {
-    const cutoff = now - KEEP_DAYS * DAY_MS;
-    const events = getEvents().filter((e) => e.ts >= cutoff);
-    events.push({ ...ev, ts: now });
-    const trimmed = events.length > MAX_EVENTS ? events.slice(-MAX_EVENTS) : events;
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(trimmed));
-  } catch {
-    // 写不进就算了，不影响主流程
-  }
+export function recordVisit(ev: Omit<VisitEvent, "ts">, now: number): void {
+  const cutoff = now - KEEP_DAYS * DAY_MS;
+  const events = getEvents().filter((e) => e.ts >= cutoff);
+  events.push({ ...ev, ts: now });
+  safeSetList(
+    STORAGE_KEY,
+    events.length > MAX_EVENTS ? events.slice(-MAX_EVENTS) : events,
+  );
 }
 
 /**
@@ -92,18 +95,17 @@ export interface Affinity {
 
 /** 把 distinct 店铺数映射成倍数（软、封顶），count 越多越熟悉但收益递减 */
 function foodBoost(distinctShops: number): number {
-  if (distinctShops <= 0) return 1;
-  if (distinctShops === 1) return 1.5;
-  if (distinctShops === 2) return 1.9;
-  return 2.2; // 封顶
+  return FOOD_BOOST[
+    Math.min(Math.max(distinctShops, 0), FOOD_BOOST.length - 1)
+  ];
 }
 function cuisineBoost(distinctShops: number): number {
-  if (distinctShops <= 0) return 1;
-  if (distinctShops === 1) return 1.25;
-  if (distinctShops === 2) return 1.5;
-  if (distinctShops === 3) return 1.7;
-  return 1.9; // 封顶
+  return CUISINE_BOOST[
+    Math.min(Math.max(distinctShops, 0), CUISINE_BOOST.length - 1)
+  ];
 }
+const FOOD_BOOST = [1, 1.5, 1.9, 2.2] as const;
+const CUISINE_BOOST = [1, 1.25, 1.5, 1.7, 1.9] as const;
 
 /**
  * 算亲和表。now 传入；只统计近 REGULAR_DAYS*2 天（口味偏好比常客判定看得久一点）。

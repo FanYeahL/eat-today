@@ -15,6 +15,8 @@
 
 import { motion } from "framer-motion";
 import CityPicker from "@/components/features/water/CityPicker";
+import GeoRetry from "@/components/common/GeoRetry";
+import type { GeoReason } from "@/lib/geo";
 import { shopsHeading, SHOPS_LEDE } from "./picker-copy";
 import type { Food } from "@/types/food";
 
@@ -46,6 +48,8 @@ type ShopResultsProps = {
   loading: boolean;
   error: string | null;
   needCity: boolean;
+  geoReason: GeoReason;
+  onRetryGeo: () => void;
   /** 是否已成功查过一次（区分「搜完 0 家」与「还没搜」） */
   fetched: boolean;
   /** 点导航跳高德那下：记一次常客信号 */
@@ -79,6 +83,8 @@ export default function ShopResults({
   loading,
   error,
   needCity,
+  geoReason,
+  onRetryGeo,
   fetched,
   onVisit,
   onPickCity,
@@ -117,7 +123,9 @@ export default function ShopResults({
 
       {/* 标题区：这份推荐附近哪里能吃到（左对齐，非居中） */}
       <div>
-        <span className="text-xs font-medium text-ink-muted/70">{SHOPS_LEDE}</span>
+        <span className="text-xs font-medium text-ink-muted/70">
+          {SHOPS_LEDE}
+        </span>
         {exploringFood && (
           <h2 className="mt-0.5 flex items-center gap-2 text-2xl font-black text-ink">
             <span>{exploringFood.emoji}</span>
@@ -175,6 +183,7 @@ export default function ShopResults({
           <div className="w-full">
             <CityPicker onConfirm={onPickCity} />
           </div>
+          <GeoRetry reason={geoReason} onRetry={onRetryGeo} />
         </div>
       )}
 
@@ -208,7 +217,9 @@ export default function ShopResults({
                   // 店卡轻微 stagger 出现（.picker-serve-up + --i，克制：最多 6 档延迟）。
                   // 语义可迁移小程序（class + animation-delay），非 JS 逐帧。
                   className={`picker-serve-up meal-transition flex items-center gap-3 rounded-3xl border border-ink/10 bg-surface/85 px-4 py-3 shadow-[0_8px_20px_rgb(var(--glow)_/_0.1)] ${
-                    i % 2 === 0 ? "rounded-tr-[2.75rem]" : "rounded-bl-[2.75rem]"
+                    i % 2 === 0
+                      ? "rounded-tr-[2.75rem]"
+                      : "rounded-bl-[2.75rem]"
                   }`}
                   style={{ ["--i" as string]: Math.min(i, 6) }}
                 >
@@ -243,7 +254,11 @@ export default function ShopResults({
                   <button
                     onClick={() => {
                       onVisit(card);
-                      window.open(amapLink(card), "_blank", "noopener,noreferrer");
+                      window.open(
+                        amapLink(card),
+                        "_blank",
+                        "noopener,noreferrer",
+                      );
                     }}
                     className="shrink-0 rounded-full bg-gradient-to-r from-[rgb(var(--c-cta-a))] to-[rgb(var(--c-cta-b))] px-4 py-2 text-sm font-semibold text-white transition-transform duration-100 active:scale-[0.95]"
                   >

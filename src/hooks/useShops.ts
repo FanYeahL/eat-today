@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { resolveCoords, type Coords, type GeoReason } from "@/lib/geo";
 import type { Shop, ShopsResponse } from "@/types/shop";
 
@@ -29,6 +29,15 @@ export function useShops() {
    * 旧响应直接丢弃（与 useRecipe 同款防串号守卫）。
    */
   const reqIdRef = useRef(0);
+  const abortRef = useRef<AbortController | null>(null);
+
+  useEffect(
+    () => () => {
+      reqIdRef.current++;
+      abortRef.current?.abort();
+    },
+    [],
+  );
 
   /**
    * 查询某关键字的店铺。
@@ -36,8 +45,12 @@ export function useShops() {
    * @param city    手输城市；定位不可用时由组件传入
    */
   const fetchShops = useCallback(async (keyword: string, city?: string) => {
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
     const reqId = ++reqIdRef.current; // 本次请求号；只有它仍是最新时才写状态
-    const fresh = () => reqId === reqIdRef.current;
+    const fresh = () =>
+      reqId === reqIdRef.current && !controller.signal.aborted;
     setLoading(true);
     setError(null);
     setShops([]);
@@ -58,6 +71,9 @@ export function useShops() {
       }
     }
 
+    // 定位是共享 Promise，无法单独取消；离开/切菜后不要再发旧的查店请求。
+    if (!fresh()) return;
+
     // 既没坐标也没城市 → 提示用户手输城市，不发请求
     if (!coords && !city) {
       if (fresh()) {
@@ -68,6 +84,8 @@ export function useShops() {
       return;
     }
 
+    // 定位已恢复，即使后续 API 失败也应展示查询错误，而非旧的选城市界面。
+    setNeedCity(false);
     const params = new URLSearchParams({ keyword });
     if (coords) {
       params.set("lng", String(coords.lng));
@@ -77,7 +95,9 @@ export function useShops() {
     }
 
     try {
-      const res = await fetch(`/api/shops?${params.toString()}`);
+      const res = await fetch(`/api/shops?${params.toString()}`, {
+        signal: controller.signal,
+      });
       const data = (await res.json()) as ShopsResponse & { error?: string };
       if (!fresh()) return; // 已有更新的请求发出，本次结果作废，不写状态
       if (!res.ok) {
@@ -90,6 +110,7 @@ export function useShops() {
       setFetched(true);
     } catch (e) {
       if (!fresh()) return;
+      if (e instanceof Error && e.name === "AbortError") return;
       setError(e instanceof Error ? e.message : "查询失败，请重试。");
     } finally {
       if (fresh()) setLoading(false);
@@ -99,12 +120,26 @@ export function useShops() {
   /** 清空，收起列表时调用 */
   const clear = useCallback(() => {
     reqIdRef.current++; // 作废所有在途请求，避免清空后又被旧响应写回
+    abortRef.current?.abort();
+    abortRef.current = null;
     setShops([]);
     setExpansion([]);
     setError(null);
     setLoading(false);
     setFetched(false);
+    setNeedCity(false);
+    setGeoReason(null);
   }, []);
 
-  return { shops, expansion, loading, error, needCity, fetched, geoReason, fetchShops, clear };
+  return {
+    shops,
+    expansion,
+    loading,
+    error,
+    needCity,
+    fetched,
+    geoReason,
+    fetchShops,
+    clear,
+  };
 }

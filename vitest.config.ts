@@ -2,8 +2,9 @@ import { defineConfig } from "vitest/config";
 import { fileURLToPath } from "node:url";
 
 export default defineConfig({
+  oxc: { jsx: { runtime: "automatic" } },
   test: {
-    // 纯逻辑单测（pick-core / foods 池函数），无需 DOM。
+    // 纯逻辑默认 Node；hook 测试用文件级 @vitest-environment jsdom。
     environment: "node",
     include: ["src/**/*.test.ts"],
   },

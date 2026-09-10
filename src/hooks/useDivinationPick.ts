@@ -19,7 +19,10 @@
  */
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { foodsByMealForSinglePick, canonicalGroupOfFoodId } from "@/config/foods";
+import {
+  foodsByMealForSinglePick,
+  canonicalGroupOfFoodId,
+} from "@/config/foods";
 import { getCurrentMeal } from "@/config/meals";
 import { resolveCoords, type Coords } from "@/lib/geo";
 import { recentFoodIds } from "@/lib/diary";
@@ -91,6 +94,14 @@ export function useDivinationPick() {
   const [verifying, setVerifying] = useState(false);
   // 最新抽中的镜像，供下一占算「避开上一签」（避免闭包拿旧值）
   const pickRef = useRef<Food | null>(null);
+  // reset/卸载后，旧定位和可用性查询只能结束，不能重新填回结果。
+  const castIdRef = useRef(0);
+  useEffect(
+    () => () => {
+      castIdRef.current++;
+    },
+    [],
+  );
 
   // 餐段：默认稳定值避免水合不一致，挂载后按真实时间校正
   const [meal, setMeal] = useState<MealType>("lunch");
@@ -147,82 +158,111 @@ export function useDivinationPick() {
    */
   const cast = useCallback(
     async (seenIds?: Set<string>): Promise<CastResult> => {
-      // tea 走三池并集（meal+side+drink），其它餐段纯 meal 层——只此一处判 tea（§3.1）。
-      const base = foodsByMealForSinglePick(meal);
-      if (base.length === 0) return { food: null, exhausted: false };
-      // ★ family 硬墙最先作用：之后去重/可用性都在「家族池」内做。
-      const pool = applyFamily(base, filters.families);
-
-      const seen = seenIds ?? new Set<string>();
-      // ★ 去重是硬约束，在可用性之前：先排掉本轮见过的。
-      //   家族池里「没见过的」为空 = 这个口味真翻遍了 → exhausted（不硬抽重复）。
-      const unseen = pool.filter((f) => !seen.has(f.id));
-      if (unseen.length === 0) {
-        setVerifying(false);
-        return { food: null, exhausted: true };
-      }
-
-      const prev = pickRef.current;
-      const avoidIds = new Set(prev ? [prev.id] : []); // 强避上一签（软避，兜底）
-      const recentIds = recentFoodIds(Date.now()); // 近几天吃过的温和降权
-      const affinity = getAffinity(Date.now()); // 常客熟悉度
-
-      // canonicalGroup 软避：已见/最近/上一签 命中过的族，桶内 ×0.15（§5.4，防连占刷屏同类）。
-      // ⚠️ 用全局 id→group 映射，不用当前 base 反查——recent 可能是别餐段吃过的同组菜，
-      // 不在当前池里，用 base 会查不到、跨餐段软避静默失效（Codex P2）。
-      const avoidGroups = new Set<string>();
-      const addGroup = (id: string) => {
-        const g = canonicalGroupOfFoodId(id);
-        if (g) avoidGroups.add(g);
-      };
-      seen.forEach(addGroup);
-      recentIds.forEach(addGroup);
-      avoidIds.forEach(addGroup);
-
-      const settle = (food: Food): CastResult => {
-        pickRef.current = food;
-        setPick(food);
-        return { food, exhausted: false };
-      };
-
-      // —— 拿坐标：拿不到就降级，不按附近过滤 ——
-      let coords: Coords | null = null;
-      setVerifying(true);
+      const requestId = ++castIdRef.current;
+      const fresh = () => requestId === castIdRef.current;
       try {
-        coords = await resolveCoords();
-      } catch {
-        coords = null;
-      }
+        // tea 走三池并集（meal+side+drink），其它餐段纯 meal 层——只此一处判 tea（§3.1）。
+        const base = foodsByMealForSinglePick(meal);
+        if (base.length === 0) return { food: null, exhausted: false };
+        // ★ family 硬墙最先作用：之后去重/可用性都在「家族池」内做。
+        const pool = applyFamily(base, filters.families);
 
-      if (!coords) {
+        const seen = seenIds ?? new Set<string>();
+        // ★ 去重是硬约束，在可用性之前：先排掉本轮见过的。
+        //   家族池里「没见过的」为空 = 这个口味真翻遍了 → exhausted（不硬抽重复）。
+        const unseen = pool.filter((f) => !seen.has(f.id));
+        if (unseen.length === 0) {
+          setVerifying(false);
+          return { food: null, exhausted: true };
+        }
+
+        const prev = pickRef.current;
+        const avoidIds = new Set(prev ? [prev.id] : []); // 强避上一签（软避，兜底）
+        const recentIds = recentFoodIds(Date.now()); // 近几天吃过的温和降权
+        const affinity = getAffinity(Date.now()); // 常客熟悉度
+
+        // canonicalGroup 软避：已见/最近/上一签 命中过的族，桶内 ×0.15（§5.4，防连占刷屏同类）。
+        // ⚠️ 用全局 id→group 映射，不用当前 base 反查——recent 可能是别餐段吃过的同组菜，
+        // 不在当前池里，用 base 会查不到、跨餐段软避静默失效（Codex P2）。
+        const avoidGroups = new Set<string>();
+        const addGroup = (id: string) => {
+          const g = canonicalGroupOfFoodId(id);
+          if (g) avoidGroups.add(g);
+        };
+        seen.forEach(addGroup);
+        recentIds.forEach(addGroup);
+        avoidIds.forEach(addGroup);
+
+        const settle = (food: Food): CastResult => {
+          if (!fresh()) return { food: null, exhausted: false };
+          pickRef.current = food;
+          setPick(food);
+          return { food, exhausted: false };
+        };
+
+        // —— 拿坐标：拿不到就降级，不按附近过滤 ——
+        let coords: Coords | null = null;
+        setVerifying(true);
+        try {
+          coords = await resolveCoords();
+        } catch {
+          coords = null;
+        }
+        if (!fresh()) return { food: null, exhausted: false };
+
+        if (!coords) {
+          setVerifying(false);
+          // 无坐标：直接在「没见过的」里加权抽，不重复。
+          return settle(
+            pickOneMain(
+              unseen,
+              filters,
+              region,
+              avoidIds,
+              recentIds,
+              affinity,
+              avoidGroups,
+              meal,
+            ),
+          );
+        }
+
+        // —— 有坐标：在「没见过的」里优先选附近的（可用性是偏好，不破坏去重）——
+        const MAX_ROUNDS = 6;
+        let chosen: Food | null = null;
+        for (let round = 0; round < MAX_ROUNDS; round++) {
+          // 可用性预过滤作用在 unseen 上：内部空了退回 unseen（绝不退回见过的）。
+          const p = prefilterByAvailability(unseen, coords);
+          const candidate = pickOneMain(
+            p,
+            filters,
+            region,
+            avoidIds,
+            recentIds,
+            affinity,
+            avoidGroups,
+            meal,
+          );
+          const bad = await unavailableKeywords([candidate], coords);
+          if (!fresh()) return { food: null, exhausted: false };
+          chosen = candidate; // 兜底留着最后一道（仍 ∈ unseen，不会重复）
+          if (bad.size === 0) break; // 附近买得到，定了
+          // 买不到：结果已落缓存，下一轮 prefilter 自动排除
+        }
+
         setVerifying(false);
-        // 无坐标：直接在「没见过的」里加权抽，不重复。
-        return settle(
-          pickOneMain(unseen, filters, region, avoidIds, recentIds, affinity, avoidGroups, meal),
-        );
+        return chosen ? settle(chosen) : { food: null, exhausted: false };
+      } finally {
+        if (fresh()) setVerifying(false);
       }
-
-      // —— 有坐标：在「没见过的」里优先选附近的（可用性是偏好，不破坏去重）——
-      const MAX_ROUNDS = 6;
-      let chosen: Food | null = null;
-      for (let round = 0; round < MAX_ROUNDS; round++) {
-        // 可用性预过滤作用在 unseen 上：内部空了退回 unseen（绝不退回见过的）。
-        const p = prefilterByAvailability(unseen, coords);
-        const candidate = pickOneMain(p, filters, region, avoidIds, recentIds, affinity, avoidGroups, meal);
-        const bad = await unavailableKeywords([candidate], coords);
-        chosen = candidate; // 兜底留着最后一道（仍 ∈ unseen，不会重复）
-        if (bad.size === 0) break; // 附近买得到，定了
-        // 买不到：结果已落缓存，下一轮 prefilter 自动排除
-      }
-
-      setVerifying(false);
-      return chosen ? settle(chosen) : { food: null, exhausted: false };
     },
     [meal, filters, region],
   );
 
   /** 复位：清空抽中的菜（回到「未占」） */
   const reset = useCallback(() => {
+    castIdRef.current++;
+    setVerifying(false);
     setPick(null);
     pickRef.current = null;
   }, []);

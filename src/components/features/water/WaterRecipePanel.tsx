@@ -33,12 +33,14 @@ type WaterRecipePanelProps = {
 export default function WaterRecipePanel({ onClose }: WaterRecipePanelProps) {
   // 「随手翻一道」当前推荐的菜（null = 还没翻过，只显示库）
   const [suggested, setSuggested] = useState<RecipeIndexEntry | null>(null);
+  const [empty, setEmpty] = useState(false);
   const { recipe, loading, error, fetchRecipe } = useRecipe();
 
   const handleSuggestRecipe = useCallback(() => {
     const next = pickNextRecipe(suggested?.id ?? null);
     setSuggested(next);
-    fetchRecipe(next.id);
+    setEmpty(next === null);
+    if (next) fetchRecipe(next.id);
   }, [suggested, fetchRecipe]);
 
   return (
@@ -76,6 +78,9 @@ export default function WaterRecipePanel({ onClose }: WaterRecipePanelProps) {
         </button>
 
         {/* 随机推荐结果：小区域展示在库上方，只在翻过之后出现 */}
+        {empty && (
+          <p className="text-sm text-ink-muted">暂时没有可推荐的菜谱。</p>
+        )}
         <AnimatePresence mode="wait">
           {suggested && (
             <motion.div

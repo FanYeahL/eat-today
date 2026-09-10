@@ -7,11 +7,22 @@
  */
 
 import { regionMeta, regionList } from "@/config/regions-cuisine";
+import { PICK_WEIGHTS } from "./pick-weights";
 import { familyOf, familyList } from "@/config/cuisine";
-import { keywordOf, checkKeyword, cachedAvailability } from "@/lib/availability";
+import {
+  keywordOf,
+  checkKeyword,
+  cachedAvailability,
+} from "@/lib/availability";
 import type { Affinity } from "@/lib/regulars";
 import type { Coords } from "@/lib/geo";
-import type { Food, RegionKey, CuisineFamily, PriceTier, MealType } from "@/types/food";
+import type {
+  Food,
+  RegionKey,
+  CuisineFamily,
+  PriceTier,
+  MealType,
+} from "@/types/food";
 
 /** 漏斗筛选：风味家族（多选）/ 心情 / 预算 */
 export interface Filters {
@@ -42,9 +53,20 @@ export const DEFAULT_FILTERS: Filters = {
 /** 合法风味家族集合（来自 familyList 单一数据源） */
 const VALID_FAMILIES = new Set<CuisineFamily>(familyList.map((f) => f.key));
 /** 合法心情集合 */
-const VALID_MOODS = new Set<Filters["mood"]>(["any", "spicy", "mild", "meat", "light"]);
+const VALID_MOODS = new Set<Filters["mood"]>([
+  "any",
+  "spicy",
+  "mild",
+  "meat",
+  "light",
+]);
 /** 合法预算集合（"any" + 三个价位桶键，与 budgetBucketMix 对齐） */
-const VALID_BUDGETS = new Set<Filters["budget"]>(["any", "budget", "normal", "treat"]);
+const VALID_BUDGETS = new Set<Filters["budget"]>([
+  "any",
+  "budget",
+  "normal",
+  "treat",
+]);
 /** 合法口味地区集合（来自 regionList 单一数据源，含 "all"） */
 const VALID_REGIONS = new Set<RegionKey>(regionList.map((r) => r.key));
 
@@ -76,7 +98,8 @@ export function normalizeFilters(raw: unknown): Filters {
       : DEFAULT_FILTERS.mood;
 
   const budget =
-    typeof r.budget === "string" && VALID_BUDGETS.has(r.budget as Filters["budget"])
+    typeof r.budget === "string" &&
+    VALID_BUDGETS.has(r.budget as Filters["budget"])
       ? (r.budget as Filters["budget"])
       : DEFAULT_FILTERS.budget;
 
@@ -147,7 +170,8 @@ export function applyFunnel(pool: Food[], filters: Filters): Food[] {
   if (filters.families.length > 0) {
     // drink family-neutral（§3.1）：饮品不参与 family 墙，与 applyFamily 保持一致。
     const next = pool.filter(
-      (f) => f.kind === "drink" || filters.families.includes(familyOf(f.cuisine)),
+      (f) =>
+        f.kind === "drink" || filters.families.includes(familyOf(f.cuisine)),
     );
     if (next.length > 0) return next;
   }
@@ -164,7 +188,10 @@ export function applyFunnel(pool: Food[], filters: Filters): Food[] {
  * 关键修复：treat 档 treat 桶占 0.75，根治「想吃好的却大概率抽到普通菜」——
  * 旧 per-dish 软权重下 normal 基数大会淹没 treat，桶抽样把它拉回预期。
  */
-export const budgetBucketMix: Record<Filters["budget"], Record<PriceTier, number>> = {
+export const budgetBucketMix: Record<
+  Filters["budget"],
+  Record<PriceTier, number>
+> = {
   any: { budget: 0.34, normal: 0.5, treat: 0.16 }, // 不选预算时贴近数据自然构成
   budget: { budget: 0.7, normal: 0.3, treat: 0 },
   normal: { budget: 0.15, normal: 0.7, treat: 0.15 },
@@ -264,10 +291,11 @@ export function bucketCandidateWeight(
 ): number {
   let w = ctx.regionActive ? regionWeight(food, ctx.region) : 1;
   w *= moodWeight(food, ctx.mood);
-  if (food.role === "main" && ctx.meal !== "tea") w *= 1.6; // 偏正餐（下午茶不偏）
+  if (food.role === "main" && ctx.meal !== "tea") w *= PICK_WEIGHTS.mainRole; // 偏正餐（下午茶不偏）
   w *= familiarFactor(food, ctx.affinity);
   w *= indulgenceWeight(food, bucket, ctx.meal); // treat 桶：犒劳提权 / 轻食降权（tea 免 satiety 惩罚）
-  if (food.canonicalGroup && ctx.avoidGroups.has(food.canonicalGroup)) w *= 0.15;
+  if (food.canonicalGroup && ctx.avoidGroups.has(food.canonicalGroup))
+    w *= PICK_WEIGHTS.canonicalGroup;
   return w * seedAvoidFactor(food.id, EMPTY_SET, ctx.avoidIds, ctx.recentIds);
 }
 
@@ -281,10 +309,17 @@ export function pickInPool(
   budget: Filters["budget"],
   ctx: BucketPickContext,
 ): Food {
-  const byBucket: Record<PriceTier, Food[]> = { budget: [], normal: [], treat: [] };
+  const byBucket: Record<PriceTier, Food[]> = {
+    budget: [],
+    normal: [],
+    treat: [],
+  };
+  // 前置条件：pool 已通过 foods.test.ts 的运行时结构校验；不将未知价位悄悄归为 normal。
   for (const f of pool) byBucket[f.priceTier].push(f);
   const nonEmpty = new Set<PriceTier>(
-    (["budget", "normal", "treat"] as PriceTier[]).filter((t) => byBucket[t].length > 0),
+    (["budget", "normal", "treat"] as PriceTier[]).filter(
+      (t) => byBucket[t].length > 0,
+    ),
   );
   const bucket = resolveBucket(budgetBucketMix[budget], nonEmpty);
   const inBucket = bucket ? byBucket[bucket] : pool; // 池非空 → bucket 必非 null；兜底取全池
@@ -299,11 +334,13 @@ export function pickInPool(
 export function moodWeight(food: Food, mood: Filters["mood"]): number {
   const pass = moodFilter(mood);
   if (!pass) return 1; // any：不挑
-  return pass(food) ? 1 : 0.15;
+  return pass(food) ? 1 : PICK_WEIGHTS.moodMismatch;
 }
 
 /** 把心情翻译成对食物的过滤谓词；any 返回 null（不过滤） */
-export function moodFilter(mood: Filters["mood"]): ((f: Food) => boolean) | null {
+export function moodFilter(
+  mood: Filters["mood"],
+): ((f: Food) => boolean) | null {
   switch (mood) {
     case "spicy":
       return (f) => f.spicy >= 2; // 想吃辣的开胃
@@ -360,9 +397,9 @@ export function seedAvoidFactor(
   recentIds: Set<string>,
 ): number {
   let f = 1;
-  if (seedIds.has(id)) f *= 8;
-  if (avoidIds.has(id)) f *= 0.05;
-  if (recentIds.has(id)) f *= 0.35;
+  if (seedIds.has(id)) f *= PICK_WEIGHTS.seeded;
+  if (avoidIds.has(id)) f *= PICK_WEIGHTS.previous;
+  if (recentIds.has(id)) f *= PICK_WEIGHTS.recent;
   return f;
 }
 

@@ -1,6 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import {
+  filterOptions,
+  toggleFilterFamily,
+  showsRegion,
+} from "@/lib/filter-options";
+import { WaterFilterPill as Chip } from "@/components/common/FilterPill";
 import { AnimatePresence, motion } from "framer-motion";
 import { familyList } from "@/config/cuisine";
 import RegionSwitcher from "./RegionSwitcher";
@@ -21,56 +27,11 @@ type FunnelFilterProps = {
 };
 
 /** 心情五态（含不挑） */
-const MOODS: { key: Filters["mood"]; label: string; emoji: string }[] = [
-  { key: "any", label: "都行", emoji: "🤙" },
-  { key: "spicy", label: "想吃点辣的开胃", emoji: "🌶️" },
-  { key: "mild", label: "淡淡的就好", emoji: "🌿" },
-  { key: "meat", label: "狠狠大口吃肉", emoji: "🍖" },
-  { key: "light", label: "控卡自律中", emoji: "🥗" },
-];
-
-/** 预算四态（语气化描述，不写具体金额） */
-const BUDGETS: { key: Filters["budget"]; label: string; emoji: string }[] = [
-  { key: "any", label: "不限", emoji: "💸" },
-  { key: "budget", label: "随便吃点", emoji: "🪙" },
-  { key: "normal", label: "正常水平", emoji: "💵" },
-  { key: "treat", label: "想吃好的", emoji: "💎" },
-];
-
+const { moods: MOODS, budgets: BUDGETS } = filterOptions("water");
 /** 标签按钮：复用全站标签选中/未选中标准样式。
  *  multi=true（多选，如风味家族）→ 用 aria-pressed 按钮语义；
  *  multi=false（单选，如心情/预算，外层是 radiogroup）→ 用 role=radio / aria-checked。
  *  之前一律 radio，但家族是多选，radio 会误告诉读屏「只能选一个」。 */
-function Chip({
-  selected,
-  onClick,
-  emoji,
-  label,
-  multi = false,
-}: {
-  selected: boolean;
-  onClick: () => void;
-  emoji: string;
-  label: string;
-  multi?: boolean;
-}) {
-  return (
-    <button
-      {...(multi
-        ? { "aria-pressed": selected }
-        : { role: "radio", "aria-checked": selected })}
-      onClick={onClick}
-      className={`flex items-center gap-1 rounded-full border px-3 py-1 text-sm font-medium transition-all ${
-        selected
-          ? "border-accent bg-accent-hot/15 text-accent shadow-[0_4px_14px_rgb(var(--c-accent)_/_0.18)]"
-          : "border-brand/40 bg-brand/5 text-ink-muted hover:border-accent/60 hover:text-accent"
-      }`}
-    >
-      <span className="text-base leading-none">{emoji}</span>
-      {label}
-    </button>
-  );
-}
 
 /**
  * 三秒温和轻筛选漏斗
@@ -107,16 +68,9 @@ export default function FunnelFilter({
   // 折叠模式默认收起；非折叠（idle 首入）始终展开
   const [open, setOpen] = useState(!collapsible);
 
-  const toggleFamily = (fam: CuisineFamily) => {
-    const has = value.families.includes(fam);
-    const families = has
-      ? value.families.filter((f) => f !== fam)
-      : [...value.families, fam];
-    onChange({ ...value, families });
-  };
-
-  const showRegion =
-    value.families.length === 0 || value.families.includes("chinese");
+  const toggleFamily = (fam: CuisineFamily) =>
+    onChange(toggleFilterFamily(value, fam));
+  const showRegion = showsRegion(value);
 
   return (
     <div className="flex w-full max-w-md flex-col gap-3 rounded-2xl border border-brand/15 bg-brand/5 px-4 py-3.5 backdrop-blur-md">
@@ -159,86 +113,86 @@ export default function FunnelFilter({
             transition={{ duration: 0.28, ease: "easeOut" }}
             className="flex flex-col gap-3 overflow-hidden"
           >
-      {/* 风味家族（多选） */}
-      <div className="flex flex-col gap-1.5">
-        <span className="text-xs text-ink-muted/80">
-          今天想吃点什么风味的？（可多选）
-        </span>
-        <div
-          role="group"
-          aria-label="选择风味"
-          className="flex flex-wrap items-center gap-2"
-        >
-          {familyList.map((f) => (
-            <Chip
-              key={f.key}
-              multi
-              selected={value.families.includes(f.key)}
-              onClick={() => toggleFamily(f.key)}
-              emoji={f.emoji}
-              label={f.label}
-            />
-          ))}
-        </div>
-      </div>
-
-      {/* 中餐二级地区：仅在「经典中式」或未限风味时展开 */}
-      <AnimatePresence initial={false}>
-        {showRegion && (
-          <motion.div
-            key="region"
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.3, ease: "easeOut" }}
-            className="overflow-hidden"
-          >
-            <div className="pt-0.5">
-              <RegionSwitcher value={region} onChange={onRegionChange} />
+            {/* 风味家族（多选） */}
+            <div className="flex flex-col gap-1.5">
+              <span className="text-xs text-ink-muted/80">
+                今天想吃点什么风味的？（可多选）
+              </span>
+              <div
+                role="group"
+                aria-label="选择风味"
+                className="flex flex-wrap items-center gap-2"
+              >
+                {familyList.map((f) => (
+                  <Chip
+                    key={f.key}
+                    multi
+                    selected={value.families.includes(f.key)}
+                    onClick={() => toggleFamily(f.key)}
+                    emoji={f.emoji}
+                    label={f.label}
+                  />
+                ))}
+              </div>
             </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
-      {/* 心情 */}
-      <div className="flex flex-col gap-1.5">
-        <span className="text-xs text-ink-muted/80">现在的心情是？</span>
-        <div
-          role="radiogroup"
-          aria-label="选择心情"
-          className="flex flex-wrap items-center gap-2"
-        >
-          {MOODS.map((m) => (
-            <Chip
-              key={m.key}
-              selected={value.mood === m.key}
-              onClick={() => onChange({ ...value, mood: m.key })}
-              emoji={m.emoji}
-              label={m.label}
-            />
-          ))}
-        </div>
-      </div>
+            {/* 中餐二级地区：仅在「经典中式」或未限风味时展开 */}
+            <AnimatePresence initial={false}>
+              {showRegion && (
+                <motion.div
+                  key="region"
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  transition={{ duration: 0.3, ease: "easeOut" }}
+                  className="overflow-hidden"
+                >
+                  <div className="pt-0.5">
+                    <RegionSwitcher value={region} onChange={onRegionChange} />
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
-      {/* 预算 */}
-      <div className="flex flex-col gap-1.5">
-        <span className="text-xs text-ink-muted/80">今天的预算？</span>
-        <div
-          role="radiogroup"
-          aria-label="选择预算"
-          className="flex flex-wrap items-center gap-2"
-        >
-          {BUDGETS.map((b) => (
-            <Chip
-              key={b.key}
-              selected={value.budget === b.key}
-              onClick={() => onChange({ ...value, budget: b.key })}
-              emoji={b.emoji}
-              label={b.label}
-            />
-          ))}
-        </div>
-      </div>
+            {/* 心情 */}
+            <div className="flex flex-col gap-1.5">
+              <span className="text-xs text-ink-muted/80">现在的心情是？</span>
+              <div
+                role="radiogroup"
+                aria-label="选择心情"
+                className="flex flex-wrap items-center gap-2"
+              >
+                {MOODS.map((m) => (
+                  <Chip
+                    key={m.key}
+                    selected={value.mood === m.key}
+                    onClick={() => onChange({ ...value, mood: m.key })}
+                    emoji={m.emoji}
+                    label={m.label}
+                  />
+                ))}
+              </div>
+            </div>
+
+            {/* 预算 */}
+            <div className="flex flex-col gap-1.5">
+              <span className="text-xs text-ink-muted/80">今天的预算？</span>
+              <div
+                role="radiogroup"
+                aria-label="选择预算"
+                className="flex flex-wrap items-center gap-2"
+              >
+                {BUDGETS.map((b) => (
+                  <Chip
+                    key={b.key}
+                    selected={value.budget === b.key}
+                    onClick={() => onChange({ ...value, budget: b.key })}
+                    emoji={b.emoji}
+                    label={b.label}
+                  />
+                ))}
+              </div>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>

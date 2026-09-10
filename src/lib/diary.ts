@@ -1,5 +1,7 @@
 "use client";
 
+import { safeGetList, safeSetList, safeRemove } from "./storage-safe";
+
 /**
  * 干饭日记
  * 用户每次「定了」就顺手记一笔——记录是摇号决策的免费副产品，零负担。
@@ -13,6 +15,14 @@
  */
 
 import { familyOf } from "@/config/cuisine";
+import {
+  isRecord,
+  isText,
+  isTimestamp,
+  isCuisine,
+  isMeal,
+  isFoodTag,
+} from "./food-validation";
 import type {
   CuisineKey,
   CuisineFamily,
@@ -77,24 +87,38 @@ function toDiaryFood(f: Food): DiaryFood {
   };
 }
 
-/** 读全部记录（按时间升序）。任何异常都退化为空数组。 */
+/** 日记快照的完整浅校验，保护统计、展示及最近食物 id 的消费者。 */
+export function isDiaryFood(value: unknown): value is DiaryFood {
+  return (
+    isRecord(value) &&
+    isText(value.id) &&
+    isText(value.name) &&
+    isText(value.emoji) &&
+    isCuisine(value.cuisine) &&
+    typeof value.spicy === "number" &&
+    Number.isInteger(value.spicy) &&
+    value.spicy >= 0 &&
+    value.spicy <= 3 &&
+    Array.isArray(value.tags) &&
+    value.tags.every(isFoodTag)
+  );
+}
+
+function parseDiaryEntry(value: unknown): DiaryEntry | null {
+  if (
+    !isRecord(value) ||
+    !isTimestamp(value.ts) ||
+    !isMeal(value.meal) ||
+    !Array.isArray(value.items)
+  )
+    return null;
+  const items = value.items.filter(isDiaryFood);
+  return items.length ? { ts: value.ts, meal: value.meal, items } : null;
+}
+
+/** 读全部记录（按时间升序）。坏食物过滤，空记录丢弃，其余数据保留。 */
 export function getEntries(): DiaryEntry[] {
-  if (typeof window === "undefined") return [];
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return [];
-    const parsed = JSON.parse(raw) as unknown;
-    if (!Array.isArray(parsed)) return [];
-    // 粗校验，挡掉损坏数据
-    return parsed.filter(
-      (e): e is DiaryEntry =>
-        !!e &&
-        typeof (e as DiaryEntry).ts === "number" &&
-        Array.isArray((e as DiaryEntry).items),
-    );
-  } catch {
-    return [];
-  }
+  return safeGetList(STORAGE_KEY, parseDiaryEntry);
 }
 
 /**
@@ -102,24 +126,15 @@ export function getEntries(): DiaryEntry[] {
  * 同一餐段短时间内重复「定了」不去重——用户改主意再定也是真实决策。
  */
 export function addEntry(foods: Food[], meal: MealType, now: number): void {
-  if (typeof window === "undefined" || foods.length === 0) return;
-  try {
-    const entries = getEntries();
-    entries.push({ ts: now, meal, items: foods.map(toDiaryFood) });
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(trimEntries(entries)));
-  } catch {
-    // 写不进去（满了 / 隐私模式）就算了，不影响主流程
-  }
+  if (foods.length === 0) return;
+  const entries = getEntries();
+  entries.push({ ts: now, meal, items: foods.map(toDiaryFood) });
+  safeSetList(STORAGE_KEY, trimEntries(entries));
 }
 
 /** 清空日记（设置里给用户一个「重新开始」的出口用） */
 export function clearDiary(): void {
-  if (typeof window === "undefined") return;
-  try {
-    localStorage.removeItem(STORAGE_KEY);
-  } catch {
-    // 忽略
-  }
+  safeRemove(STORAGE_KEY);
 }
 
 /**
@@ -148,7 +163,12 @@ export interface DiaryStats {
   /** 陪伴天数：首条记录到现在跨越的天数（至少 1） */
   companionDays: number;
   /** 最懂的风味家族 + 命中次数；无数据为 null */
-  topFamily: { family: CuisineFamily; label: string; emoji: string; count: number } | null;
+  topFamily: {
+    family: CuisineFamily;
+    label: string;
+    emoji: string;
+    count: number;
+  } | null;
 }
 
 const FAMILY_LABEL: Record<CuisineFamily, { label: string; emoji: string }> = {
@@ -162,7 +182,13 @@ const FAMILY_LABEL: Record<CuisineFamily, { label: string; emoji: string }> = {
 export function computeStats(now: number): DiaryStats {
   const entries = getEntries();
   if (entries.length === 0) {
-    return { hasData: false, total: 0, thisMonth: 0, companionDays: 1, topFamily: null };
+    return {
+      hasData: false,
+      total: 0,
+      thisMonth: 0,
+      companionDays: 1,
+      topFamily: null,
+    };
   }
 
   const nowDate = new Date(now);
@@ -192,7 +218,13 @@ export function computeStats(now: number): DiaryStats {
   const firstTs = entries[0].ts;
   const companionDays = Math.max(1, Math.floor((now - firstTs) / DAY_MS) + 1);
 
-  return { hasData: true, total: entries.length, thisMonth, companionDays, topFamily };
+  return {
+    hasData: true,
+    total: entries.length,
+    thisMonth,
+    companionDays,
+    topFamily,
+  };
 }
 
 /**
@@ -212,8 +244,7 @@ export function gentleReminder(now: number): string | null {
   const n = recentItems.length;
   if (n === 0) return null;
 
-  const spicyShare =
-    recentItems.filter((f) => f.spicy >= 2).length / n;
+  const spicyShare = recentItems.filter((f) => f.spicy >= 2).length / n;
   const lightShare =
     recentItems.filter(
       (f) => f.tags.includes("健康轻食") || f.tags.includes("清淡"),

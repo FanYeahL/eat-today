@@ -27,12 +27,14 @@ type RecipePanelV2Props = {
 
 export default function RecipePanelV2({ onClose }: RecipePanelV2Props) {
   const [suggested, setSuggested] = useState<RecipeIndexEntry | null>(null);
+  const [empty, setEmpty] = useState(false);
   const { recipe, loading, error, fetchRecipe } = useRecipe();
 
   const handleSuggestRecipe = useCallback(() => {
     const next = pickNextRecipe(suggested?.id ?? null);
     setSuggested(next);
-    fetchRecipe(next.id);
+    setEmpty(next === null);
+    if (next) fetchRecipe(next.id);
   }, [suggested, fetchRecipe]);
 
   return (
@@ -53,8 +55,12 @@ export default function RecipePanelV2({ onClose }: RecipePanelV2Props) {
         </button>
 
         <div className="flex flex-col items-center gap-1">
-          <h2 className="text-2xl font-black text-ink">{PANEL_COPY.cook.title}</h2>
-          <p className="text-xs text-ink-muted/70">{PANEL_COPY.cook.subtitle}</p>
+          <h2 className="text-2xl font-black text-ink">
+            {PANEL_COPY.cook.title}
+          </h2>
+          <p className="text-xs text-ink-muted/70">
+            {PANEL_COPY.cook.subtitle}
+          </p>
         </div>
 
         {/* 轻量随机入口：文案按钮，不喧宾夺主（库才是主体） */}
@@ -62,10 +68,14 @@ export default function RecipePanelV2({ onClose }: RecipePanelV2Props) {
           onClick={handleSuggestRecipe}
           className="rounded-full border border-brand/50 bg-brand/5 px-5 py-2 text-sm font-medium text-brand-soft transition-colors hover:border-accent hover:text-accent"
         >
-          🍳 {suggested ? PANEL_COPY.cook.randomMore : PANEL_COPY.cook.randomFirst}
+          🍳{" "}
+          {suggested ? PANEL_COPY.cook.randomMore : PANEL_COPY.cook.randomFirst}
         </button>
 
         {/* 随机推荐结果：只在翻过之后出现 */}
+        {empty && (
+          <p className="text-sm text-ink-muted">暂时没有可推荐的菜谱。</p>
+        )}
         <AnimatePresence mode="wait">
           {suggested && (
             <motion.div

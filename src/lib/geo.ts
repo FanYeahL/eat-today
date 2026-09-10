@@ -5,6 +5,9 @@
  * 不重复弹权限、不各存一份坐标。
  */
 
+import { wgs84ToGcj02 } from "./gcj02";
+
+/** 高德查询坐标：采集点已转换为 GCJ-02；粗略适用范围外保留 WGS-84。下游不得重复转换。 */
 export type Coords = { lng: number; lat: number };
 
 /** 定位失败时返回的具体原因，便于给用户精准提示 */
@@ -19,7 +22,17 @@ export type GeoReason =
 type GeoCache =
   | { kind: "unknown" }
   | { kind: "ok"; coords: Coords }
-  | { kind: "unavailable"; reason: GeoReason };
+  | { kind: "unavailable"; reason: GeoReason; retryAfter: number | null };
+
+export const GEO_RETRY_MS = 30_000;
+
+function failureExpired(): boolean {
+  return (
+    cache.kind === "unavailable" &&
+    cache.retryAfter !== null &&
+    Date.now() >= cache.retryAfter
+  );
+}
 
 // 模块级单例缓存：整个页面生命周期共享一次定位结果。
 let cache: GeoCache = { kind: "unknown" };
@@ -54,8 +67,13 @@ function getBrowserCoords(): Promise<Coords> {
       return;
     }
     navigator.geolocation.getCurrentPosition(
-      (pos) =>
-        resolve({ lng: pos.coords.longitude, lat: pos.coords.latitude }),
+      (pos) => {
+        try {
+          resolve(wgs84ToGcj02(pos.coords.longitude, pos.coords.latitude));
+        } catch {
+          reject("unavailable" satisfies GeoReason);
+        }
+      },
       (err) => reject(classifyGeoError(err)),
       { timeout: 8000, maximumAge: 5 * 60 * 1000 },
     );
@@ -65,10 +83,11 @@ function getBrowserCoords(): Promise<Coords> {
 /**
  * 解析坐标：命中缓存直接返回，否则尝试定位一次并缓存。
  * - 成功：resolve 坐标。
- * - 失败：reject 一个 GeoReason，并把不可用状态连同原因缓存，后续不再重复弹权限。
+ * - 失败：瞬时故障冷却 30 秒后允许重试；拒绝权限/不支持不自动重试。
  * 并发调用共享同一个 inflight Promise。
  */
 export function resolveCoords(): Promise<Coords> {
+  if (failureExpired()) cache = { kind: "unknown" };
   if (cache.kind === "ok") return Promise.resolve(cache.coords);
   if (cache.kind === "unavailable") {
     return Promise.reject(cache.reason);
@@ -82,7 +101,14 @@ export function resolveCoords(): Promise<Coords> {
       return coords;
     })
     .catch((reason: GeoReason) => {
-      cache = { kind: "unavailable", reason: reason ?? "unsupported" };
+      cache = {
+        kind: "unavailable",
+        reason: reason ?? "unsupported",
+        retryAfter:
+          reason === "timeout" || reason === "unavailable"
+            ? Date.now() + GEO_RETRY_MS
+            : null,
+      };
       inflight = null;
       throw cache.reason;
     });
@@ -97,5 +123,10 @@ export function cachedCoords(): Coords | null {
 
 /** 当前是否已确定定位不可用（用户拒权限 / 非安全环境等） */
 export function isGeoUnavailable(): boolean {
-  return cache.kind === "unavailable";
+  return cache.kind === "unavailable" && !failureExpired();
+}
+
+/** 清除已有结果以允许显式重试；进行中的定位仍共享，结束后正常写缓存。 */
+export function resetGeo(): void {
+  cache = { kind: "unknown" };
 }

@@ -16,6 +16,12 @@
  */
 
 import { useState } from "react";
+import {
+  filterOptions,
+  toggleFilterFamily,
+  showsRegion,
+} from "@/lib/filter-options";
+import { PickerFilterPill as Opt } from "@/components/common/FilterPill";
 import { AnimatePresence, motion } from "framer-motion";
 import { familyList } from "@/config/cuisine";
 import { regionList } from "@/config/regions-cuisine";
@@ -29,21 +35,7 @@ type MenuFilterProps = {
   onRegionChange: (region: RegionKey) => void;
 };
 
-const MOODS: { key: Filters["mood"]; label: string; emoji: string }[] = [
-  { key: "any", label: "不挑心情", emoji: "🤙" },
-  { key: "spicy", label: "想吃点辣的", emoji: "🌶️" },
-  { key: "mild", label: "淡淡的就好", emoji: "🌿" },
-  { key: "meat", label: "大口吃肉", emoji: "🍖" },
-  { key: "light", label: "控卡轻食", emoji: "🥗" },
-];
-
-const BUDGETS: { key: Filters["budget"]; label: string; emoji: string }[] = [
-  { key: "any", label: "不限预算", emoji: "💸" },
-  { key: "budget", label: "随便吃点", emoji: "🪙" },
-  { key: "normal", label: "正常水平", emoji: "💵" },
-  { key: "treat", label: "想吃好的", emoji: "💎" },
-];
-
+const { moods: MOODS, budgets: BUDGETS } = filterOptions("picker");
 /** 风味家族多选 → 一句话摘要（填进 slot）。 */
 function familiesSummary(families: CuisineFamily[]): string {
   if (families.length === 0) return "不限口味";
@@ -81,36 +73,6 @@ function Slot({
 }
 
 /** 选项面板里的单个选项按钮。 */
-function Opt({
-  selected,
-  onClick,
-  emoji,
-  label,
-  multi = false,
-}: {
-  selected: boolean;
-  onClick: () => void;
-  emoji: string;
-  label: string;
-  multi?: boolean;
-}) {
-  return (
-    <button
-      {...(multi
-        ? { "aria-pressed": selected }
-        : { role: "radio", "aria-checked": selected })}
-      onClick={onClick}
-      className={`flex items-center gap-1.5 rounded-full border px-3.5 py-2 text-sm font-medium transition-all duration-200 active:scale-[0.94] ${
-        selected
-          ? "-translate-y-0.5 border-brand bg-brand text-white shadow-[0_5px_14px_rgb(var(--c-brand)_/_0.3)]"
-          : "border-brand/40 bg-surface text-ink-muted"
-      }`}
-    >
-      <span className="text-base leading-none">{emoji}</span>
-      {label}
-    </button>
-  );
-}
 
 type OpenSlot = null | "flavor" | "mood" | "budget";
 
@@ -124,17 +86,11 @@ export default function MenuFilter({
   const toggle = (slot: Exclude<OpenSlot, null>) =>
     setOpen((o) => (o === slot ? null : slot));
 
-  const toggleFamily = (fam: CuisineFamily) => {
-    const has = value.families.includes(fam);
-    const families = has
-      ? value.families.filter((f) => f !== fam)
-      : [...value.families, fam];
-    onChange({ ...value, families });
-  };
-
-  const showRegion =
-    value.families.length === 0 || value.families.includes("chinese");
-  const moodLabel = MOODS.find((m) => m.key === value.mood)?.label ?? "不挑心情";
+  const toggleFamily = (fam: CuisineFamily) =>
+    onChange(toggleFilterFamily(value, fam));
+  const showRegion = showsRegion(value);
+  const moodLabel =
+    MOODS.find((m) => m.key === value.mood)?.label ?? "不挑心情";
   const budgetLabel =
     BUDGETS.find((b) => b.key === value.budget)?.label ?? "不限预算";
 

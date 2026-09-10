@@ -1,6 +1,0 @@
-# /public/scenes/ — 饭点场景板绘底图（V3）
-#
-# 约定路径：{meal}.webp（breakfast / lunch / tea / dinner / midnight）
-# 由 PickerScene 的 SceneBitmap 消费；图缺失/加载失败时 onError 自隐，回落 --sky 渐变兜底。
-# 规格：约 780×1688（2x），WebP quality ~80，每张 ≤200KB。
-# 生图 prompt pack 见 ATMOSPHERE_REDESIGN_PLAN.md §二。

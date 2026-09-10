@@ -12,67 +12,30 @@
  * 查店走 useShops（同 /api/shops）。签文/吉位来自 config/divination。
  */
 
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useWaterDivination } from "@/hooks/useWaterDivination";
-import { useDivinationPick } from "@/hooks/useDivinationPick";
-import { useShops } from "@/hooks/useShops";
+import { useFoodOrchestration } from "@/hooks/useFoodOrchestration";
 import { verseFor, gradeFor } from "@/config/divination";
-import { addEntry } from "@/lib/diary";
-import { logPick, type PickAction } from "@/lib/pick-log";
-import { recordVisit } from "@/lib/regulars";
 import WaterAmbience from "@/components/features/water/WaterAmbience";
 import RippleLayer from "@/components/features/water/RippleLayer";
 import DivinationSlip from "@/components/features/water/DivinationSlip";
-import DriftCards, {
-  type DriftShop,
-} from "@/components/features/water/DriftCards";
+import DriftExplore from "@/components/features/water/DriftExplore";
 import WaterDiaryPanel from "@/components/features/water/WaterDiaryPanel";
 import WaterRecipePanel from "@/components/features/water/WaterRecipePanel";
 import FunnelFilter from "@/components/features/water/FunnelFilter";
 import MealSwitcher from "@/components/features/water/MealSwitcher";
-import CityPicker from "@/components/features/water/CityPicker";
 import StyleSwitch from "@/components/common/StyleSwitch";
 import { mealMeta } from "@/config/meals";
-import { keywordOf } from "@/lib/availability";
-import type { Shop } from "@/types/shop";
-import type { Food } from "@/types/food";
 
-/** 距离 number(米) → 展示字符串。null/0 时留空。 */
-function fmtDistance(d: number | null): string {
-  if (d === null) return "";
-  return d >= 1000 ? `${(d / 1000).toFixed(1)}km` : `${d}m`;
-}
-
-/** 严格匹配≥这个数就够选了，不必展开第二层 */
-const STRICT_ENOUGH = 4;
-
-/** Shop[] → DriftShop[]：emoji 用抽中那道菜的（店铺数据本身没 emoji）。
- *  tier="expansion" 的店带 category 标签（这家是哪类、为什么可能也卖）。 */
-function toDriftShops(
-  shops: Shop[],
-  emoji: string,
-  tier: "strict" | "expansion" = "strict",
-): DriftShop[] {
-  return shops.map((s) => ({
-    id: s.id,
-    emoji,
-    name: s.name,
-    distance: fmtDistance(s.distance),
-    location: s.location,
-    tier,
-    category: s.category ?? null,
-  }));
-}
+import { toShopCards as toDriftShops } from "@/lib/shop-format";
+import { STRICT_ENOUGH } from "@/lib/shop-policy";
 
 /** idle 签纸悬浮时的占位文案（还没抽，纸是空白的） */
 const EMPTY_REVEAL = { emoji: "", name: "", verse: "", grade: undefined };
 
 export default function WaterConceptPage() {
   const w = useWaterDivination();
-  const div = useDivinationPick();
-  const { shops, expansion, loading, error, fetched, needCity, fetchShops } = useShops();
-
   // 是否已离开筛选屏、进入水占场景
   const [entered, setEntered] = useState(false);
   // 覆盖面板：null=水占主流程 / "diary"=干饭日记 / "recipes"=自己做翻菜谱
@@ -80,26 +43,56 @@ export default function WaterConceptPage() {
   // 水占途中临时调口味的浮层（突然想吃某类时，不退出场景就能改 tag）
   const [quickFilter, setQuickFilter] = useState(false);
 
-  // 候选篮：连占时攒下的菜（不含当前签面那道，那道还在 div.pick）。
-  // 「定了」时把篮子 + 当前签面合并去重，作为一条干饭记录一次性写入。
-  const [basket, setBasket] = useState<Food[]>([]);
-  // 本轮已见过的菜 id（篮子 ∪ 跳过的 ∪ 当前签面）：传给 cast 硬排除，本轮定下前不重复。
-  // 用 ref 同步累积——recast 是异步的，要在调 cast 前一刻就把当前签面记进去，避免闭包拿旧值。
-  // 与跨天的 recentFoodIds 降权正交：那个是「最近吃过」，这个是「这一轮已经看过」。
-  const seenRef = useRef<Set<string>>(new Set());
-  // 本轮该「家族∩餐段」是否已翻遍（cast 返回 exhausted）：true 时停在水面提示换筛选，
-  // 不硬抽重复（A 方案）。换筛选 / 重新占 / 返回首页都会清掉它。
-  const [exhausted, setExhausted] = useState(false);
-  // 已定下的整桌（进探店后用；非空即「已定」，决定按钮形态 + 探店切菜）。
-  const [confirmed, setConfirmed] = useState<Food[]>([]);
-  // 探店时当前正在看哪道菜的店（confirmed 里的某道 id）。
-  const [exploringId, setExploringId] = useState<string | null>(null);
-  // 抽签并发硬锁：cast 是异步（定位 + 可用性查店可能很慢），若不锁，
-  // 快速重复点「投签/留下/换一道/重新占/就按这个」会启动多个 cast，晚返回的会
-  // 覆盖早返回的签面，且 seenRef/篮子/动画 phase 可能串线。ref 立即生效（不等重渲染），
-  // state 只用于 disable 按钮。div.verifying 只反映 hook 内部一次抽取，不足以拦住页面层连点。
-  const castingRef = useRef(false);
-  const [casting, setCasting] = useState(false);
+  const {
+    div,
+    shops,
+    expansion,
+    loading,
+    error,
+    fetched,
+    needCity,
+    geoReason,
+    basket,
+    exhausted,
+    confirmed,
+    exploringId,
+    exploringFood,
+    casting,
+    castError,
+    runCast,
+    onAddAndRecast,
+    onSkipAndRecast,
+    onFreshRecast,
+    removeFromBasket,
+    onConfirm,
+    onConfirmBasketOnly,
+    onHome,
+    onChangeFilters,
+    onChangeMeal,
+    onChangeRegion,
+    onPickExploreDish,
+    onReExplore,
+    onVisitShop,
+    onPickCity,
+    onRetryGeo,
+  } = useFoodOrchestration({
+    excludeCurrentOnFresh: true,
+    clearShopsOnHome: false,
+    onCastStart: (mode) => {
+      if (mode !== "initial") w.reset();
+    },
+    onCastResult: ({ food }) => {
+      if (food) w.cast();
+    },
+    onCastFailed: () => w.reset(),
+    onExplore: () => w.explore(),
+    onHome: () => {
+      w.reset();
+      setQuickFilter(false);
+      setEntered(false);
+    },
+  });
+  const onCast = () => runCast();
 
   const committed = confirmed.length > 0;
   const splashing = w.phase === "splash" || w.phase === "revealing";
@@ -119,197 +112,6 @@ export default function WaterConceptPage() {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [div.pick?.id]);
-
-  // 投签：先抽菜（含定位+可用性门控），定下来再启动落水动画，避免签纸落下时还没菜。
-  // 首签——本轮还没见过任何菜，seen 传当前累积（正常为空）。
-  const onCast = async () => {
-    if (castingRef.current) return; // 并发硬锁：一次只允许一个 cast 在途
-    castingRef.current = true;
-    setCasting(true);
-    try {
-      const { food, exhausted } = await div.cast(seenRef.current);
-      if (food) {
-        seenRef.current.add(food.id);
-        setExhausted(false);
-        w.cast();
-      } else if (exhausted) {
-        setExhausted(true);
-      }
-    } finally {
-      castingRef.current = false;
-      setCasting(false);
-    }
-  };
-
-  // 直接再抽一签：回到水面（隐去旧签面）后立刻投签抽新菜并落水，
-  // 不再停在「投签入水」按钮等用户二次点击。div 不 reset。
-  // 关键：抽之前把「当前签面」记进 seen——无论用户留下还是跳过，它都已被看过，本轮不该再现。
-  const recastNow = async () => {
-    if (castingRef.current) return; // 并发硬锁：与 onCast 共用，杜绝多个 cast 串线
-    castingRef.current = true;
-    setCasting(true);
-    try {
-      if (div.pick) seenRef.current.add(div.pick.id);
-      w.reset(); // phase→idle，旧签面隐去（这一拍批量更新，紧接 cast 转 casting，不会真停在 idle）
-      const { food, exhausted } = await div.cast(seenRef.current);
-      if (food) {
-        seenRef.current.add(food.id);
-        setExhausted(false);
-        w.cast();
-      } else if (exhausted) {
-        // 这个口味∩餐段都翻遍了：不硬抽重复，停在水面提示用户换筛选（A 方案）。
-        setExhausted(true);
-      }
-    } finally {
-      castingRef.current = false;
-      setCasting(false);
-    }
-  };
-
-  // 埋点：记录当前签面那道菜的处置（accept/reroll）。纯本地、只记录、不改任何抽签行为。
-  // budget 取自当前筛选，用于将来切「想吃好的时各实体接受率」这类条件信号。
-  const logCurrent = (action: PickAction) => {
-    if (div.pick) logPick(div.pick, div.filters.budget, action, Date.now());
-  };
-
-  // 攒一道再占：把当前签面收入候选篮，然后立刻抽下一签（连占）。
-  const onAddAndRecast = () => {
-    if (div.pick) {
-      logCurrent("accept"); // 留下 = 接受当前签面
-      setBasket((prev) =>
-        prev.some((f) => f.id === div.pick!.id) ? prev : [...prev, div.pick!],
-      );
-    }
-    void recastNow();
-  };
-
-  // 不要当前这道、但保留已攒的：直接抽下一签（cast 内部自动避开刚抽的这道）。
-  const onSkipAndRecast = () => {
-    logCurrent("reroll"); // 换一道 = 拒绝当前签面
-    void recastNow();
-  };
-
-  // 不收这道、单纯换一签（已定后从头开始也走这里）：清空已定/篮子，重抽。
-  // 「这套都不要，重新占」——本轮重来，seen 清空。
-  const onFreshRecast = () => {
-    logCurrent("reroll"); // 这套都不要 = 拒绝当前签面
-    setBasket([]);
-    setConfirmed([]);
-    setExploringId(null);
-    seenRef.current = new Set();
-    setExhausted(false); // 新一轮，清掉「翻遍了」
-    void recastNow();
-  };
-
-  // 从候选篮移除某道（抽到不想要的可丢掉）
-  const removeFromBasket = (id: string) => {
-    setBasket((prev) => prev.filter((f) => f.id !== id));
-  };
-
-  // 把一桌菜定下来：写一条干饭日记（含全部菜），进探店看第一道。
-  // 一桌定了 = 本轮决策结束，seen 清空（下次从头占不受这轮影响）。
-  const commitTable = (table: Food[]) => {
-    if (table.length === 0) return;
-    addEntry(table, div.meal, Date.now());
-    setConfirmed(table);
-    setBasket([]);
-    seenRef.current = new Set();
-    setExhausted(false);
-    const first = table[0];
-    setExploringId(first.id);
-    w.explore();
-    fetchShops(keywordOf(first));
-  };
-
-  // 定了（含当前签面）：候选篮 + 当前这道合并去重 = 今天这一桌。
-  // 篮子为空时就是「只定当前这一道」；有篮子时把当前这道也算上。
-  const onConfirm = () => {
-    logCurrent("accept"); // 定了 = 接受当前签面
-    const table: Food[] = [];
-    for (const f of [...basket, ...(div.pick ? [div.pick] : [])]) {
-      if (!table.some((x) => x.id === f.id)) table.push(f);
-    }
-    commitTable(table);
-  };
-
-  // 只定已攒的这几道（不要当前签面这道）：篮子非空时给的出口，
-  // 解决「抽到第三道不想要、但要定下前两道」——按逻辑就该是 2 道，不被迫凑 3 道。
-  const onConfirmBasketOnly = () => {
-    logCurrent("reroll"); // 不要当前这道 = 拒绝当前签面
-    commitTable([...basket]);
-  };
-
-  // 返回首页（筛选屏）：清空全部水占状态，回到「开始投签」。
-  const onHome = () => {
-    w.reset();
-    div.reset();
-    setBasket([]);
-    setConfirmed([]);
-    setExploringId(null);
-    seenRef.current = new Set();
-    setExhausted(false);
-    setQuickFilter(false);
-    setEntered(false);
-  };
-
-  // 改筛选（家族/餐段/预算/地区）会改变抽签池上下文，「翻遍了」不再成立——清掉它。
-  // 包一层 div 的 setter，UI 一律用这几个，保证哪改都生效。
-  const onChangeFilters = (next: typeof div.filters) => {
-    setExhausted(false);
-    div.setFilters(next);
-  };
-  const onChangeMeal = (next: typeof div.meal) => {
-    setExhausted(false);
-    div.setMeal(next);
-  };
-  const onChangeRegion = (next: typeof div.region) => {
-    setExhausted(false);
-    div.setRegion(next);
-  };
-
-  // 已定后再次「循此而去」：不重复记日记，直接回探店看当前那道。
-  const onReExplore = () => {
-    w.explore();
-    const target = confirmed.find((f) => f.id === exploringId) ?? confirmed[0];
-    if (target) fetchShops(keywordOf(target));
-  };
-
-  // 探店里切看另一道菜的店
-  const onPickExploreDish = (id: string) => {
-    const target = confirmed.find((f) => f.id === id);
-    if (!target) return;
-    setExploringId(id);
-    fetchShops(keywordOf(target));
-  };
-
-  // 点「一键导航」跳高德那下记常客信号（真意图，喂给已在读取的熟悉度加权）。
-  // 用当前正在探店的那道菜作上下文（多道时取 exploringId）。
-  const onVisitShop = (shop: DriftShop) => {
-    const food =
-      confirmed.find((f) => f.id === exploringId) ?? confirmed[0] ?? div.pick;
-    if (!food) return;
-    recordVisit(
-      {
-        shopId: shop.id,
-        shopName: shop.name,
-        foodId: food.id,
-        cuisine: food.cuisine,
-        kind: food.kind,
-      },
-      Date.now(),
-    );
-  };
-
-  // 定位失败时用户手输城市后重查（城市兜底）。
-  const onPickCity = (city: string) => {
-    const target =
-      confirmed.find((f) => f.id === exploringId) ?? confirmed[0] ?? div.pick;
-    if (target) fetchShops(keywordOf(target), city);
-  };
-
-  // 当前正在探店的菜（emoji / 名字用它）
-  const exploringFood =
-    confirmed.find((f) => f.id === exploringId) ?? confirmed[0] ?? div.pick;
 
   // 展示用店（两级）：先严格匹配；严格 < STRICT_ENOUGH 时把第二层「同类店」
   // 也拼进漂卡流（带 category 标签），让选择太少时也有得挑。emoji 用当前探店那道菜的。
@@ -333,6 +135,14 @@ export default function WaterConceptPage() {
         }}
       />
 
+      {castError && (
+        <p
+          role="alert"
+          className="relative z-50 p-4 text-center text-accent-pink"
+        >
+          {castError}
+        </p>
+      )}
       <WaterAmbience />
 
       {/* 涟漪交互层：常驻渲染（筛选屏也在），点裸露水面起涟漪；
@@ -346,7 +156,9 @@ export default function WaterConceptPage() {
 
       {/* 顶部标题 */}
       <div className="pointer-events-none absolute top-10 z-40 w-full text-center">
-        <div className="text-xl tracking-[0.5em] text-brand-soft">今 日 饭 签</div>
+        <div className="text-xl tracking-[0.5em] text-brand-soft">
+          今 日 饭 签
+        </div>
         <div className="mt-2 text-[11px] tracking-[0.4em] text-brand-soft/60">
           MODERN WATER DIVINATION
         </div>
@@ -500,7 +312,7 @@ export default function WaterConceptPage() {
                     <button
                       onClick={() => {
                         setQuickFilter(false);
-                        void recastNow();
+                        void runCast("recast");
                       }}
                       disabled={casting}
                       className="water-action-primary rounded-full px-6 py-3 text-sm font-medium text-ink/80 disabled:opacity-50"
@@ -528,6 +340,8 @@ export default function WaterConceptPage() {
                 fetched={fetched}
                 error={error}
                 needCity={needCity}
+                geoReason={geoReason}
+                onRetryGeo={onRetryGeo}
                 shops={driftShops}
                 dishName={exploringFood?.name ?? ""}
                 dishes={confirmed}
@@ -557,7 +371,8 @@ export default function WaterConceptPage() {
                     <div className="flex max-w-[80vw] flex-col items-center gap-2 rounded-2xl border border-white/55 bg-white/55 px-5 py-3 text-center backdrop-blur">
                       <p className="text-sm leading-relaxed text-ink/80">
                         这个口味的都给你翻遍啦
-                        {basket.length > 0 ? "，已攒的可以直接定，或" : "，"}换个筛选再占？
+                        {basket.length > 0 ? "，已攒的可以直接定，或" : "，"}
+                        换个筛选再占？
                       </p>
                       {/* 已攒了菜时，翻遍了也别把篮子困死：给一条定下出口（修 exhausted 困住 basket）。 */}
                       {basket.length > 0 && (
@@ -655,10 +470,14 @@ export default function WaterConceptPage() {
                           onClick={() => removeFromBasket(f.id)}
                           title="点一下丢掉这道"
                           className="group flex items-center gap-1 rounded-full border border-white/60 bg-white/55 px-2.5 py-1 text-xs text-ink/75 backdrop-blur transition-colors hover:border-accent-pink/50"
-                          style={{ boxShadow: "0 2px 8px rgba(150,179,170,0.15)" }}
+                          style={{
+                            boxShadow: "0 2px 8px rgba(150,179,170,0.15)",
+                          }}
                         >
                           <span>{f.emoji}</span>
-                          <span className="max-w-[6rem] truncate">{f.name}</span>
+                          <span className="max-w-[6rem] truncate">
+                            {f.name}
+                          </span>
                           <span className="text-ink-muted/40 group-hover:text-accent-pink">
                             ×
                           </span>
@@ -728,175 +547,5 @@ export default function WaterConceptPage() {
         </>
       )}
     </main>
-  );
-}
-
-/**
- * 探店层包装：处理 loading / 定位失败选城市 / 有店 / 真空 四态。
- * DriftCards 只管渲染卡片，其余状态在这里兜（loading/需选城市/有店/真空 都不留白）。
- */
-function DriftExplore({
-  loading,
-  fetched,
-  error,
-  needCity,
-  shops,
-  dishName,
-  dishes,
-  activeId,
-  onPickDish,
-  onPickCity,
-  onVisit,
-  onClose,
-  onHome,
-}: {
-  loading: boolean;
-  fetched: boolean;
-  /** useShops 的错误信息；非空 = 真·查询失败（区别于「搜完 0 家」），要如实提示+给重试，别伪装成「附近没有」 */
-  error: string | null;
-  needCity: boolean;
-  shops: DriftShop[];
-  dishName: string;
-  /** 已定的整桌；>1 道时顶部出现切菜 chips */
-  dishes: Food[];
-  activeId: string | null;
-  onPickDish: (id: string) => void;
-  onPickCity: (city: string) => void;
-  onVisit: (shop: DriftShop) => void;
-  onClose: () => void;
-  /** 返回首页（筛选屏），重置全部状态 */
-  onHome: () => void;
-}) {
-  // 多道菜时，顶部一排可切换的菜 chip：点哪道看哪道的店。
-  const switcher =
-    dishes.length > 1 ? (
-      <div className="pointer-events-auto absolute left-1/2 top-20 z-40 flex max-w-[88vw] -translate-x-1/2 flex-wrap items-center justify-center gap-1.5">
-        {dishes.map((f) => {
-          const active = f.id === activeId;
-          return (
-            <button
-              key={f.id}
-              onClick={() => onPickDish(f.id)}
-              aria-pressed={active}
-              className="flex items-center gap-1 rounded-full px-2.5 py-1 text-xs backdrop-blur transition-colors"
-              style={{
-                background: active
-                  ? "rgba(150,179,170,0.45)"
-                  : "rgba(255,255,255,0.5)",
-                border: active
-                  ? "1px solid rgba(255,255,255,0.8)"
-                  : "1px solid rgba(255,255,255,0.45)",
-                color: active ? "rgb(var(--c-ink))" : "rgb(var(--c-brand-soft))",
-                fontWeight: active ? 600 : 400,
-              }}
-            >
-              <span>{f.emoji}</span>
-              <span className="max-w-[6rem] truncate">{f.name}</span>
-            </button>
-          );
-        })}
-      </div>
-    ) : null;
-
-  // 有店（严格 shops 或第二层扩展店）→ 漂卡
-  if (!loading && fetched && shops.length > 0) {
-    return (
-      <>
-        {switcher}
-        <DriftCards
-          shops={shops}
-          onClose={onClose}
-          onVisit={onVisit}
-          onHome={onHome}
-        />
-      </>
-    );
-  }
-
-  return (
-    <motion.div
-      className="water-depth-overlay absolute inset-0 z-30 flex flex-col items-center justify-end pb-16"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-    >
-      {switcher}
-      {loading ? (
-        <div className="flex flex-col items-center gap-3">
-          <p className="mb-20 text-sm tracking-[0.2em] text-brand-soft">
-            — 正在水底寻店… —
-          </p>
-          <button
-            onClick={onClose}
-            className="text-sm text-brand-soft transition-colors hover:text-accent"
-          >
-            ↑ 收回签纸
-          </button>
-        </div>
-      ) : needCity ? (
-        // 定位失败：让用户手输城市兜底
-        <div className="mb-16 flex w-full max-w-xs flex-col items-center gap-3 rounded-2xl border border-brand/20 bg-white/85 px-5 py-4 backdrop-blur-md">
-          <p className="text-center text-xs leading-relaxed text-ink-muted/80">
-            没拿到你的位置，滚动选个城市，看看哪儿能吃到「{dishName}」：
-          </p>
-          <CityPicker onConfirm={onPickCity} />
-          <div className="mt-1 flex items-center gap-4">
-            <button
-              onClick={onClose}
-              className="text-xs text-brand-soft transition-colors hover:text-accent"
-            >
-              ↑ 收回签纸
-            </button>
-            <button
-              onClick={onHome}
-              className="text-xs text-brand-soft transition-colors hover:text-accent"
-            >
-              🏠 返回首页
-            </button>
-          </div>
-        </div>
-      ) : error && !needCity ? (
-        // 真·查询失败（网络/接口报错）：如实说，给重试，别伪装成「附近没有」误导用户。
-        <div className="mb-16 flex w-full max-w-xs flex-col items-center gap-3 rounded-2xl border border-accent-pink/30 bg-white/85 px-5 py-4 text-center backdrop-blur-md">
-          <p className="text-sm leading-relaxed text-accent-pink">{error}</p>
-          <p className="text-xs text-ink-muted/70">网络或服务出了点岔子，不是附近没有。</p>
-          <div className="mt-1 flex items-center gap-4">
-            <button
-              onClick={onClose}
-              className="text-xs text-brand-soft transition-colors hover:text-accent"
-            >
-              ↑ 收回签纸
-            </button>
-            <button
-              onClick={onHome}
-              className="text-xs text-brand-soft transition-colors hover:text-accent"
-            >
-              🏠 返回首页
-            </button>
-          </div>
-        </div>
-      ) : (
-        // 真·附近没有（高德也翻不出相关店）
-        <div className="flex flex-col items-center gap-3">
-          <p className="mb-20 text-sm tracking-[0.2em] text-brand-soft">
-            — 这会儿附近没寻到卖「{dishName}」的店，换一签试试 —
-          </p>
-          <div className="flex items-center gap-4">
-            <button
-              onClick={onClose}
-              className="text-sm text-brand-soft transition-colors hover:text-accent"
-            >
-              ↑ 收回签纸
-            </button>
-            <button
-              onClick={onHome}
-              className="text-sm text-brand-soft transition-colors hover:text-accent"
-            >
-              🏠 返回首页
-            </button>
-          </div>
-        </div>
-      )}
-    </motion.div>
   );
 }

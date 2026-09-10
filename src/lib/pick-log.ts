@@ -1,5 +1,7 @@
 "use client";
 
+import { safeGetList, safeSetList, safeRemove } from "./storage-safe";
+
 /**
  * 抽签埋点（pick-log）
  * ─────────────────────────────────────────────
@@ -15,6 +17,13 @@
  */
 
 import type { EntityType, PriceTier } from "@/types/food";
+import {
+  isRecord,
+  isText,
+  isTimestamp,
+  isEntityType,
+  isPriceTier,
+} from "./food-validation";
 
 const STORAGE_KEY = "foodie:picklog";
 /**
@@ -59,23 +68,29 @@ export interface PickLogEntry {
 
 /** 读全部记录（时间升序）。任何异常退化为空数组。 */
 export function getPickLog(): PickLogEntry[] {
-  if (typeof window === "undefined") return [];
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return [];
-    const parsed = JSON.parse(raw) as unknown;
-    if (!Array.isArray(parsed)) return [];
-    return parsed.filter(
-      (e): e is PickLogEntry =>
-        !!e &&
-        typeof (e as PickLogEntry).ts === "number" &&
-        typeof (e as PickLogEntry).entityType === "string" &&
-        ((e as PickLogEntry).action === "accept" ||
-          (e as PickLogEntry).action === "reroll"),
-    );
-  } catch {
-    return [];
-  }
+  return safeGetList(STORAGE_KEY, (e): PickLogEntry | null => {
+    if (
+      isRecord(e) &&
+      isTimestamp(e.ts) &&
+      isText(e.foodId) &&
+      isText(e.name) &&
+      isEntityType(e.entityType) &&
+      isPriceTier(e.priceTier) &&
+      (e.budget === "any" || isPriceTier(e.budget)) &&
+      (e.action === "accept" || e.action === "reroll")
+    ) {
+      return {
+        ts: e.ts,
+        foodId: e.foodId,
+        name: e.name,
+        entityType: e.entityType,
+        priceTier: e.priceTier,
+        budget: e.budget,
+        action: e.action,
+      };
+    }
+    return null;
+  });
 }
 
 /**
@@ -83,37 +98,32 @@ export function getPickLog(): PickLogEntry[] {
  * 写失败（满了/隐私模式）静默忽略，绝不影响主流程。
  */
 export function logPick(
-  food: { id: string; name: string; entityType: EntityType; priceTier: PriceTier },
+  food: {
+    id: string;
+    name: string;
+    entityType: EntityType;
+    priceTier: PriceTier;
+  },
   budget: string,
   action: PickAction,
   now: number,
 ): void {
-  if (typeof window === "undefined") return;
-  try {
-    const log = getPickLog();
-    log.push({
-      ts: now,
-      foodId: food.id,
-      name: food.name,
-      entityType: food.entityType,
-      priceTier: food.priceTier,
-      budget,
-      action,
-    });
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(trimPickLog(log)));
-  } catch {
-    // 忽略写入失败
-  }
+  const log = getPickLog();
+  log.push({
+    ts: now,
+    foodId: food.id,
+    name: food.name,
+    entityType: food.entityType,
+    priceTier: food.priceTier,
+    budget,
+    action,
+  });
+  safeSetList(STORAGE_KEY, trimPickLog(log));
 }
 
 /** 清空埋点（调试/重新收集用） */
 export function clearPickLog(): void {
-  if (typeof window === "undefined") return;
-  try {
-    localStorage.removeItem(STORAGE_KEY);
-  } catch {
-    // 忽略
-  }
+  safeRemove(STORAGE_KEY);
 }
 
 /** 按 entityType 聚合的接受率统计 */

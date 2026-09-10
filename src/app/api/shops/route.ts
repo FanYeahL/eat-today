@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
-import type { Shop, ShopsResponse } from "@/types/shop";
+import type { ShopsResponse } from "@/types/shop";
+import { normalizeShops, str } from "@/lib/shop-poi";
+import { isRecord } from "@/lib/food-validation";
 import {
   parseShopQuery,
   isQueryError,
@@ -75,8 +77,8 @@ async function fetchAmap(
     }
     await passThrottle(); // 过全局限流闸再打高德
     const res = await fetchWithTimeout(`${endpoint}?${qs}`, {
-      // 高德数据有时效性，但同条件短时间内可缓存，降低额度消耗
-      next: { revalidate: 60 },
+      // HTTP 200 也可能是业务限流；每次退避重试必须真实请求上游。
+      cache: "no-store",
     });
     data = (await res.json()) as Record<string, unknown>;
     if (data.status === "1") return data;
@@ -85,57 +87,6 @@ async function fetchAmap(
     if (!info.includes("CUQPS")) return data;
   }
   return data; // 重试到底仍超限，返回最后一次（上层据 status 报错）
-}
-
-/**
- * 高德字段缺失时返回空数组 []，存在时返回字符串。
- * 统一成 string | null。
- */
-function str(value: unknown): string | null {
-  if (typeof value === "string" && value.trim() !== "") return value;
-  return null;
-}
-
-/** 把高德一条 POI 归一化成我们的 Shop */
-function toShop(poi: Record<string, unknown>): Shop {
-  const bizExt = (poi.biz_ext ?? {}) as Record<string, unknown>;
-  const ratingRaw = str(bizExt.rating);
-  const distanceRaw = str(poi.distance);
-
-  return {
-    id: String(poi.id ?? poi.name ?? Math.random()),
-    name: str(poi.name) ?? "未知店铺",
-    address: str(poi.address) ?? "地址信息缺失",
-    distance: distanceRaw !== null ? Number(distanceRaw) : null,
-    rating: ratingRaw !== null ? Number(ratingRaw) : null,
-    tel: str(poi.tel),
-    location: str(poi.location) ?? "",
-    category: categoryOf(poi),
-  };
-}
-
-/**
- * 从高德 type 提炼「店类型」短标签，给第二层扩展推荐展示。
- * 高德 type 是「大类;中类;小类」三级（如「餐饮服务;快餐厅;快餐厅」），
- * 取中段最具体且对用户有意义——「快餐厅 / 咖啡厅 / 糕饼店 / 甜品店」。
- * 中段是泛词（餐饮相关场所/餐饮相关）时退到小段，仍泛就返回 null（不硬贴标签）。
- */
-const VAGUE_CATEGORY = new Set([
-  "餐饮相关场所",
-  "餐饮相关",
-  "餐饮服务",
-  "",
-]);
-function categoryOf(poi: Record<string, unknown>): string | null {
-  const type = str(poi.type);
-  if (!type) return null;
-  const segs = type.split(";").map((s) => s.trim());
-  // 优先中段，泛词则退小段
-  const mid = segs[1] ?? "";
-  if (mid && !VAGUE_CATEGORY.has(mid)) return mid;
-  const last = segs[segs.length - 1] ?? "";
-  if (last && !VAGUE_CATEGORY.has(last)) return last;
-  return null;
 }
 
 /**
@@ -169,12 +120,14 @@ function isRelevant(poi: Record<string, unknown>, keyword: string): boolean {
  * 搜「川菜」返回的就是川菜馆。所以这条只在「高德认为匹配、但 type 措辞与我们的词不同字面」
  * 时兜底，方向只会减少假阴性（门控本就该问「附近有没有这类店」，高德已替我们判过了）。
  */
-function isGateRelevant(poi: Record<string, unknown>, keyword: string): boolean {
+function isGateRelevant(
+  poi: Record<string, unknown>,
+  keyword: string,
+): boolean {
   if (isRelevant(poi, keyword)) return true;
   const type = str(poi.type);
   return type !== null && type.includes("餐饮");
 }
-
 
 export async function GET(request: Request) {
   const key = process.env.AMAP_KEY;
@@ -192,9 +145,13 @@ export async function GET(request: Request) {
   // 必须取整页 + 相关性过滤后再数，才与展示一致、不假阳性。
   const parsed = parseShopQuery(searchParams);
   if (isQueryError(parsed)) {
-    return NextResponse.json({ error: parsed.error }, { status: parsed.status });
+    return NextResponse.json(
+      { error: parsed.error },
+      { status: parsed.status },
+    );
   }
   const { keyword, city, lng, lat, useAround, countOnly } = parsed;
+  // lng/lat 已由采集点归一化为高德坐标；这里不得再次做 WGS-84 转换。
 
   // 有经纬度走周边搜索（按距离排序），否则走城市关键字搜索
   const via: ShopsResponse["via"] = useAround ? "location" : "city";
@@ -225,15 +182,17 @@ export async function GET(request: Request) {
     const data = await fetchAmap(endpoint, params.toString());
 
     if (data.status !== "1") {
+      console.error("[api/shops] amap failure", {
+        info: str(data.info),
+        infocode: str(data.infocode),
+      });
       return NextResponse.json(
         { error: `高德接口返回错误：${str(data.info) ?? "未知"}` },
         { status: 502 },
       );
     }
 
-    const pois = Array.isArray(data.pois)
-      ? (data.pois as Record<string, unknown>[])
-      : [];
+    const pois = Array.isArray(data.pois) ? data.pois.filter(isRecord) : [];
 
     // count 模式（门控）：用放宽相关性，回「附近有几家这类店」。
     // 过滤后为 0 = 附近确实没这类店，门控据此把菜排除出候选池，从根上避免「抽到没地方吃」。
@@ -246,19 +205,18 @@ export async function GET(request: Request) {
 
     // 展示列表第一层：严格相关性过滤，踢掉高德模糊匹配带进来的噪音店。
     const relevant = pois.filter((poi) => isRelevant(poi, keyword));
-    const shops = relevant.map(toShop);
+    const strictIds = new Set<string>();
+    const shops = normalizeShops(relevant, strictIds);
 
     // 第二层·扩展推荐：同一次搜索里、严格匹配筛掉的同类店（赛百味/巴黎贝甜这种
     // 店名不含菜名、但高德认为相关、常供应这道的店）。始终算出来一并返回，
     // 由前端按阈值决定展不展示——这就把「严格匹配只有 1~2 家、选择太少」这个
     // 第三态接住了，不再二元地只在 0 家时兜底。
     // 用 id 去重，避免与严格层重复；不调第二次高德、不维护菜系表，零额外成本。
-    const strictIds = new Set(shops.map((s) => s.id));
-    const expansion = pois
-      .filter((poi) => !isRelevant(poi, keyword)) // 严格层之外的
-      .map(toShop)
-      .filter((s) => !strictIds.has(s.id))
-      .slice(0, PAGE_SIZE);
+    const expansion = normalizeShops(
+      pois.filter((poi) => !isRelevant(poi, keyword)),
+      strictIds,
+    ).slice(0, PAGE_SIZE);
 
     const payload: ShopsResponse = {
       shops,
@@ -266,7 +224,19 @@ export async function GET(request: Request) {
       ...(expansion.length > 0 ? { expansion } : {}),
     };
     return NextResponse.json(payload);
-  } catch {
+  } catch (err) {
+    // 不记录带 key/坐标的请求 URL；保留错误类型和已脱敏消息。
+    const message =
+      err instanceof Error
+        ? err.message
+            .split(key)
+            .join("[redacted]")
+            .replace(/https?:\/\/\S+/g, "[url]")
+        : "Unknown error";
+    console.error("[api/shops] request failed", {
+      name: err instanceof Error ? err.name : "UnknownError",
+      message,
+    });
     return NextResponse.json(
       { error: "请求高德接口失败，请稍后重试。" },
       { status: 502 },

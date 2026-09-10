@@ -21,9 +21,13 @@ export function pickRandom<T>(arr: T[]): T {
 }
 
 /** 取一道随机菜，尽量避开上一道（池子够大时循环重抽成本极低） */
-export function pickNextRecipe(avoidId: string | null): RecipeIndexEntry {
-  if (ALL_RECIPES.length <= 1) return ALL_RECIPES[0];
+export function pickNextRecipe(
+  avoidId: string | null,
+): RecipeIndexEntry | null {
+  if (ALL_RECIPES.length <= 1) return ALL_RECIPES[0] ?? null;
   let next = pickRandom(ALL_RECIPES);
-  while (next.id === avoidId) next = pickRandom(ALL_RECIPES);
+  // 极端脏数据（id 全重复）或恒定随机源也必须结束；达到上限允许重复。
+  for (let tries = 0; next.id === avoidId && tries < 20; tries++)
+    next = pickRandom(ALL_RECIPES);
   return next;
 }

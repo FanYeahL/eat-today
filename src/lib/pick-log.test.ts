@@ -1,9 +1,57 @@
-import { describe, it, expect } from "vitest";
+import { afterEach, describe, it, expect, vi } from "vitest";
+import { mockStorage } from "./storage-test-helpers";
 import {
   trimPickLog,
   MAX_PICKLOG_ENTRIES,
   type PickLogEntry,
+  getPickLog,
+  logPick,
+  acceptanceByEntity,
 } from "@/lib/pick-log";
+
+afterEach(() => vi.unstubAllGlobals());
+describe("pick log storage boundary", () => {
+  it("filters corrupt records and preserves valid acceptance statistics", () => {
+    const storage = mockStorage();
+    const [entry] = makeLog(1);
+    storage.setItem(
+      "foodie:picklog",
+      JSON.stringify([
+        null,
+        { ts: 0, entityType: "dish", action: "accept" },
+        { ...entry, priceTier: "bad" },
+        entry,
+      ]),
+    );
+    expect(getPickLog()).toEqual([entry]);
+    logPick(
+      { id: "f", name: "菜", entityType: "dish", priceTier: "normal" },
+      "any",
+      "reroll",
+      1,
+    );
+    expect(acceptanceByEntity()).toEqual([
+      { entityType: "dish", shown: 2, accepted: 1, acceptRate: 0.5 },
+    ]);
+  });
+  it("tolerates invalid JSON, SSR and failed writes", () => {
+    expect(getPickLog()).toEqual([]);
+    const storage = mockStorage();
+    storage.setItem("foodie:picklog", "{");
+    expect(getPickLog()).toEqual([]);
+    storage.setItem.mockImplementation(() => {
+      throw new Error("full");
+    });
+    expect(() =>
+      logPick(
+        { id: "f", name: "菜", entityType: "dish", priceTier: "normal" },
+        "any",
+        "accept",
+        0,
+      ),
+    ).not.toThrow();
+  });
+});
 
 /** 造 n 条时间升序的假埋点（ts 从 0 递增） */
 function makeLog(n: number): PickLogEntry[] {

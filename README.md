@@ -12,7 +12,7 @@
 - **TypeScript**
 - **Tailwind CSS 3**
 - **framer-motion**（水占 / 抽签动效）
-- **Vitest**（纯逻辑单测）
+- **Vitest**（纯逻辑、存储边界与 hook 行为测试；hook 使用局部 jsdom 环境）
 - 店铺搜索经服务端 Route Handler 代理**高德地图 Web 服务 API**，key 只留在服务端
 - 菜谱数据来自开源项目 **HowToCook**，构建期离线清洗成本地 JSON
 
@@ -69,20 +69,28 @@ npm run audit:ci     # 安全门：critical 零容忍 + 挡新引入的 high
 
 CI（`.github/workflows/verify.yml`）在 push / PR 到 `main` 时依次跑 `verify` → `build` → `audit:ci`。
 
+业务编排由 `src/hooks/useFoodOrchestration.ts` 共享，两主题分别维护视觉相位。
+定位在 `src/lib/geo.ts` 采集处转换后再供高德查询使用；采用粗略矩形边界，
+盒外原样返回，盒内包含部分境外区域，不能理解为精确国界判断。
+瞬时定位失败冷却 30 秒后允许重试，也可从找店页面显式重试。
+
+历史数据规格见 [归档规格](docs/archive/DB_REBUILD_SPEC.md)，一次性脚本见
+[脚本归档说明](scripts/archive/README.md)。现行场景图规格见 [图片说明](docs/SCENE_ASSETS.md)。
+
 ### 依赖安全说明
 
 `npm run audit:ci` 的判定规则见 `scripts/audit-ci.mjs`：**任何 critical 一律失败**，
 任何未登记的 high 也失败。已知、当前只能靠跨大版本升级消除的漏洞登记在脚本的 `BASELINE` 里，
-既不让 CI 假绿、也不长期假红。
+清单不是永久安全证明，需要按最新公告复核。网络失败或报告不完整同样会让门禁失败。
 
-**当前安全状态（如实说明，勿理解为"已达完全上线安全"）：** 已把 Vitest 链升到 4.x，
-消除了原先的 1 个 critical 及全部 vite/esbuild 相关（dev）漏洞；已建立 `audit:ci` 门禁并登记剩余风险。
-但仍有 **已登记、未消除的漏洞**，其中包含 **生产依赖 Next.js 的 1 个 high + 1 个 moderate**
-（另有 eslint-config-next 链路 3 个 high，属 dev 依赖）。这些均只能升级到
-**Next 16 / eslint-config-next 16**（大版本、含破坏性变更）才能消除，本轮未盲升。
+**本轮核查状态（2026-09-11）：`audit:ci` 未通过。** `npm audit` 报告
+1 个 critical、7 个 high、2 个 moderate（按受影响包计数），其中生产依赖 Next.js
+包含 critical。对比本轮修改前后的锁文件，报告涉及的包版本未发生变化，属于既有依赖风险，
+不能因业务测试和构建通过就认定可以安全发布。
 
-结论：**门禁已建立、剩余风险已登记，Next 生产依赖漏洞待「Next 16 升级」专项处理**。
-升级完成后请重跑 `npm audit` 并据实清理 `BASELINE` 中已消除的条目。
+本轮没有扩大 `BASELINE`，也没有执行框架大版本升级。需单独评估 Next.js 升级和其余依赖的
+补丁更新，完成后重跑安全审计并清理已失效的豁免项。具体交付边界见
+[修复验收说明](docs/REPAIR_NOTES.md)。
 
 ## 部署（CloudBase 云托管 / Docker）
 
